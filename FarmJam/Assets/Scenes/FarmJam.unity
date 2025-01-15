@@ -166,8 +166,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TileList: []
   GridTilePrefab: {fileID: 4696141928495056421, guid: 43422fc1354449841a8a80b9a8edec13, type: 3}
-  xValue: 5
-  yValue: 5
+  xValue: 7
+  yValue: 4
   MiddlePoint: {fileID: 924880745}
 --- !u!1 &811948467
 GameObject:
@@ -229,7 +229,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 65
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -255,13 +255,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811948467}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5735764, y: 0, z: 0, w: 0.8191521}
-  m_LocalPosition: {x: 0, y: 1.62, z: -0.3}
+  m_LocalRotation: {x: 0.6427876, y: 0, z: 0, w: 0.7660445}
+  m_LocalPosition: {x: 0, y: 11.37, z: -0.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 70, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 80, y: 0, z: 0}
 --- !u!114 &811948471
 MonoBehaviour:
   m_ObjectHideFlags: 0

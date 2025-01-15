@@ -14,7 +14,8 @@ public class GridTileManager : MonoBehaviour
 
     public void Init()
     {
-        
+        GenerateGridTiles();
+        CalculateMiddlePoint();
     }
 
     public void Disable()
@@ -45,15 +46,13 @@ public class GridTileManager : MonoBehaviour
         for (int i = 0; i < xValue; i++)
         {
             for (int j = 0; j < yValue; j++)
-            {
                 SpawmnGridTile(i,j);
-            }
         }
     }
 
     private void SpawmnGridTile(int x, int y)
     {
-        Vector3 pos = new Vector3(x * .15f,0, y * -.15f);
+        Vector3 pos = new Vector3(x ,0, y * -1f);
         Quaternion rot = Quaternion.Euler(new Vector3(90, 0, 0));
         GridTile gridTile =  _gridTileFactory.CreateGridTile(GridTilePrefab, pos, rot, transform);
         TileList.Add(gridTile);
@@ -61,8 +60,8 @@ public class GridTileManager : MonoBehaviour
 
     private void CalculateMiddlePoint()
     {
-        var XMiddlePos = (xValue - 1) * .15f * .5f;
-        var ZMiddlePos = (yValue - 1) * -.15f * .5f;
+        var XMiddlePos = (xValue - 1) * 1f * .5f;
+        var ZMiddlePos = (yValue - 1) * -1f * .5f;
         MiddlePoint.position = new Vector3(XMiddlePos, 0, ZMiddlePos);
 
         for (int i = 0; i < TileList.Count; i++)
