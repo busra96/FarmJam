@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 2104395517152764083}
   - component: {fileID: 7326653281950777948}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: RaycastController_Main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bd6256daba288245823e309feded4a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMain: 0
+  isMain: 1
   boxSize: {x: 0.9, y: 0.9, z: 0.9}
   maxDistance: 5
   collisionLayers:
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 476061031800299217}
   - component: {fileID: 4802372312726403828}
   m_Layer: 0
-  m_Name: GameObject (1)
+  m_Name: RaycastController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

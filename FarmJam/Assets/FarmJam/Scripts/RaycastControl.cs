@@ -14,17 +14,13 @@ public class RaycastControl : MonoBehaviour
 
     void Update()
     {
-        // BoxCast için başlangıç pozisyonu
         Vector3 origin = transform.position;
         
-        // BoxCast'in aşağı yönlü taraması
         RaycastHit hit;
         hasHit = Physics.BoxCast(origin, boxSize / 2, Vector3.down, out hit, Quaternion.identity, maxDistance, collisionLayers);
         
-        // Eğer bir çarpışma olduysa
         if (hasHit)
         {
-            // Çarpışan objenin tag'ini kontrol et
             if (hit.collider.CompareTag("EmptyBox"))
             {
                 hitResult = false; // EmptyBox tagine çarparsa false döndür
@@ -38,13 +34,11 @@ public class RaycastControl : MonoBehaviour
         }
         else
         {
-            // Çarpışma yoksa sonuç varsayılan olarak false
             hitResult = false;
             gizmoColor = Color.red; // Çarpışma yoksa rengi kırmızı tut
         }
     }
 
-    // Gizmos ile çarpışma kutusunu göster
     private void OnDrawGizmos()
     {
         RaycastHit hit;
@@ -58,7 +52,6 @@ public class RaycastControl : MonoBehaviour
         else
         {
             
-            // BoxCast'in başlangıç noktasını ve yönünü görselleştirmek için
             Gizmos.color = Color.yellow; // BoxCast tarama alanı için sarı renk kullan
             Gizmos.DrawRay(transform.position, Vector3.down * maxDistance);
         }
