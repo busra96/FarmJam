@@ -1,11 +1,12 @@
 using DG.Tweening;
+using Signals;
 using UnityEngine;
 
 public class EmptyBoxMovement : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform rotatePoint;
-    [SerializeField] private Camera mainCamera;
+    private Camera mainCamera;
     [SerializeField] private LayerMask planeLayer;
 
     [Header("Settings")]
@@ -21,17 +22,15 @@ public class EmptyBoxMovement : MonoBehaviour
     private Vector3 movingPosition;
     private Vector3 lastMouseWorldPosition;
     private Tween scaleTween;
+    
+    private bool isActive;
 
-    private void Start()
+    public void Init()
     {
+        mainCamera = Camera.main;
         InitializeValues();
-    }
-
-    private void Update()
-    {
-        HandleMouseDown();
-        HandleMouseHold();
-        HandleMouseUp();
+        
+        InputSignals.OnInputGetMouseHold.AddListener(HandleMouseHold);
     }
 
     private void InitializeValues()
@@ -41,30 +40,29 @@ public class EmptyBoxMovement : MonoBehaviour
         transform.localScale = initialScale;
     }
 
-    private void HandleMouseDown()
+    public void HandleMouseDown(Vector3 mousePosition)
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            isMouseDown = true;
-            clickTimer = clickTimerDuration;
+        isMouseDown = true;
+        clickTimer = clickTimerDuration;
 
-            ScaleTweenTo(clickScale, 0.25f);
+        ScaleTweenTo(clickScale, 0.25f);
 
-            movingPosition = transform.position;
-            lastMouseWorldPosition = GetMouseWorldPosition();
-        }
+        movingPosition = transform.position;
+        lastMouseWorldPosition = GetMouseWorldPosition(mousePosition);
+        
+        isActive = true;
     }
 
-    private void HandleMouseHold()
+    private void HandleMouseHold(Vector3 pos)
     {
-        if (!Input.GetMouseButton(0)) return;
-
+        if(!isActive) return;
+        
         clickTimer = Mathf.Max(clickTimer - Time.deltaTime, 0);
 
-        Vector3 currentMouseWorldPos = GetMouseWorldPosition();
+        Vector3 currentMouseWorldPos = GetMouseWorldPosition(pos);
 
         Vector3 velocity = currentMouseWorldPos - lastMouseWorldPosition;
-        velocity.y = 0; // Sadece x ve z eksenlerinde hareket
+        velocity.y = 0; 
 
         movingPosition += velocity;
 
@@ -74,10 +72,10 @@ public class EmptyBoxMovement : MonoBehaviour
         lastMouseWorldPosition = currentMouseWorldPos;
     }
 
-    private void HandleMouseUp()
+    public void HandleMouseUp()
     {
-        if (!Input.GetMouseButtonUp(0)) return;
-
+        isActive = false;
+        
         if (isMouseDown && clickTimer > 0)
         {
             RotateObject();
@@ -109,9 +107,9 @@ public class EmptyBoxMovement : MonoBehaviour
         scaleTween = transform.DOScale(targetScale, duration).SetEase(Ease.Linear);
     }
 
-    private Vector3 GetMouseWorldPosition()
+    private Vector3 GetMouseWorldPosition(Vector3 mousePos)
     {
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(mousePos);
 
         if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, planeLayer))
         {

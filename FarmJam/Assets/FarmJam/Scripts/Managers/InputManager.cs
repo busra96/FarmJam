@@ -21,6 +21,10 @@ public class InputManager
             {
                 InputSignals.OnInputGetMouseDown?.Dispatch(Input.mousePosition);
             }
+            else if (Input.GetMouseButton(0))
+            {
+                InputSignals.OnInputGetMouseHold?.Dispatch(Input.mousePosition);
+            }
             else if (Input.GetMouseButtonUp(0))
             {
                 InputSignals.OnInputGetMouseUp?.Dispatch(Input.mousePosition);
