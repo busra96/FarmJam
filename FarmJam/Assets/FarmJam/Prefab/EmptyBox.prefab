@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e23eed2832a31cc4385e3c5b1aeaaeea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsMain: 0
   GridTile: {fileID: 0}
 --- !u!1 &389386420434617081
 GameObject:
@@ -404,6 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e23eed2832a31cc4385e3c5b1aeaaeea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsMain: 0
   GridTile: {fileID: 0}
 --- !u!1001 &4789515491061706770
 PrefabInstance:

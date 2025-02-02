@@ -40,8 +40,8 @@ public class EmptyBox : MonoBehaviour
 
     public void Deselected(Vector3 pos)
     {
-        _emptyBoxMovement.HandleMouseUp();
          isActive = false;
+         MouseUpRaycastCheck();
     }
 
     private void SelectableColliderIsActive(bool isActive)
@@ -95,7 +95,33 @@ public class EmptyBox : MonoBehaviour
             
             gridControlCollider.GridTile.IsGridOkeyAndNotOkey(isOkey);
         }
-     
+    }
+
+    public void MouseUpRaycastCheck()
+    {
+        bool isOkey = true;
+        for (int i = 0; i < GridControlColliders.Count; i++)
+        {
+            GridControlCollider gridControlCollider = GridControlColliders[i];
+            if (!gridControlCollider.ReturnOnGridTileIsAvailable())
+            {
+                isOkey = false;
+                break;
+            }
+        }
+
+        if (isOkey)
+        {
+            for (int i = 0; i < GridControlColliders.Count; i++)
+            {
+               GridControlCollider gridControlCollider = GridControlColliders[i];
+             
+            } 
+        }
+        else
+        {
+            _emptyBoxMovement.HandleMouseUp();
+        }
     }
     
     private void OnTheBoxHasCompletedTheMovementToTheStartingPosition(EmptyBoxMovement emptyBoxMovement)
