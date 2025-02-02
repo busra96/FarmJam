@@ -592,6 +592,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4802372312726403828, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: boxSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802372312726403828, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: boxSize.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4802372312726403828, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: boxSize.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4941733785757778021, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -635,6 +647,22 @@ PrefabInstance:
     - target: {fileID: 6690269226441856336, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
       propertyPath: m_Name
       value: EmptyBox
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690269226441856336, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7326653281950777948, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: boxSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7326653281950777948, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: boxSize.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7326653281950777948, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: boxSize.z
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

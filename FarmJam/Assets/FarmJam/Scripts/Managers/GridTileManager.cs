@@ -57,7 +57,7 @@ public class GridTileManager : MonoBehaviour
 
     private void SpawmnGridTile(int x, int y)
     {
-        Vector3 pos = new Vector3(x * 2.5f ,0, y * -1f * 2.5f);
+        Vector3 pos = new Vector3(x *2,0, y * 2* -1f);
         Quaternion rot = Quaternion.identity;
         GridTile gridTile =  _gridTileFactory.CreateGridTile(GridTilePrefab, pos, rot, transform);
         if((y + x) % 2 == 0) gridTile.SetMaterial(WhiteMat);
@@ -69,8 +69,8 @@ public class GridTileManager : MonoBehaviour
 
     private void CalculateMiddlePoint()
     {
-        var XMiddlePos = (xValue - 1) * 2.5f * .5f;
-        var ZMiddlePos = (yValue - 1) * -2.5f * .5f;
+        var XMiddlePos = (xValue - 1) * 2 *.5f;
+        var ZMiddlePos = (yValue - 1) * -2 *.5f;
         MiddlePoint.position = new Vector3(XMiddlePos, 0, ZMiddlePos);
 
         for (int i = 0; i < TileList.Count; i++)

@@ -12,6 +12,8 @@ public class RaycastControl : MonoBehaviour
     private bool hitResult; 
     private Color gizmoColor = Color.red;
 
+    public GridTile GridTile;
+
     void Update()
     {
         Vector3 origin = transform.position;
@@ -21,19 +23,36 @@ public class RaycastControl : MonoBehaviour
         
         if (hasHit)
         {
-            if (hit.collider.CompareTag("EmptyBox"))
+            // if (hit.collider.CompareTag("EmptyBox"))
+            // {
+            //     hitResult = false; // EmptyBox tagine çarparsa false döndür
+            //     gizmoColor = Color.red; // Gizmos rengi kırmızı olsun
+            // }
+            if (hit.collider.CompareTag("GridTile"))
             {
-                hitResult = false; // EmptyBox tagine çarparsa false döndür
-                gizmoColor = Color.red; // Gizmos rengi kırmızı olsun
+                hitResult = true;
+                var _targetGridTile = hit.collider.gameObject.GetComponent<GridTile>(); // GridTile tagine çarparsa true döndür
+                if (_targetGridTile != GridTile)
+                {
+                    if(GridTile !=null) GridTile.SetDefaultMat();
+                    GridTile = _targetGridTile;
+                }
+                
+                if(GridTile.EmptyBox == null)
+                    gizmoColor = Color.green; // Gizmos rengi yeşil olsun
+                else 
+                    gizmoColor = Color.red; // Gizmos rengi yeşil olsun
             }
-            else if (hit.collider.CompareTag("GridTile"))
+            else
             {
-                hitResult = true; // GridTile tagine çarparsa true döndür
-                gizmoColor = Color.green; // Gizmos rengi yeşil olsun
+                if(GridTile != null) GridTile.SetDefaultMat();
+                GridTile = null;
             }
         }
         else
         {
+            if(GridTile != null) GridTile.SetDefaultMat();
+            GridTile = null;
             hitResult = false;
             gizmoColor = Color.red; // Çarpışma yoksa rengi kırmızı tut
         }
@@ -56,4 +75,6 @@ public class RaycastControl : MonoBehaviour
             Gizmos.DrawRay(transform.position, Vector3.down * maxDistance);
         }
     }
+
+    public bool GetHasHit() => hasHit;
 }

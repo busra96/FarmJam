@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EmptyBoxMovement : MonoBehaviour
 {
+    
     [Header("References")]
     [SerializeField] private Transform rotatePoint;
     private Camera mainCamera;
@@ -97,7 +98,7 @@ public class EmptyBoxMovement : MonoBehaviour
     private void ResetObjectPositionAndScale()
     {
         isMouseDown = false;
-        transform.DOMove(startPosition, 0.1f).SetEase(Ease.Linear);
+        transform.DOMove(startPosition, 0.1f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this));
         ScaleTweenTo(initialScale, 0.1f);
     }
 
