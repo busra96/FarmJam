@@ -1,4 +1,3 @@
-using Signals;
 using UnityEngine;
 
 public class GridTile : MonoBehaviour
@@ -10,26 +9,9 @@ public class GridTile : MonoBehaviour
     public Material GreenMat, RedMat;
     private Material DefaultMat;
     
-    public bool OnThisGridHasEmptyBox;
     public EmptyBox EmptyBox;
 
     public GridControlCollider GridControlCollider;
-
-    private void OnEnable()
-    {
-        GridTileSignals.OnGridTileMaterialColorCheck.AddListener(OnGridTileMaterialColorCheck);
-    }
-    private void OnDisable()
-    {
-        GridTileSignals.OnGridTileMaterialColorCheck.RemoveListener(OnGridTileMaterialColorCheck);
-    }
-    
-    private void OnGridTileMaterialColorCheck()
-    {
-        Debug.Log("OnGridTileMaterialColorCheck ");
-        if(GridControlCollider == null)
-            SetDefaultMat();
-    }
 
     public void SetGridControlCollider(GridControlCollider controlCollider)
     {
@@ -47,16 +29,6 @@ public class GridTile : MonoBehaviour
         EmptyBox = emptyBox;
     }
 
-    public void SetGreenMat()
-    {
-        _MeshRenderer.material = GreenMat;
-    }
-
-    public void SetRedMat()
-    {
-        _MeshRenderer.material = RedMat;
-    }
-
     public void SetDefaultMat()
     {
         _MeshRenderer.material = DefaultMat;
@@ -64,7 +36,7 @@ public class GridTile : MonoBehaviour
 
     public void IsGridOkeyAndNotOkey(bool isGridOkey)
     {
-        if (isGridOkey) SetGreenMat();
-        else SetRedMat();
+        if (isGridOkey)  _MeshRenderer.material = GreenMat;
+        else _MeshRenderer.material = RedMat;
     }
 }

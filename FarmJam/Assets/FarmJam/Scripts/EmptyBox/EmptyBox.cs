@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EmptyBox : MonoBehaviour
 {
+    public UnitBox UnitBox;
     private EmptyBoxMovement _emptyBoxMovement;
     
     public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
@@ -80,7 +81,7 @@ public class EmptyBox : MonoBehaviour
         for (int i = 0; i < GridControlColliders.Count; i++)
         {
             GridControlCollider gridControlCollider = GridControlColliders[i];
-            if (!gridControlCollider.ReturnOnGridTileIsAvailable())
+            if (gridControlCollider.ReturnOnGridTileIsAvailable() == false)
             {
                 isOkey = false;
                 break;
@@ -95,6 +96,7 @@ public class EmptyBox : MonoBehaviour
             
             gridControlCollider.GridTile.IsGridOkeyAndNotOkey(isOkey);
         }
+     
     }
 
     public void MouseUpRaycastCheck()
@@ -114,12 +116,21 @@ public class EmptyBox : MonoBehaviour
         {
             for (int i = 0; i < GridControlColliders.Count; i++)
             {
-               GridControlCollider gridControlCollider = GridControlColliders[i];
-             
+                if (GridControlColliders[i].IsMain)
+                {
+                   UnitBox.JumpToGridTile(GridControlColliders[i].GridTile);
+                   break;
+                }
             } 
         }
         else
         {
+            for (int i = 0; i < GridControlColliders.Count; i++)
+            {
+                GridControlCollider gridControlCollider = GridControlColliders[i];
+                gridControlCollider.GridTile = null;
+            }
+
             _emptyBoxMovement.HandleMouseUp();
         }
     }

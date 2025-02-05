@@ -644,6 +644,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6251896453807348099, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
+      propertyPath: IsMain
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6690269226441856336, guid: 516df24624fb54d41ad45712857a6ae0, type: 3}
       propertyPath: m_Name
       value: EmptyBox
