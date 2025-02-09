@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Signals;
 using UnityEngine;
 
@@ -26,6 +27,12 @@ public class EmptyBox : MonoBehaviour
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
         _cancellationTokenSource = new CancellationTokenSource();
+        
+        transform.localScale = Vector3.one * 0.7f;
+        transform.DOPunchScale(Vector3.one * 0.2f, 0.2f, 8, 0.5f).SetEase(Ease.OutBounce)
+            .OnComplete(() => transform.localScale = Vector3.one * .7f);
+        
+        
         SelectableColliderIsActive(true);
     }
 

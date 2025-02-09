@@ -460,7 +460,7 @@ MonoBehaviour:
   maxYPos: 1.25
   moveSpeed: 50
   clickTimerDuration: 0.25
-  initialScale: {x: 0.8, y: 0.8, z: 0.8}
+  initialScale: {x: 0.7, y: 0.7, z: 0.7}
   clickScale: {x: 1, y: 1, z: 1}
 --- !u!1 &5928823588286035760
 GameObject:

@@ -15,7 +15,7 @@ public class EmptyBoxMovement : MonoBehaviour
     [SerializeField] private float maxYPos = 1.25f;
     [SerializeField] private float moveSpeed = 5f; 
     [SerializeField] private float clickTimerDuration = 0.25f;
-    [SerializeField] private Vector3 initialScale = Vector3.one * 0.8f;
+    [SerializeField] private Vector3 initialScale = Vector3.one * 0.7f;
     [SerializeField] private Vector3 clickScale = Vector3.one;
 
     private bool isMouseDown;
