@@ -8,25 +8,13 @@ public class GridTile : MonoBehaviour
 
     public Material GreenMat, RedMat;
     private Material DefaultMat;
+
+    public UnitBox UnitBox;
     
-    public EmptyBox EmptyBox;
-
-    public GridControlCollider GridControlCollider;
-
-    public void SetGridControlCollider(GridControlCollider controlCollider)
-    {
-        GridControlCollider = controlCollider;
-    }
-
     public void SetMaterial(Material material)
     {
          DefaultMat = material;
         _MeshRenderer.material = material;
-    }
-
-    public void SetEmptyBox(EmptyBox emptyBox)
-    {
-        EmptyBox = emptyBox;
     }
 
     public void SetDefaultMat()

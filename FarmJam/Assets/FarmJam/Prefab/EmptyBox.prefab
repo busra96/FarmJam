@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 2975389073936080585}
   - component: {fileID: 7290293983065285297}
   m_Layer: 0
-  m_Name: UnitBox_Main
+  m_Name: UnitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -230,6 +230,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GridControlColliders:
+  - {fileID: 6251896453807348099}
+  - {fileID: 1597764956436360427}
 --- !u!1 &6690269226441856336
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,7 +507,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 75a8b3bc3a3dd2948b8f4388f1cfc060, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 1af77a0726ebbea4e9ada4ba37c12031, type: 2}
+      objectReference: {fileID: 2100000, guid: 94536056ff8cc494a95776d16a78f884, type: 2}
     - target: {fileID: 919132149155446097, guid: 75a8b3bc3a3dd2948b8f4388f1cfc060, type: 3}
       propertyPath: m_Name
       value: SM_2UnitBox (1)

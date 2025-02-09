@@ -38,7 +38,7 @@ public class RaycastControl : MonoBehaviour
                     GridTile = _targetGridTile;
                 }
                 
-                if(GridTile.EmptyBox == null)
+                if(GridTile.UnitBox == null)
                     gizmoColor = Color.green; // Gizmos rengi yeşil olsun
                 else 
                     gizmoColor = Color.red; // Gizmos rengi yeşil olsun

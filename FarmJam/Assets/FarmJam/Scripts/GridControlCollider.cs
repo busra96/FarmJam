@@ -1,4 +1,3 @@
-using Signals;
 using UnityEngine;
 
 public class GridControlCollider : MonoBehaviour
@@ -55,7 +54,7 @@ public class GridControlCollider : MonoBehaviour
    public bool ReturnOnGridTileIsAvailable()
    {
       if (GridTile == null) return false;
-      if(GridTile.GridControlCollider != null) return false;
+      if(GridTile.UnitBox != null) return false;
 
       return true;
    }

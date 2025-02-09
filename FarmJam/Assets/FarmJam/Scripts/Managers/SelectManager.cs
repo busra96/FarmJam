@@ -40,9 +40,8 @@ public class SelectManager
    private void OnInputGetMouseUp(Vector3 mousePosition)
    {
       if (SelectedEmptyBox != null)
-      {
-          SelectedEmptyBox.Deselected(mousePosition);
-          SelectedEmptyBox = null;
-      }
+         SelectedEmptyBox.Deselected(mousePosition);
+      
+      SelectedEmptyBox = null;
    }
 }

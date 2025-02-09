@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using Signals;
 using UnityEngine;
@@ -32,6 +33,11 @@ public class EmptyBoxMovement : MonoBehaviour
         InitializeValues();
         
         InputSignals.OnInputGetMouseHold.AddListener(HandleMouseHold);
+    }
+
+    public void Disable()
+    {
+        InputSignals.OnInputGetMouseHold.RemoveListener(HandleMouseHold);
     }
 
     private void InitializeValues()

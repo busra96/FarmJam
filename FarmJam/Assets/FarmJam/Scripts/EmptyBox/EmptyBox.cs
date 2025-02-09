@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Signals;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class EmptyBox : MonoBehaviour
     private bool _onGridTile;
     
     private bool isActive;
+    private CancellationTokenSource _cancellationTokenSource;
 
     private void Start()
     {
@@ -24,12 +26,15 @@ public class EmptyBox : MonoBehaviour
     {
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
+        _cancellationTokenSource = new CancellationTokenSource();
         SelectableColliderIsActive(true);
     }
 
     public void Disable()
     {
+        _emptyBoxMovement.Disable();
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.RemoveListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
+        _cancellationTokenSource?.Cancel();
     }
     
     public void Selected(Vector3 pos)
@@ -48,7 +53,12 @@ public class EmptyBox : MonoBehaviour
     private void SelectableColliderIsActive(bool isActive)
     {
         SelectableCollider.enabled = isActive;
-        if (!_onGridTile)
+        
+        foreach (var gridControlCollider in GridControlColliders)
+        {
+            gridControlCollider.gameObject.SetActive(_onGridTile ? isActive : !isActive);
+        }
+        /*if (!_onGridTile)
         {
             foreach (var gridControlCollider in GridControlColliders)
             {
@@ -61,14 +71,14 @@ public class EmptyBox : MonoBehaviour
             {
                 gridControlCollider.gameObject.SetActive(isActive);
             }
-        }
+        }*/
     }
     
     private async UniTask CheckInput()
     {
         isActive = true;
 
-        while (isActive)
+        while (isActive && !_cancellationTokenSource.IsCancellationRequested)
         {
             RaycastCheck();
             await UniTask.Yield();
@@ -119,6 +129,7 @@ public class EmptyBox : MonoBehaviour
                 if (GridControlColliders[i].IsMain)
                 {
                    UnitBox.JumpToGridTile(GridControlColliders[i].GridTile);
+                   DestroySelf().Forget();
                    break;
                 }
             } 
@@ -140,5 +151,30 @@ public class EmptyBox : MonoBehaviour
         if(emptyBoxMovement != _emptyBoxMovement) return;
         
         SelectableColliderIsActive(true);
+    }
+    
+    private async UniTaskVoid DestroySelf()
+    {
+        if (this == null || _emptyBoxMovement == null) return;
+
+        Disable();
+        // UniTask işlemlerini durdur
+        isActive = false;
+        _cancellationTokenSource?.Cancel();
+
+        // _emptyBoxMovement bileşenini devre dışı bırak
+        if (_emptyBoxMovement != null)
+        {
+            _emptyBoxMovement.enabled = false;
+        }
+
+        // Bir frame bekleyerek UniTask süreçlerinin kapanmasını sağla
+        await UniTask.DelayFrame(1);
+
+        // Eğer nesne hala varsa yok et
+        if (this != null)
+        {
+            Destroy(gameObject);
+        }
     }
 }
