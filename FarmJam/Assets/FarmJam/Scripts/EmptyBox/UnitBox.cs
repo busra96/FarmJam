@@ -13,7 +13,7 @@ public class UnitBox : MonoBehaviour
       GridTile = tile;
       transform.SetParent(GridTile.transform);
       transform.localPosition = Vector3.zero;
-      UnitBoxModel.transform.localScale = Vector3.one * .98f;
+      UnitBoxModel.transform.localScale = Vector3.one * .96f;
 
       for (int i = 0; i < GridControlColliders.Count; i++)
       {
