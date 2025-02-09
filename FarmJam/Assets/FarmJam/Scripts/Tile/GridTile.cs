@@ -1,3 +1,5 @@
+using System;
+using Signals;
 using UnityEngine;
 
 public class GridTile : MonoBehaviour
@@ -10,7 +12,23 @@ public class GridTile : MonoBehaviour
     private Material DefaultMat;
 
     public UnitBox UnitBox;
+
+    private void OnEnable()
+    {
+        GridTileSignals.OnGridMaterialCheck.AddListener(GridTileMaterialCheck);
+    }
+    private void OnDisable()
+    {
+        GridTileSignals.OnGridMaterialCheck.RemoveListener(GridTileMaterialCheck);
+    }
     
+    
+    private void GridTileMaterialCheck()
+    {
+        if (UnitBox == null)
+            SetDefaultMat();
+    }
+
     public void SetMaterial(Material material)
     {
          DefaultMat = material;

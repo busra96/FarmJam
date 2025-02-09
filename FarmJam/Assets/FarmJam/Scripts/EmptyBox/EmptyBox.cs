@@ -10,7 +10,6 @@ public class EmptyBox : MonoBehaviour
     private EmptyBoxMovement _emptyBoxMovement;
     
     public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
-    public Collider SelectableCollider;
     private bool _onGridTile;
     
     private bool isActive;
@@ -52,26 +51,8 @@ public class EmptyBox : MonoBehaviour
 
     private void SelectableColliderIsActive(bool isActive)
     {
-        SelectableCollider.enabled = isActive;
-        
         foreach (var gridControlCollider in GridControlColliders)
-        {
             gridControlCollider.gameObject.SetActive(_onGridTile ? isActive : !isActive);
-        }
-        /*if (!_onGridTile)
-        {
-            foreach (var gridControlCollider in GridControlColliders)
-            {
-                gridControlCollider.gameObject.SetActive(!isActive);
-            }
-        }
-        else
-        {
-            foreach (var gridControlCollider in GridControlColliders)
-            {
-                gridControlCollider.gameObject.SetActive(isActive);
-            }
-        }*/
     }
     
     private async UniTask CheckInput()
@@ -129,6 +110,7 @@ public class EmptyBox : MonoBehaviour
                 if (GridControlColliders[i].IsMain)
                 {
                    UnitBox.JumpToGridTile(GridControlColliders[i].GridTile);
+                   EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
                    DestroySelf().Forget();
                    break;
                 }

@@ -43,5 +43,6 @@ public class SelectManager
          SelectedEmptyBox.Deselected(mousePosition);
       
       SelectedEmptyBox = null;
+      GridTileSignals.OnGridMaterialCheck?.Dispatch();
    }
 }

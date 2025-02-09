@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class UnitBox : MonoBehaviour
 {
+   public GameObject UnitBoxModel;
    private GridTile GridTile;
    private List<GridTile> GridTiles = new List<GridTile>();
    [SerializeField] private List<GridControlCollider> GridControlColliders;
@@ -12,6 +13,7 @@ public class UnitBox : MonoBehaviour
       GridTile = tile;
       transform.SetParent(GridTile.transform);
       transform.localPosition = Vector3.zero;
+      UnitBoxModel.transform.localScale = Vector3.one * .98f;
 
       for (int i = 0; i < GridControlColliders.Count; i++)
       {
