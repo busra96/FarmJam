@@ -6,10 +6,14 @@ using VContainer.Unity;
 public class GameLifetimeScope : LifetimeScope
 {
     [SerializeField] private GridTileManager _gridTileManager;
+    [SerializeField] private UnitBoxManager _unitBoxManager;
+    [SerializeField] private EmptyBoxSpawner _emptyBoxSpawner;
     
     protected override void Configure(IContainerBuilder builder)
     {
          builder.RegisterComponent(_gridTileManager);
+         builder.RegisterComponent(_unitBoxManager);
+         builder.RegisterComponent(_emptyBoxSpawner);
         
          builder.Register<InputManager>(Lifetime.Singleton);
          builder.Register<GridTileFactory>(Lifetime.Singleton);
