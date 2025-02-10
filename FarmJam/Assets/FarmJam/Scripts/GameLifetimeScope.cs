@@ -8,12 +8,14 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private GridTileManager _gridTileManager;
     [SerializeField] private UnitBoxManager _unitBoxManager;
     [SerializeField] private EmptyBoxSpawner _emptyBoxSpawner;
+    [SerializeField] private CollectableBoxManager _collectableBoxManager;
     
     protected override void Configure(IContainerBuilder builder)
     {
          builder.RegisterComponent(_gridTileManager);
          builder.RegisterComponent(_unitBoxManager);
          builder.RegisterComponent(_emptyBoxSpawner);
+         builder.RegisterComponent(_collectableBoxManager);
         
          builder.Register<InputManager>(Lifetime.Singleton);
          builder.Register<GridTileFactory>(Lifetime.Singleton);

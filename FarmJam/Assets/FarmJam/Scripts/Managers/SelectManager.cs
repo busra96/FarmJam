@@ -44,5 +44,6 @@ public class SelectManager
       
       SelectedEmptyBox = null;
       GridTileSignals.OnGridMaterialCheck?.Dispatch();
+      CollectableBoxSignals.OnCollectableBoxControl?.Dispatch();
    }
 }

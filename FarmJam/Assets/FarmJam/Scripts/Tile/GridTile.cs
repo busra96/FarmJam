@@ -16,13 +16,14 @@ public class GridTile : MonoBehaviour
     private void OnEnable()
     {
         GridTileSignals.OnGridMaterialCheck.AddListener(GridTileMaterialCheck);
+        UnitBoxSignals.OnThisUnitBoxDestroyed.AddListener(OnThisUnitBoxDestroyedControl);
     }
     private void OnDisable()
     {
         GridTileSignals.OnGridMaterialCheck.RemoveListener(GridTileMaterialCheck);
+        UnitBoxSignals.OnThisUnitBoxDestroyed.RemoveListener(OnThisUnitBoxDestroyedControl);
     }
-    
-    
+
     private void GridTileMaterialCheck()
     {
         if (UnitBox == null)
@@ -44,5 +45,14 @@ public class GridTile : MonoBehaviour
     {
         if (isGridOkey)  _MeshRenderer.material = GreenMat;
         else _MeshRenderer.material = RedMat;
+    }
+    
+    private void OnThisUnitBoxDestroyedControl(UnitBox unitBox)
+    {
+        if (UnitBox != null && UnitBox == unitBox)
+        {
+            UnitBox = null;
+            SetDefaultMat();
+        }
     }
 }

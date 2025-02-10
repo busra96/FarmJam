@@ -10,12 +10,14 @@ public class UnitBoxManager : MonoBehaviour
    {
       GridTileSignals.OnAddedUnitBox.AddListener(AddedUnitBox);
       GridTileSignals.OnRemovedUnitBox.AddListener(RemovedUnitBox);
+      UnitBoxSignals.OnThisUnitBoxDestroyed.AddListener(RemovedUnitBox);
    }
 
    private void OnDisable()
    {
       GridTileSignals.OnAddedUnitBox.RemoveListener(AddedUnitBox);
       GridTileSignals.OnRemovedUnitBox.RemoveListener(RemovedUnitBox);
+      UnitBoxSignals.OnThisUnitBoxDestroyed.RemoveListener(RemovedUnitBox);
    }
 
    public void AddedUnitBox(UnitBox unitBox)
@@ -36,6 +38,12 @@ public class UnitBoxManager : MonoBehaviour
 
    public UnitBox GetUnitBox()
    {
-      return UnitBoxes[0];
+      foreach (UnitBox box in UnitBoxes)
+      {
+         if(box.IsFull) continue;
+         return box;
+      }
+
+      return null;
    } 
 }

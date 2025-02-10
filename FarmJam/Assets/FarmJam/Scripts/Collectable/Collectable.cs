@@ -1,25 +1,27 @@
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Signals;
 using UnityEngine;
 
 public class Collectable : MonoBehaviour
 {
-    public void JumpToTarget(Transform target)
+    public bool isJumping;
+    public async UniTask JumpToTarget(Transform target)
     {
-        /*transform.parent = target;
-        transform.DOLocalJump(Vector3.zero, 1, 1, .5f).SetEase(Ease.Linear);*/
+        isJumping = true;
+        Vector3 backwardPos = transform.position + (transform.position - target.position).normalized * 1f;
         
-        // İlk önce objeyi hedefin ters yönüne çekiyoruz
-        Vector3 backwardPos = transform.position + (transform.position - target.position).normalized * 0.5f;
-
-        // Önce geri git, sonra hedefe atla
-        transform.DOMove(backwardPos, 0.2f)
+        await transform.DOMove(backwardPos, 0.2f)
             .SetEase(Ease.OutQuad)
-            .OnComplete(() =>
-            {
-                transform.parent = target;
-                transform.DOLocalJump(Vector3.zero, 1, 1, 0.5f)
-                    .SetEase(Ease.OutBack);
-            });
+            .AsyncWaitForCompletion();
         
+        transform.parent = target;
+        await transform.DOLocalJump(Vector3.zero, 1, 1, 0.3f)
+            .SetEase(Ease.OutBack).OnComplete(()=>
+            {
+                isJumping = false;
+                UnitBoxSignals.OnThisUnitBoxIsFullCheck?.Dispatch();
+            })
+            .AsyncWaitForCompletion();
     }
 }
