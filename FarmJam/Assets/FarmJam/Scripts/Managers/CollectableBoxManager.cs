@@ -14,18 +14,16 @@ public class CollectableBoxManager : MonoBehaviour
     private void OnEnable()
     {
         CollectableBoxSignals.OnCollectableBoxControl.AddListener(CollectableBoxControl);
-        CollectableBoxSignals.OnCollectableBoxDestroyed.AddListener(RemovedCollectableBox);
     }
 
     private void OnDisable()
     {
         CollectableBoxSignals.OnCollectableBoxControl.RemoveListener(CollectableBoxControl);
-        CollectableBoxSignals.OnCollectableBoxDestroyed.RemoveListener(RemovedCollectableBox);
     }
 
     private void CollectableBoxControl()
     {
-        UTCollectableBoxControl();
+        UTCollectableBoxControl().Forget();
     }
 
     public async UniTask UTCollectableBoxControl()
@@ -38,18 +36,16 @@ public class CollectableBoxManager : MonoBehaviour
         isProcessing = true;
         taskCompletionSource = new UniTaskCompletionSource();
 
-        foreach (var box in CollectableBoxes)
+        for (int i = 0; i < CollectableBoxes.Count; i++)
         {
+            var box = CollectableBoxes[i];
+
+            if (box == null) continue; // Silinen nesne olabilir
+
             await box.FindUnitBox();
         }
 
         isProcessing = false;
         taskCompletionSource.TrySetResult(); // Bekleyen diğer çağrılara haber ver
-    }
-
-    public void RemovedCollectableBox(CollectableBox collectableBox)
-    {
-        if(CollectableBoxes.Contains(collectableBox))
-            CollectableBoxes.Remove(collectableBox);
     }
 }

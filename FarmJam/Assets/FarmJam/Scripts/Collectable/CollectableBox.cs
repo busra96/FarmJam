@@ -85,7 +85,6 @@ public class CollectableBox : MonoBehaviour
 
        if (isEmpty)
        {
-           CollectableBoxSignals.OnCollectableBoxDestroyed?.Dispatch(this);
            Destroy(gameObject);
        }
    }
