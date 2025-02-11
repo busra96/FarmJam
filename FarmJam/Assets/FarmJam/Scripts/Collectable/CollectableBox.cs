@@ -11,7 +11,8 @@ public class CollectableBox : MonoBehaviour
    [Inject] public UnitBoxManager unitBoxManager;
    public List<CollectableParameter> CollectableParameters;
    private bool jumping = false;
-   
+
+
    [ContextMenu(" Find Unit Box ")]
    public async UniTask FindUnitBox()
    {
@@ -84,6 +85,7 @@ public class CollectableBox : MonoBehaviour
 
        if (isEmpty)
        {
+           CollectableBoxSignals.OnCollectableBoxDestroyed?.Dispatch(this);
            Destroy(gameObject);
        }
    }
