@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Signals;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class UnitBox : MonoBehaviour
    [SerializeField] private List<GridControlCollider> GridControlColliders;
 
    public List<UnityBoxPoint> Points;
+   private bool onDestroyed = false;
 
    private void Start()
    {
@@ -43,6 +45,9 @@ public class UnitBox : MonoBehaviour
 
    public void CheckIsFull()
    {
+      if(onDestroyed)
+         return;
+      
       bool isFull = true;
       foreach (var point in Points)
       {
@@ -55,8 +60,22 @@ public class UnitBox : MonoBehaviour
 
       if (isFull)
       {
-         UnitBoxSignals.OnThisUnitBoxDestroyed?.Dispatch(this);
-         Destroy( gameObject);
+         onDestroyed = true;
+         DestroyAnim();
       }
+   }
+
+   private async UniTask DestroyAnim()
+   {
+      UnitBoxSignals.OnThisUnitBoxDestroyed?.Dispatch(this);
+      UnitBoxModel.transform.DOScale(Vector3.zero, .25f).SetEase(Ease.OutBounce).OnComplete(() => Destroy(gameObject));
+   }
+
+   public UnityBoxPoint GetEmptyBoxPoint()
+   {
+      foreach (var unitBoxPoint in Points)
+         if(unitBoxPoint.Collectable == null) return unitBoxPoint;
+
+      return null;
    }
 }

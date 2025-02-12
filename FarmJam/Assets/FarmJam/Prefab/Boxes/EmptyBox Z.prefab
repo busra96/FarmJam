@@ -24,8 +24,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 36179752414930124}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 2572989727363028451}
   - {fileID: 551843066256608131}
   - {fileID: 394293578512317460}
-  m_Father: {fileID: 8292021670630821847}
+  m_Father: {fileID: 8632753765971934180}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &909740372143553219
 GameObject:
@@ -446,7 +446,6 @@ Transform:
   m_Children:
   - {fileID: 8632753765971934180}
   - {fileID: 6857728207707674611}
-  - {fileID: 6382502500209010268}
   m_Father: {fileID: 6169224908116092198}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1938480435496673139
@@ -461,6 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsFull: 0
   UnitBoxModel: {fileID: 8972968585720521054}
   GridControlColliders:
   - {fileID: 6783781044830821121}
@@ -1079,7 +1079,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bb939365971456e43ad3fdf53479bc5a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6382502500209010268}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bb939365971456e43ad3fdf53479bc5a, type: 3}
       insertIndex: -1

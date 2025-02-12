@@ -195,6 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &2012861685682288548
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,15 +371,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2966647600952994531}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6718629113057341545}
   - {fileID: 8500808739226766119}
   - {fileID: 3807650979265967914}
-  m_Father: {fileID: 94502061843518846}
+  m_Father: {fileID: 5570916216800062201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4052484925343905523
 GameObject:
@@ -412,7 +413,6 @@ Transform:
   m_Children:
   - {fileID: 5570916216800062201}
   - {fileID: 7963959777055387212}
-  - {fileID: 3390876417501137729}
   m_Father: {fileID: 4207875543002944885}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3520373867044389287
@@ -427,6 +427,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsFull: 0
   UnitBoxModel: {fileID: 5045173309069914179}
   GridControlColliders:
   - {fileID: 8123798091209435644}
@@ -480,6 +481,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &5044138849761658550
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,6 +743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &6870571661541486853
 GameObject:
   m_ObjectHideFlags: 0
@@ -875,7 +878,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5a7723ecd5a08a44e826cfbd46c12543, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3390876417501137729}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a7723ecd5a08a44e826cfbd46c12543, type: 3}
       insertIndex: -1

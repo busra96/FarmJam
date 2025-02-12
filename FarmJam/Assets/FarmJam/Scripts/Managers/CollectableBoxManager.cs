@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Signals;
 using UnityEngine;
 using VContainer;
 
@@ -8,44 +7,36 @@ public class CollectableBoxManager : MonoBehaviour
 {
     [Inject] private UnitBoxManager unitBoxManager;
     public List<CollectableBox> CollectableBoxes;
-    private UniTaskCompletionSource taskCompletionSource;
     private bool isProcessing = false;
 
-    private void OnEnable()
+    private void Start()
     {
-        CollectableBoxSignals.OnCollectableBoxControl.AddListener(CollectableBoxControl);
+        UTProcessCollectableBoxes().Forget();
     }
-
-    private void OnDisable()
+    
+    public async UniTask UTProcessCollectableBoxes()
     {
-        CollectableBoxSignals.OnCollectableBoxControl.RemoveListener(CollectableBoxControl);
-    }
-
-    private void CollectableBoxControl()
-    {
-        UTCollectableBoxControl().Forget();
-    }
-
-    public async UniTask UTCollectableBoxControl()
-    {
-        while (isProcessing) // Eğer şu an çalışıyorsa, bitmesini bekle
-        {
-            await taskCompletionSource.Task;
-        }
-
         isProcessing = true;
-        taskCompletionSource = new UniTaskCompletionSource();
-
-        for (int i = 0; i < CollectableBoxes.Count; i++)
+        while (true) // Sonsuz döngü
         {
-            var box = CollectableBoxes[i];
+            // Eğer tüm CollectableBox'lar yok olduysa döngüyü sonlandır
+            CollectableBoxes.RemoveAll(box => box == null);
+            if (CollectableBoxes.Count == 0)
+            {
+                isProcessing = false;
+                break; // Döngüden çık
+            }
 
-            if (box == null) continue; // Silinen nesne olabilir
+            // Tüm aktif CollectableBox nesneleri sırayla işlenir
+            foreach (var collectableBox in CollectableBoxes)
+            {
+                if (collectableBox != null && collectableBox.gameObject.activeInHierarchy)
+                {
+                    await collectableBox.FindUnitBox();
+                }
+            }
 
-            await box.FindUnitBox();
+            await UniTask.Delay(500); // 2 saniye bekleyerek tekrar kontrol et
         }
-
-        isProcessing = false;
-        taskCompletionSource.TrySetResult(); // Bekleyen diğer çağrılara haber ver
     }
 }

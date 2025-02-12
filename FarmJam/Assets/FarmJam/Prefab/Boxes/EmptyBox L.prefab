@@ -175,7 +175,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2035956077164537504}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -183,7 +183,7 @@ Transform:
   - {fileID: 3869499814052058564}
   - {fileID: 5560090704569280541}
   - {fileID: 8574616417722952625}
-  m_Father: {fileID: 3011834328894488178}
+  m_Father: {fileID: 1352334844968431707}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2372081905929254712
 GameObject:
@@ -368,7 +368,6 @@ Transform:
   m_Children:
   - {fileID: 1352334844968431707}
   - {fileID: 6780855762668763705}
-  - {fileID: 7540234266576383426}
   m_Father: {fileID: 6103925512587187346}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8185060776448401598
@@ -383,6 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsFull: 0
   UnitBoxModel: {fileID: 1841873072387893985}
   GridControlColliders:
   - {fileID: 515711821886125895}
@@ -540,6 +540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &5395721824530760507
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,6 +585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &7259724111969181264
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,6 +630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &7341673204670482774
 GameObject:
   m_ObjectHideFlags: 0
@@ -875,7 +878,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1e5d0eef622e0cd4f83b12afa6321e57, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7540234266576383426}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e5d0eef622e0cd4f83b12afa6321e57, type: 3}
       insertIndex: -1

@@ -227,6 +227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &2190306149403120099
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,7 +252,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2190306149403120099}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -260,7 +261,7 @@ Transform:
   - {fileID: 3857739651765123211}
   - {fileID: 7808826307963668807}
   - {fileID: 3366299509014374257}
-  m_Father: {fileID: 4171601399298631774}
+  m_Father: {fileID: 5309599006910353522}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2373247449726996860
 GameObject:
@@ -329,7 +330,6 @@ Transform:
   m_Children:
   - {fileID: 5309599006910353522}
   - {fileID: 4632755383748340215}
-  - {fileID: 1877287876386552315}
   m_Father: {fileID: 912116493170946469}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7297824082011103532
@@ -344,6 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsFull: 0
   UnitBoxModel: {fileID: 4820167196075936456}
   GridControlColliders:
   - {fileID: 6273295287205404389}
@@ -472,6 +473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &4404257091581633130
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,6 +669,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &4860823966684635706
 GameObject:
   m_ObjectHideFlags: 0
@@ -711,6 +714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &5171308660237327943
 GameObject:
   m_ObjectHideFlags: 0
@@ -1075,7 +1079,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 28db235472a7cb749811f398547ea850, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1877287876386552315}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 28db235472a7cb749811f398547ea850, type: 3}
       insertIndex: -1

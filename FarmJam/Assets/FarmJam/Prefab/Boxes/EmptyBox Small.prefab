@@ -64,7 +64,6 @@ Transform:
   m_Children:
   - {fileID: 1969970738566051378}
   - {fileID: 3624450240312415286}
-  - {fileID: 4294418747731685849}
   m_Father: {fileID: 7012053341145315860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5280283402649799951
@@ -79,6 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsFull: 0
   UnitBoxModel: {fileID: 1161204536146455688}
   GridControlColliders:
   - {fileID: 450692540797533840}
@@ -294,14 +294,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2783824232034104579}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4685617894502869817}
   - {fileID: 3991899635501183271}
-  m_Father: {fileID: 5908836976138303906}
+  m_Father: {fileID: 1969970738566051378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3942795299922757110
 GameObject:
@@ -418,6 +418,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &7796491770339123857
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,6 +614,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1001 &2079542137826431449
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -675,7 +677,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2310e477e8607994d84d6b3037170998, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4294418747731685849}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2310e477e8607994d84d6b3037170998, type: 3}
       insertIndex: -1

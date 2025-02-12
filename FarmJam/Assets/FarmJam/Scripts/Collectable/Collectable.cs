@@ -11,12 +11,12 @@ public class Collectable : MonoBehaviour
         isJumping = true;
         Vector3 backwardPos = transform.position + (transform.position - target.position).normalized * 1f;
         
-        await transform.DOMove(backwardPos, 0.2f)
+        await transform.DOMove(backwardPos, 0.1f)
             .SetEase(Ease.OutQuad)
             .AsyncWaitForCompletion();
         
         transform.parent = target;
-        await transform.DOLocalJump(Vector3.zero, 1, 1, 0.3f)
+        await transform.DOLocalJump(Vector3.zero, 1, 1, 0.2f)
             .SetEase(Ease.OutBack).OnComplete(()=>
             {
                 isJumping = false;

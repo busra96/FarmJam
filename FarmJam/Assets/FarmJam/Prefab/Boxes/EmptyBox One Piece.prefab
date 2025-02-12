@@ -259,6 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5495f44063c077f4c8553620e5b3c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collectable: {fileID: 0}
 --- !u!1 &5562338829817111255
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,13 +354,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7337595588956145159}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5262654503914901948}
-  m_Father: {fileID: 459412978115883257}
+  m_Father: {fileID: 4003948242873356595}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7388646292194612790
 GameObject:
@@ -393,7 +394,6 @@ Transform:
   m_Children:
   - {fileID: 4003948242873356595}
   - {fileID: 6369422826515538682}
-  - {fileID: 4248461643199402877}
   m_Father: {fileID: 7747187550018903881}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5664057603932347490
@@ -408,6 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfaf716bac629354891e2caf9aac3e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsFull: 0
   UnitBoxModel: {fileID: 4385152650202860425}
   GridControlColliders:
   - {fileID: 6080941005700815842}
@@ -475,7 +476,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4248461643199402877}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
       insertIndex: -1
