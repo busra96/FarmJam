@@ -25,7 +25,7 @@ public class Collectable : MonoBehaviour
             .AsyncWaitForCompletion();
         
         transform.parent = target;
-        await transform.DOLocalJump(Vector3.zero, 1, 1, 0.2f)
+        await transform.DOLocalJump(new Vector3(0, .6f, 0), 1, 1, 0.2f)
             .SetEase(Ease.OutBack).OnComplete(()=>
             {
                 isJumping = false;
