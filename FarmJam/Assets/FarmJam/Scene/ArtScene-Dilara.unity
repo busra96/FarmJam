@@ -232,6 +232,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SM_Top_Box
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 309dab2b43750104f812b4b8d63c38b6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -285,6 +289,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4436516d17978c14db6504da7808746e, type: 2}
     - target: {fileID: 919132149155446097, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
       propertyPath: m_Name
       value: SM_Box1Unit (4)
@@ -581,6 +589,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 546c20048e2157d4083f4619893eb99d, type: 2}
     - target: {fileID: 919132149155446097, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
       propertyPath: m_Name
       value: SM_Box1Unit (2)
@@ -699,6 +711,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 5e6ef36d1444ee3449d87b9b61e89009, type: 2}
     - target: {fileID: 919132149155446097, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
       propertyPath: m_Name
       value: SM_Box1Unit
@@ -1076,6 +1092,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3308d938886343947ba06effb0b6c33e, type: 2}
     - target: {fileID: 919132149155446097, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
       propertyPath: m_Name
       value: SM_Box1Unit (3)
@@ -1222,8 +1242,8 @@ SceneRoots:
   - {fileID: 1897781829}
   - {fileID: 1313431067}
   - {fileID: 356141232}
+  - {fileID: 1981659848}
   - {fileID: 1575465072}
   - {fileID: 820329732}
   - {fileID: 1052519740}
-  - {fileID: 1981659848}
   - {fileID: 391009998}
