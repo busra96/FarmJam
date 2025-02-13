@@ -36,11 +36,13 @@ public class UnitBoxManager : MonoBehaviour
       UnitBoxes.Remove(unitBox);
    }
 
-   public UnitBox GetUnitBox()
+   public UnitBox GetUnitBox(ColorType colorType)
    {
       foreach (UnitBox box in UnitBoxes)
       {
+         if(box.UnitBoxColorTypeAndMat.ColorType != colorType) continue;
          if(box.IsFull) continue;
+         
          return box;
       }
 

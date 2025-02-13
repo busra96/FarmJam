@@ -13,6 +13,20 @@ public class CollectableBox : MonoBehaviour
     private bool jumping = false;
     private bool onDestroyed = false;
 
+    public ColorType ColorType;
+
+    private void Start()
+    {
+        SetColor(); 
+    }
+
+    [ContextMenu(" Set Color ")]
+    public void SetColor()
+    {
+        foreach (CollectableParameter collectableParameter in CollectableParameters)
+            collectableParameter.Collectable.Init(ColorType);
+    }
+
     public async UniTask FindUnitBox()
     {
         if(IsLock) return;
@@ -21,7 +35,7 @@ public class CollectableBox : MonoBehaviour
         {
             if(collectableParameter.Collectable == null) continue;
             
-            UnitBox unitBox = unitBoxManager.GetUnitBox();
+            UnitBox unitBox = unitBoxManager.GetUnitBox(ColorType);
             if (unitBox == null)
                 return;
             

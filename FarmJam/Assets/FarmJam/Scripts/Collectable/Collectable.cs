@@ -5,7 +5,16 @@ using UnityEngine;
 
 public class Collectable : MonoBehaviour
 {
+    [SerializeField] private CollectableColorAndMesh _collectableColorAndMesh;
+    
     public bool isJumping;
+
+    [ContextMenu(" Init ")]
+    public void Init(ColorType colorType)
+    {
+        _collectableColorAndMesh.ColorType = colorType;
+        _collectableColorAndMesh.ActiveColorObject();
+    }
     public async UniTask JumpToTarget(Transform target)
     {
         isJumping = true;

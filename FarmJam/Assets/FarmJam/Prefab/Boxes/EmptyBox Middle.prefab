@@ -391,6 +391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 94502061843518846}
   - component: {fileID: 3520373867044389287}
+  - component: {fileID: 5684000539725883530}
   m_Layer: 0
   m_Name: UnitBox
   m_TagString: Untagged
@@ -437,6 +438,32 @@ MonoBehaviour:
   - {fileID: 7495721285106411902}
   - {fileID: 7592891421516541809}
   - {fileID: 320875390224921182}
+  UnitBoxColorTypeAndMat: {fileID: 5684000539725883530}
+--- !u!114 &5684000539725883530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4052484925343905523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e25e616d0004740a34cb249d261c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 6702748316700725654}
+  ColorTypeAndUnitBoxMaterialList:
+  - ColorType: 0
+    ColorMaterial: {fileID: 2100000, guid: b28f3258f43b2a94c8e85b7a4bdad589, type: 2}
+  - ColorType: 1
+    ColorMaterial: {fileID: 2100000, guid: 546c20048e2157d4083f4619893eb99d, type: 2}
+  - ColorType: 2
+    ColorMaterial: {fileID: 2100000, guid: 3308d938886343947ba06effb0b6c33e, type: 2}
+  - ColorType: 3
+    ColorMaterial: {fileID: 2100000, guid: 5e6ef36d1444ee3449d87b9b61e89009, type: 2}
+  - ColorType: 4
+    ColorMaterial: {fileID: 2100000, guid: 4436516d17978c14db6504da7808746e, type: 2}
+  ColorType: 0
 --- !u!1 &4959196554417082913
 GameObject:
   m_ObjectHideFlags: 0
@@ -916,5 +943,10 @@ BoxCollider:
 --- !u!4 &5570916216800062201 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5a7723ecd5a08a44e826cfbd46c12543, type: 3}
+  m_PrefabInstance: {fileID: 5387826556329118994}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6702748316700725654 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 5a7723ecd5a08a44e826cfbd46c12543, type: 3}
   m_PrefabInstance: {fileID: 5387826556329118994}
   m_PrefabAsset: {fileID: 0}

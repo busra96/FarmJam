@@ -157,6 +157,7 @@ MonoBehaviour:
     Collectable: {fileID: 1730195869}
   - Point: {fileID: 35434707}
     Collectable: {fileID: 1335091648}
+  ColorType: 1
 --- !u!4 &6287359
 Transform:
   m_ObjectHideFlags: 0
@@ -663,6 +664,7 @@ MonoBehaviour:
     Collectable: {fileID: 425315125}
   - Point: {fileID: 2122476638}
     Collectable: {fileID: 65898999}
+  ColorType: 3
 --- !u!4 &474780187
 Transform:
   m_ObjectHideFlags: 0
@@ -739,6 +741,7 @@ MonoBehaviour:
     Collectable: {fileID: 125834950}
   - Point: {fileID: 818714175}
     Collectable: {fileID: 1563203754}
+  ColorType: 0
 --- !u!1 &607444650
 GameObject:
   m_ObjectHideFlags: 0
@@ -1351,6 +1354,7 @@ MonoBehaviour:
     Collectable: {fileID: 1917540884}
   - Point: {fileID: 607444651}
     Collectable: {fileID: 622605808}
+  ColorType: 2
 --- !u!4 &1236906822
 Transform:
   m_ObjectHideFlags: 0

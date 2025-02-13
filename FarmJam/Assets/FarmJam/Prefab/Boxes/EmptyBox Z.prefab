@@ -424,6 +424,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8292021670630821847}
   - component: {fileID: 1938480435496673139}
+  - component: {fileID: 6093682625832943960}
   m_Layer: 0
   m_Name: UnitBox
   m_TagString: Untagged
@@ -472,6 +473,32 @@ MonoBehaviour:
   - {fileID: 7418393928514144947}
   - {fileID: 3121952562862021719}
   - {fileID: 6225083452702014854}
+  UnitBoxColorTypeAndMat: {fileID: 6093682625832943960}
+--- !u!114 &6093682625832943960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4543233992750190270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e25e616d0004740a34cb249d261c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 7459824738789212299}
+  ColorTypeAndUnitBoxMaterialList:
+  - ColorType: 0
+    ColorMaterial: {fileID: 2100000, guid: b28f3258f43b2a94c8e85b7a4bdad589, type: 2}
+  - ColorType: 1
+    ColorMaterial: {fileID: 2100000, guid: 546c20048e2157d4083f4619893eb99d, type: 2}
+  - ColorType: 2
+    ColorMaterial: {fileID: 2100000, guid: 3308d938886343947ba06effb0b6c33e, type: 2}
+  - ColorType: 3
+    ColorMaterial: {fileID: 2100000, guid: 5e6ef36d1444ee3449d87b9b61e89009, type: 2}
+  - ColorType: 4
+    ColorMaterial: {fileID: 2100000, guid: 4436516d17978c14db6504da7808746e, type: 2}
+  ColorType: 0
 --- !u!1 &5033209703561800577
 GameObject:
   m_ObjectHideFlags: 0
@@ -1091,6 +1118,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3767790661666149587}
   m_SourcePrefab: {fileID: 100100000, guid: bb939365971456e43ad3fdf53479bc5a, type: 3}
+--- !u!23 &7459824738789212299 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: bb939365971456e43ad3fdf53479bc5a, type: 3}
+  m_PrefabInstance: {fileID: 8090447018042940431}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8632753765971934180 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bb939365971456e43ad3fdf53479bc5a, type: 3}

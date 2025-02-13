@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7542975567822585259}
   - component: {fileID: 2400046809108659522}
+  - component: {fileID: 3254426052407948238}
   m_Layer: 0
   m_Name: Collectable
   m_TagString: Untagged
@@ -49,7 +50,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71211f092543a5548a3ddb4065aa6908, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _collectableColorAndMesh: {fileID: 3254426052407948238}
   isJumping: 0
+--- !u!114 &3254426052407948238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686142765926249773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9f091ed00a0fcf4481cd9a98ab45665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ColorTypeAndCollectableObjList:
+  - ColorType: 0
+    CollectableMeshRenderer: {fileID: 6887718583603106223}
+  - ColorType: 1
+    CollectableMeshRenderer: {fileID: 5549412703755184344}
+  - ColorType: 2
+    CollectableMeshRenderer: {fileID: 436736592995682684}
+  - ColorType: 3
+    CollectableMeshRenderer: {fileID: 8491782487246630400}
+  - ColorType: 4
+    CollectableMeshRenderer: {fileID: 389212954666193511}
+  ColorType: 0
 --- !u!1001 &1282976412316112376
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -98,6 +124,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 3bd03e7889616ab42b9a3f40230e141b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3bd03e7889616ab42b9a3f40230e141b, type: 3}
       propertyPath: m_Name
       value: SM_Eggplant
@@ -111,6 +141,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3bd03e7889616ab42b9a3f40230e141b, type: 3}
+--- !u!23 &436736592995682684 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 3bd03e7889616ab42b9a3f40230e141b, type: 3}
+  m_PrefabInstance: {fileID: 1282976412316112376}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1604606665040327187 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3bd03e7889616ab42b9a3f40230e141b, type: 3}
@@ -164,19 +199,28 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: abe347b2db7dbf2498e813cfe57f188d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: abe347b2db7dbf2498e813cfe57f188d, type: 3}
       propertyPath: m_Name
       value: SM_Lemon
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: abe347b2db7dbf2498e813cfe57f188d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: abe347b2db7dbf2498e813cfe57f188d, type: 3}
+--- !u!23 &389212954666193511 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: abe347b2db7dbf2498e813cfe57f188d, type: 3}
+  m_PrefabInstance: {fileID: 1344138392442064611}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1526139467075954952 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: abe347b2db7dbf2498e813cfe57f188d, type: 3}
@@ -230,13 +274,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
       propertyPath: m_Name
       value: SM_Avocado
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -246,6 +294,11 @@ PrefabInstance:
 --- !u!4 &5754821128876649152 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
+  m_PrefabInstance: {fileID: 5212778231847423275}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6887718583603106223 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
   m_PrefabInstance: {fileID: 5212778231847423275}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6540049997293728860
@@ -296,19 +349,28 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 9e07d7cb29e50344389104a61753da81, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9e07d7cb29e50344389104a61753da81, type: 3}
       propertyPath: m_Name
       value: SM_Carrot
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9e07d7cb29e50344389104a61753da81, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e07d7cb29e50344389104a61753da81, type: 3}
+--- !u!23 &5549412703755184344 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 9e07d7cb29e50344389104a61753da81, type: 3}
+  m_PrefabInstance: {fileID: 6540049997293728860}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6721716654415401911 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9e07d7cb29e50344389104a61753da81, type: 3}
@@ -362,13 +424,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 284839390b07e8e468683b10d166ed3a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 284839390b07e8e468683b10d166ed3a, type: 3}
       propertyPath: m_Name
       value: SM_Apple
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 284839390b07e8e468683b10d166ed3a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -378,5 +444,10 @@ PrefabInstance:
 --- !u!4 &7319462044043318639 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 284839390b07e8e468683b10d166ed3a, type: 3}
+  m_PrefabInstance: {fileID: 7068763070668305028}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8491782487246630400 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 284839390b07e8e468683b10d166ed3a, type: 3}
   m_PrefabInstance: {fileID: 7068763070668305028}
   m_PrefabAsset: {fileID: 0}

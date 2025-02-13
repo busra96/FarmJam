@@ -90,6 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1437152199548658195}
   - component: {fileID: 2354889066998534089}
+  - component: {fileID: 4337550157305354366}
   m_Layer: 0
   m_Name: UnitBox
   m_TagString: Untagged
@@ -138,6 +139,32 @@ MonoBehaviour:
   - {fileID: 7519412185065496541}
   - {fileID: 962883054076510018}
   - {fileID: 330432958385091646}
+  UnitBoxColorTypeAndMat: {fileID: 4337550157305354366}
+--- !u!114 &4337550157305354366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153728406767267586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e25e616d0004740a34cb249d261c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 8401465055539963722}
+  ColorTypeAndUnitBoxMaterialList:
+  - ColorType: 0
+    ColorMaterial: {fileID: 2100000, guid: b28f3258f43b2a94c8e85b7a4bdad589, type: 2}
+  - ColorType: 1
+    ColorMaterial: {fileID: 2100000, guid: 546c20048e2157d4083f4619893eb99d, type: 2}
+  - ColorType: 2
+    ColorMaterial: {fileID: 2100000, guid: 3308d938886343947ba06effb0b6c33e, type: 2}
+  - ColorType: 3
+    ColorMaterial: {fileID: 2100000, guid: 5e6ef36d1444ee3449d87b9b61e89009, type: 2}
+  - ColorType: 4
+    ColorMaterial: {fileID: 2100000, guid: 4436516d17978c14db6504da7808746e, type: 2}
+  ColorType: 0
 --- !u!1 &2077328802241880986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1119,3 +1146,8 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 8.000244, y: 0.9808159, z: 2.0002444}
   m_Center: {x: 0, y: 0.49028587, z: 0.00000011920929}
+--- !u!23 &8401465055539963722 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 10f9123c1be9f8b409d4d9ff89dfaa69, type: 3}
+  m_PrefabInstance: {fileID: 7158025572515560398}
+  m_PrefabAsset: {fileID: 0}

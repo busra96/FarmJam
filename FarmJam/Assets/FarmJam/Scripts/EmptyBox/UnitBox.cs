@@ -15,11 +15,14 @@ public class UnitBox : MonoBehaviour
    public List<UnityBoxPoint> Points;
    private bool onDestroyed = false;
 
+   public UnitBoxColorTypeAndMat UnitBoxColorTypeAndMat;
+
    private void Start()
    {
       for (int i = 0; i < Points.Count; i++)
          Points[i].Init(this);
-      
+
+      UnitBoxColorTypeAndMat.ActiveColor();
       UnitBoxSignals.OnThisUnitBoxIsFullCheck.AddListener(CheckIsFull);
    }
 
@@ -27,7 +30,7 @@ public class UnitBox : MonoBehaviour
    {
       UnitBoxSignals.OnThisUnitBoxIsFullCheck.RemoveListener(CheckIsFull);
    }
-
+   
    public void JumpToGridTile(GridTile tile)
    {
       GridTile = tile;

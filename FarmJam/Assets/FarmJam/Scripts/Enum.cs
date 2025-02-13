@@ -5,3 +5,12 @@ public enum Direction
     Left,
     Right
 }
+
+public enum ColorType
+{
+    Green,
+    Orange,
+    Purple,
+    Red,
+    Yellow
+}

@@ -83,6 +83,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2416770354491798318}
   - component: {fileID: 4759070765791222105}
+  - component: {fileID: 1463920502747476460}
   m_Layer: 0
   m_Name: UnitBox
   m_TagString: Untagged
@@ -131,6 +132,32 @@ MonoBehaviour:
   - {fileID: 8624233706457116634}
   - {fileID: 2447980160200432955}
   - {fileID: 6135593016275196246}
+  UnitBoxColorTypeAndMat: {fileID: 1463920502747476460}
+--- !u!114 &1463920502747476460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751950581258527761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e25e616d0004740a34cb249d261c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 7239117238133797176}
+  ColorTypeAndUnitBoxMaterialList:
+  - ColorType: 0
+    ColorMaterial: {fileID: 2100000, guid: b28f3258f43b2a94c8e85b7a4bdad589, type: 2}
+  - ColorType: 1
+    ColorMaterial: {fileID: 2100000, guid: 546c20048e2157d4083f4619893eb99d, type: 2}
+  - ColorType: 2
+    ColorMaterial: {fileID: 2100000, guid: 3308d938886343947ba06effb0b6c33e, type: 2}
+  - ColorType: 3
+    ColorMaterial: {fileID: 2100000, guid: 5e6ef36d1444ee3449d87b9b61e89009, type: 2}
+  - ColorType: 4
+    ColorMaterial: {fileID: 2100000, guid: 4436516d17978c14db6504da7808746e, type: 2}
+  ColorType: 0
 --- !u!1 &1140951506966682123
 GameObject:
   m_ObjectHideFlags: 0
@@ -1088,6 +1115,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1869850786541271638}
   m_SourcePrefab: {fileID: 100100000, guid: d24684a9ef051b342bdd2f06cdb2b66e, type: 3}
+--- !u!23 &7239117238133797176 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: d24684a9ef051b342bdd2f06cdb2b66e, type: 3}
+  m_PrefabInstance: {fileID: 8338158969889336764}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8376042311460637271 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d24684a9ef051b342bdd2f06cdb2b66e, type: 3}

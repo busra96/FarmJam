@@ -372,6 +372,7 @@ GameObject:
   m_Component:
   - component: {fileID: 459412978115883257}
   - component: {fileID: 5664057603932347490}
+  - component: {fileID: 5090511605978141841}
   m_Layer: 0
   m_Name: UnitBox
   m_TagString: Untagged
@@ -414,6 +415,32 @@ MonoBehaviour:
   - {fileID: 6080941005700815842}
   Points:
   - {fileID: 7803924619005717087}
+  UnitBoxColorTypeAndMat: {fileID: 5090511605978141841}
+--- !u!114 &5090511605978141841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7388646292194612790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e25e616d0004740a34cb249d261c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 2872115043193580124}
+  ColorTypeAndUnitBoxMaterialList:
+  - ColorType: 0
+    ColorMaterial: {fileID: 2100000, guid: b28f3258f43b2a94c8e85b7a4bdad589, type: 2}
+  - ColorType: 1
+    ColorMaterial: {fileID: 2100000, guid: 546c20048e2157d4083f4619893eb99d, type: 2}
+  - ColorType: 2
+    ColorMaterial: {fileID: 2100000, guid: 3308d938886343947ba06effb0b6c33e, type: 2}
+  - ColorType: 3
+    ColorMaterial: {fileID: 2100000, guid: 5e6ef36d1444ee3449d87b9b61e89009, type: 2}
+  - ColorType: 4
+    ColorMaterial: {fileID: 2100000, guid: 4436516d17978c14db6504da7808746e, type: 2}
+  ColorType: 0
 --- !u!1001 &3466180496230807256
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -485,6 +512,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7007321145765109675}
   m_SourcePrefab: {fileID: 100100000, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+--- !u!23 &2872115043193580124 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
+  m_PrefabInstance: {fileID: 3466180496230807256}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4003948242873356595 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 79b316c8c6acd044c88f8d016bba1cf2, type: 3}
