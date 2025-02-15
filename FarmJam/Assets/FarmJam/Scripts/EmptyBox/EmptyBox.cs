@@ -8,6 +8,7 @@ using UnityEngine;
 public class EmptyBox : MonoBehaviour
 {
     public UnitBox UnitBox;
+    public TetrisSpacing TetrisSpacing;
     private EmptyBoxMovement _emptyBoxMovement;
     
     public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
@@ -24,6 +25,7 @@ public class EmptyBox : MonoBehaviour
 
     public void Init()
     {
+        TetrisSpacing = GetComponentInChildren<TetrisSpacing>();
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
         _cancellationTokenSource = new CancellationTokenSource();
@@ -118,6 +120,7 @@ public class EmptyBox : MonoBehaviour
                 {
                    UnitBox.JumpToGridTile(GridControlColliders[i].GridTile);
                    EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
+                   EmptyBoxSignals.OnRemovedTetrisLayoutList?.Dispatch(this);
                    DestroySelf().Forget();
                    break;
                 }

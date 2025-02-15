@@ -98,13 +98,13 @@ public class EmptyBoxMovement : MonoBehaviour
         float currentYRotation = rotatePoint.eulerAngles.y;
         float newYRotation = currentYRotation + 90f;
 
-        rotatePoint.DORotateQuaternion(Quaternion.Euler(0, newYRotation, 0), 0.1f).SetEase(Ease.Linear);
+        rotatePoint.DORotateQuaternion(Quaternion.Euler(0, newYRotation, 0), 0.1f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch());
     }
 
     private void ResetObjectPositionAndScale()
     {
         isMouseDown = false;
-        transform.DOMove(startPosition, 0.1f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this));
+        transform.DOLocalMove(Vector3.zero, 0.1f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this));
         ScaleTweenTo(initialScale, 0.1f);
     }
 

@@ -58,9 +58,12 @@ public class EmptyBoxSpawner : MonoBehaviour
        
        int randomIndex = Random.Range(0, AllEmptyBoxPrefabs.Count);
        EmptyBox emptyBox = Instantiate(AllEmptyBoxPrefabs[randomIndex], spawnPoint.transform.position, Quaternion.identity);
-
+       emptyBox.transform.SetParent(spawnPoint.transform);
+       emptyBox.transform.localPosition = Vector3.zero;
        spawnPoint.SetEmptyBox(emptyBox);
        AddedEmptyBox(emptyBox);
+      
+       EmptyBoxSignals.OnAddedTetrisSpacingLayoutList?.Dispatch(emptyBox);
     }
 
     public SpawnPoint GetEmptySpawnPoint()

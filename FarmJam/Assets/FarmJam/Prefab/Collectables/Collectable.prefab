@@ -288,7 +288,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -356,7 +356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
-  fixedRotation: {x: -40, y: 180, z: 0}
+  fixedRotation: {x: -70, y: 180, z: 0}
 --- !u!4 &5754821128876649152 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2a35a4e3fd9f50542abafc579497252e, type: 3}
