@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class TetrisSpacing : MonoBehaviour
 {
+    public Collider Collider;
     public float TargetAngle;
     
     // Açılara göre kapladığı alan (Örn: 2x1 yatayken 2, dikeyken 1)

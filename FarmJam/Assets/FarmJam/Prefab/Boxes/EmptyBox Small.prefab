@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7012053341145315860}
   - component: {fileID: 4400604331291904218}
+  - component: {fileID: 8700549559154513884}
   m_Layer: 0
   m_Name: RotatePoint
   m_TagString: Untagged
@@ -45,11 +46,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 082214c24d2e1564d83cbfb8159f467f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collider: {fileID: 8700549559154513884}
   TargetAngle: 0
   sizeAt0: {x: 1.5, y: 1.5}
   sizeAt90: {x: 0.75, y: 0.75}
   sizeAt180: {x: 1.5, y: 1.5}
   sizeAt270: {x: 0.75, y: 0.75}
+--- !u!65 &8700549559154513884
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 826575157981713542}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.0001225, y: 0.9806938, z: 2.0001223}
+  m_Center: {x: 0, y: 0.49028587, z: 0.00000011920929}
 --- !u!1 &1014491660527770154
 GameObject:
   m_ObjectHideFlags: 0
