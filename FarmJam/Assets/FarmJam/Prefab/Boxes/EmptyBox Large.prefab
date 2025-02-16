@@ -951,6 +951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UnitBox: {fileID: 2354889066998534089}
+  TetrisSpacing: {fileID: 0}
   GridControlColliders:
   - {fileID: 4478714917860056519}
   - {fileID: 7244825557928831877}
@@ -972,6 +973,7 @@ MonoBehaviour:
   planeLayer:
     serializedVersion: 2
     m_Bits: 64
+  TetrisSpacing: {fileID: 415485822410106080}
   maxYPos: 1.25
   moveSpeed: 50
   clickTimerDuration: 0.25
@@ -1057,11 +1059,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 082214c24d2e1564d83cbfb8159f467f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pieceType: 4X1
-  sizeAt0: {x: 2, y: 2}
-  sizeAt90: {x: 1, y: 1}
-  sizeAt180: {x: 2, y: 2}
-  sizeAt270: {x: 1, y: 1}
+  TargetAngle: 0
+  sizeAt0: {x: 3, y: 3}
+  sizeAt90: {x: 0.75, y: 0.75}
+  sizeAt180: {x: 3, y: 3}
+  sizeAt270: {x: 0.75, y: 0.75}
 --- !u!1001 &7158025572515560398
 PrefabInstance:
   m_ObjectHideFlags: 0

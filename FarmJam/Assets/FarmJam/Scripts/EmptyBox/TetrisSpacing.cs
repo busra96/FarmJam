@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TetrisSpacing : MonoBehaviour
 {
-    public string pieceType; // Örn: "2x1", "3x1"
+    public float TargetAngle;
     
     // Açılara göre kapladığı alan (Örn: 2x1 yatayken 2, dikeyken 1)
     public Vector2 sizeAt0 = Vector2.one;

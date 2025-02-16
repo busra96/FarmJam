@@ -588,11 +588,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 082214c24d2e1564d83cbfb8159f467f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pieceType: 3X1
-  sizeAt0: {x: 2, y: 2}
-  sizeAt90: {x: 1, y: 1}
-  sizeAt180: {x: 2, y: 2}
-  sizeAt270: {x: 1, y: 1}
+  TargetAngle: 0
+  sizeAt0: {x: 2.25, y: 2.25}
+  sizeAt90: {x: 0.75, y: 0.75}
+  sizeAt180: {x: 2.25, y: 2.25}
+  sizeAt270: {x: 0.75, y: 0.75}
 --- !u!1 &6197590519538309962
 GameObject:
   m_ObjectHideFlags: 0
@@ -836,6 +836,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UnitBox: {fileID: 3520373867044389287}
+  TetrisSpacing: {fileID: 0}
   GridControlColliders:
   - {fileID: 8123798091209435644}
   - {fileID: 9013969853748409568}
@@ -856,6 +857,7 @@ MonoBehaviour:
   planeLayer:
     serializedVersion: 2
     m_Bits: 64
+  TetrisSpacing: {fileID: 7869455305377521416}
   maxYPos: 1.25
   moveSpeed: 50
   clickTimerDuration: 0.25

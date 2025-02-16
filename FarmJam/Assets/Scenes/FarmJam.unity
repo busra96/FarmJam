@@ -544,7 +544,8 @@ MonoBehaviour:
   P1: {fileID: 0}
   P2: {fileID: 0}
   centerPosition: {x: 0, y: 0, z: -10}
-  extraSpacing: 1.5
+  extraSpacing: 0.75
+  speed: 0.1
 --- !u!4 &227207388
 Transform:
   m_ObjectHideFlags: 0

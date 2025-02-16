@@ -30,11 +30,14 @@ public class EmptyBox : MonoBehaviour
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
         _cancellationTokenSource = new CancellationTokenSource();
         
-        transform.localScale = Vector3.one * 0.7f;
+      /*  transform.localScale = Vector3.one * 0.7f;
         transform.DOPunchScale(Vector3.one * 0.2f, 0.2f, 8, 0.5f).SetEase(Ease.OutBounce)
-            .OnComplete(() => transform.localScale = Vector3.one * .7f);
+            .OnComplete(() => transform.localScale = Vector3.one * .7f);*/
+
+        transform.localScale = Vector3.zero;
+        transform.DOScale(Vector3.one * 0.7f, .2f).SetEase(Ease.InBounce);
         
-        
+        EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
         SelectableColliderIsActive(true);
     }
 
@@ -120,8 +123,8 @@ public class EmptyBox : MonoBehaviour
                 {
                    UnitBox.JumpToGridTile(GridControlColliders[i].GridTile);
                    EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
-                   EmptyBoxSignals.OnRemovedTetrisLayoutList?.Dispatch(this);
                    DestroySelf().Forget();
+                   EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
                    break;
                 }
             } 

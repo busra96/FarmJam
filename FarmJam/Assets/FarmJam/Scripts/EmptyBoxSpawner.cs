@@ -63,7 +63,7 @@ public class EmptyBoxSpawner : MonoBehaviour
        spawnPoint.SetEmptyBox(emptyBox);
        AddedEmptyBox(emptyBox);
       
-       EmptyBoxSignals.OnAddedTetrisSpacingLayoutList?.Dispatch(emptyBox);
+   
     }
 
     public SpawnPoint GetEmptySpawnPoint()
