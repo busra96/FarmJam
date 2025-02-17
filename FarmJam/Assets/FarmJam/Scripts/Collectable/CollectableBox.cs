@@ -7,7 +7,8 @@ using VContainer;
 
 public class CollectableBox : MonoBehaviour
 {
-    public bool IsLock;
+    public Transform BoxcastStartPoint;
+    public bool IsLocked;
     [Inject] public UnitBoxManager unitBoxManager;
     public List<CollectableParameter> CollectableParameters;
     private bool jumping = false;
@@ -29,7 +30,7 @@ public class CollectableBox : MonoBehaviour
 
     public async UniTask FindUnitBox()
     {
-        if(IsLock) return;
+        if(IsLocked) return;
         
         foreach (var collectableParameter in CollectableParameters)
         {
@@ -73,6 +74,47 @@ public class CollectableBox : MonoBehaviour
                 .OnComplete(() => Destroy(gameObject));
         }
     }
+    
+    [ContextMenu(" Set Color")]
+    public void CheckIsLocked()
+    {
+        Vector3 halfExtents = lockBoxScale; 
+        Vector3 boxCenter = BoxcastStartPoint.position;
+
+        Collider[] colliders = Physics.OverlapBox(boxCenter, halfExtents, Quaternion.identity);
+
+        bool hasBoxAbove = false;
+            
+        foreach (var collider in colliders)
+        {
+            if (collider != null && collider.gameObject != gameObject)
+            {
+                hasBoxAbove = true;
+                break; //
+            }
+        }
+
+        if (!hasBoxAbove)
+        {
+            //Debug.Log("Üzerimde başka kutu yok, kilit açıldı: " + gameObject.name);
+            IsLocked = false; 
+        }
+        else
+        {
+            //Debug.Log("Üzerimde başka bir kutu var: " + gameObject.name);
+            IsLocked = true; 
+        }
+    }
+        
+    public Vector3 lockBoxScale = Vector3.one;
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Vector3 halfExtents = lockBoxScale; // Kutunun yarı boyutları
+        Vector3 boxCenter = BoxcastStartPoint.position;    // Kutunun merkez noktası
+        Gizmos.DrawWireCube(boxCenter, halfExtents );   // Yarı boyutların tam kutu boyutuna dönüşümü
+    }
+    
 }
 
 [Serializable]
