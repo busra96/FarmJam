@@ -466,7 +466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UnitBox: {fileID: 8185060776448401598}
-  TetrisSpacing: {fileID: 0}
+  Collider: {fileID: 8791584442053476375}
   GridControlColliders:
   - {fileID: 515711821886125895}
   - {fileID: 7202784515553786175}
@@ -487,7 +487,7 @@ MonoBehaviour:
   planeLayer:
     serializedVersion: 2
     m_Bits: 64
-  TetrisSpacing: {fileID: 4135344240074385657}
+  TetrisSpacing: {fileID: 0}
   maxYPos: 1.25
   moveSpeed: 50
   clickTimerDuration: 0.25
@@ -502,7 +502,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6103925512587187346}
-  - component: {fileID: 4135344240074385657}
   - component: {fileID: 8791584442053476375}
   m_Layer: 0
   m_Name: RotatePoint
@@ -527,24 +526,6 @@ Transform:
   - {fileID: 3011834328894488178}
   m_Father: {fileID: 7963715593647097680}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4135344240074385657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3854693733978777927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 082214c24d2e1564d83cbfb8159f467f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Collider: {fileID: 8791584442053476375}
-  TargetAngle: 0
-  sizeAt0: {x: 2.25, y: 0.75}
-  sizeAt90: {x: 2.25, y: 0.75}
-  sizeAt180: {x: 0.75, y: 2.25}
-  sizeAt270: {x: 0.75, y: 2.25}
 --- !u!65 &8791584442053476375
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -4,14 +4,11 @@ using UnityEngine;
 
 public class EmptyBoxMovement : MonoBehaviour
 {
-    
     [Header("References")]
     [SerializeField] private Transform rotatePoint;
     private Camera mainCamera;
     [SerializeField] private LayerMask planeLayer;
 
-    public TetrisSpacing TetrisSpacing;
-    
     [Header("Settings")]
     [SerializeField] private float maxYPos = 1.25f;
     [SerializeField] private float moveSpeed = 5f; 
@@ -98,7 +95,6 @@ public class EmptyBoxMovement : MonoBehaviour
 
         float currentYRotation = rotatePoint.eulerAngles.y;
         float newYRotation = currentYRotation + 90f;
-        TetrisSpacing.TargetAngle = newYRotation;
 
         rotatePoint.DORotateQuaternion(Quaternion.Euler(0, newYRotation, 0), 0.1f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch());
     }
@@ -106,7 +102,7 @@ public class EmptyBoxMovement : MonoBehaviour
     private void ResetObjectPositionAndScale()
     {
         isMouseDown = false;
-        transform.DOLocalMove(Vector3.zero, 0.25f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this));
+        EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this);
         ScaleTweenTo(initialScale, 0.1f);
     }
 

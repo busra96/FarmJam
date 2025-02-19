@@ -8,31 +8,22 @@ using UnityEngine;
 public class EmptyBox : MonoBehaviour
 {
     public UnitBox UnitBox;
-    public TetrisSpacing TetrisSpacing;
     private EmptyBoxMovement _emptyBoxMovement;
+    public Collider Collider;
     
     public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
     private bool _onGridTile;
     
     private bool isActive;
     private CancellationTokenSource _cancellationTokenSource;
-
-    private void Start()
-    {
-        Init();
-        _emptyBoxMovement.Init();
-    }
+    
 
     public void Init()
     {
-        TetrisSpacing = GetComponentInChildren<TetrisSpacing>();
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
+        _emptyBoxMovement.Init();
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
         _cancellationTokenSource = new CancellationTokenSource();
-        
-      /*  transform.localScale = Vector3.one * 0.7f;
-        transform.DOPunchScale(Vector3.one * 0.2f, 0.2f, 8, 0.5f).SetEase(Ease.OutBounce)
-            .OnComplete(() => transform.localScale = Vector3.one * .7f);*/
 
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one * 0.7f, .2f).SetEase(Ease.InBounce);
@@ -53,6 +44,8 @@ public class EmptyBox : MonoBehaviour
         _emptyBoxMovement.HandleMouseDown(pos);
         SelectableColliderIsActive(false);
         CheckInput().Forget();
+        
+        EmptyBoxSignals.OnRemovedEmptyBox?.Dispatch(this);
     }
 
     public void Deselected(Vector3 pos)
@@ -137,7 +130,9 @@ public class EmptyBox : MonoBehaviour
                 gridControlCollider.GridTile = null;
             }
 
+            EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(this);
             _emptyBoxMovement.HandleMouseUp();
+          
         }
     }
     

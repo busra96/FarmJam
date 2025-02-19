@@ -1,178 +1,215 @@
-using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Signals;
 using UnityEngine;
 
 public class TetrisSpacingLayoutManager : MonoBehaviour
 {
-   public List<SpawnPoint> spawnPoints; // Spawn noktalarının transform'ları
-   public TetrisSpacing P0;
-   public TetrisSpacing P1;
-   public TetrisSpacing P2;
-   
-   public Vector3 centerPosition; // Orta nokta
-   public float extraSpacing = 0.5f; // Parçalar arasında ekstra boşluk
-   public float speed = .05f;
+   public List<EmptyBox> objects = new List<EmptyBox>(); // Dinamik obje listesi
+    public float moveDuration = 0.5f; // Yumuşak geçiş süresi
 
-   private void OnEnable()
-   {
-      EmptyBoxSignals.OnUpdateTetrisLayout.AddListener(ArrangeSpawnPoints);
-   }
-   private void OnDisable()
-   {
-      EmptyBoxSignals.OnUpdateTetrisLayout.RemoveListener(ArrangeSpawnPoints);
-   }
-
-    [ContextMenu(" ArrangeSpawnPoints ")]
-    public void ArrangeSpawnPoints()
+    private void OnEnable()
     {
-        Debug.Log(" Arrange SpawnPoints  ");
-        P0 = spawnPoints[0].EmptyBox?.TetrisSpacing;
-        P1 = spawnPoints[1].EmptyBox?.TetrisSpacing;
-        P2 = spawnPoints[2].EmptyBox?.TetrisSpacing;
-        
+        EmptyBoxSignals.OnAddedEmptyBox.AddListener(OnSpawnedEmptyBox); 
+        EmptyBoxSignals.OnTheEmptyBoxRemoved.AddListener(OnRemovedEmptyBox); 
+        EmptyBoxSignals.OnRemovedEmptyBox.AddListener(OnRemovedEmptyBox);
+        EmptyBoxSignals.OnUpdateTetrisLayout.AddListener(OnUpdateTetrisLayout);
+    }
 
-        if (P0 != null && P1 == null && P2 == null)
+    private void OnDisable()
+    {
+        EmptyBoxSignals.OnAddedEmptyBox.RemoveListener(OnSpawnedEmptyBox); 
+        EmptyBoxSignals.OnTheEmptyBoxRemoved.RemoveListener(OnRemovedEmptyBox); 
+        EmptyBoxSignals.OnRemovedEmptyBox.RemoveListener(OnRemovedEmptyBox);
+        EmptyBoxSignals.OnUpdateTetrisLayout.RemoveListener(OnUpdateTetrisLayout);
+    }
+
+    private void OnUpdateTetrisLayout()
+    {
+        UpdateTetrisLayout();
+    }
+
+    private void OnSpawnedEmptyBox(EmptyBox obj)
+    {
+        if(objects.Contains(obj))
+            return;
+       
+        objects.Add(obj);
+        UpdateTetrisLayout();
+    }
+
+    public async UniTask UpdateTetrisLayout()
+    {
+        await UniTask.DelayFrame(20);
+        UpdateLayout();
+        await UniTask.DelayFrame(20);
+        await PositionObjectsSmooth(); // Smooth geçişi çağır
+    }
+
+    private void OnRemovedEmptyBox(EmptyBox obj)
+    {
+        if(!objects.Contains(obj))
+            return;
+       
+        objects.Remove(obj);
+        UpdateTetrisLayout();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
         {
-            Debug.Log(" SAdECE P0 NULL DEĞİL ");
-            spawnPoints[0].transform.position = centerPosition;
+            UpdateLayout();
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            _ = PositionObjectsSmooth(); // Smooth versiyonu çağır
+        }
+    }
+
+    /// <summary>
+    /// Objeleri güncelleyerek pivot noktalarını tekrar hesaplar ve konumlarını belirler.
+    /// </summary>
+    public void UpdateLayout()
+    {
+        if (objects == null || objects.Count == 0)
+        {
+            Debug.LogWarning("Liste boş, işlem yapılmadı.");
             return;
         }
-        
-        if (P0 == null && P1 != null && P2 == null)
+
+        // 1. Önce Pivot Noktalarını Düzenle (Child Collider'a göre EmptyBox'ı hizala)
+        foreach (var obj in objects)
         {
-            Debug.Log(" SAdECE P1 NULL DEĞİL ");
-            spawnPoints[1].transform.position = centerPosition;
+            AdjustPivotToBottomCenter(obj);
+        }
+    }
+
+    /// <summary>
+    /// EmptyBox'ın kendi child Collider'ına göre pivot noktasını ayarlar.
+    /// </summary>
+    void AdjustPivotToBottomCenter(EmptyBox emptyBox)
+    {
+        if (emptyBox == null || emptyBox.Collider == null)
+        {
+            Debug.LogError($"Objede Collider bulunamadı veya obje null: {emptyBox?.gameObject.name}");
             return;
         }
-        
-        if (P0 == null && P1 == null && P2 != null)
+
+        Collider col = emptyBox.Collider;
+        Bounds bounds = col.bounds;
+        Vector3 newPivotPosition = new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
+
+        Transform parentTransform = emptyBox.transform;
+
+        if (parentTransform == null)
         {
-            Debug.Log(" SAdECE P2 NULL DEĞİL ");
-            spawnPoints[2].transform.position = centerPosition;
+            Debug.LogWarning($"Objenin parent'ı yok: {emptyBox.gameObject.name}, işlem yapılamadı.");
             return;
         }
 
-        
-        if (P0 != null && P1 != null && P2 != null)
-            CalculateP0P1P2();
-        
-        else if (P0 != null && P1 != null && P2 == null)
-            CalculateP0P1();
+        // Mevcut EmptyBox'ı, Child'ın collider'ına göre hizala
+        Vector3 offset = parentTransform.position - newPivotPosition;
+        parentTransform.position -= offset;
 
-        else if (P0 != null && P1 == null && P2 != null)
-            CalculateP0P2();
-
-        else if (P0 == null && P1 != null && P2 != null)
-            CalculateP1P2();
-
+        // Çocukları orijinal pozisyonlarını koruyarak hizala
+        foreach (Transform child in parentTransform)
+        {
+            child.position += offset;
+        }
     }
 
-    public void CalculateP0P1()
+    /// <summary>
+    /// Ekran genişliği ve obje boyutlarına göre objeleri hizalar (SERT geçiş).
+    /// </summary>
+    public void PositionObjects()
     {
-        Debug.Log(" CalculateP0P1 ");
-        Vector2 P0Spacing = P0.GetSizeAtRotation(Mathf.RoundToInt(P0.TargetAngle));
-        float p0RightSpacing = P0Spacing.y;
-        
-        Vector2 P1Spacing = P1.GetSizeAtRotation(Mathf.RoundToInt(P1.TargetAngle));
-        float p1LeftSpacing = P1Spacing.x;
+        if (objects == null || objects.Count == 0)
+        {
+            Debug.LogWarning("Liste boş, hizalama yapılmadı.");
+            return;
+        }
 
-        float targetSpacing = (p0RightSpacing + p1LeftSpacing + extraSpacing) * .5f;
-        float P0TargetXPosition = centerPosition.x - targetSpacing;
-       // spawnPoints[0].transform.position = new Vector3(P0TargetXPosition, 0,-10);
-        spawnPoints[0].transform.DOMoveX(P0TargetXPosition, speed).SetEase(Ease.Linear);
-        
-        
-        float P1TargetXPosition = centerPosition.x + targetSpacing;
-       // spawnPoints[1].transform.position = new Vector3(P1TargetXPosition, 0,-10);
-        spawnPoints[1].transform.DOMoveX(P1TargetXPosition, speed).SetEase(Ease.Linear);
+        float screenWorldWidth = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 10)).x * 2;
+        float[] widths = new float[objects.Count];
+        float totalWidth = 0;
 
-    }
-    
-    
-    // X _> LEFT           Y _> RİGHT
-    public void CalculateP1P2()
-    {
-        Debug.Log(" CalculateP1P2 ");
-        Vector2 P1Spacing = P1.GetSizeAtRotation(Mathf.RoundToInt(P1.TargetAngle));
-        float p1RightSpacing = P1Spacing.y;
-        
-        Vector2 P2Spacing = P2.GetSizeAtRotation(Mathf.RoundToInt(P2.TargetAngle));
-        float p2LeftSpacing = P2Spacing.x;
+        for (int i = 0; i < objects.Count; i++)
+        {
+            Collider col = objects[i].Collider;
+            if (col != null)
+            {
+                widths[i] = col.bounds.size.x;
+                totalWidth += widths[i];
+            }
+        }
 
-        float targetSpacing = (p1RightSpacing + p2LeftSpacing + extraSpacing) * .5f;
-        float P1TargetPositionX = centerPosition.x - targetSpacing;
-       // spawnPoints[1].transform.position = new Vector3(P1TargetPositionX, 0,-10);
-        spawnPoints[1].transform.DOMoveX(P1TargetPositionX, speed).SetEase(Ease.Linear);
+        float totalSpacing = screenWorldWidth - totalWidth;
+        float spacing = totalSpacing / (objects.Count + 1);
+        float currentX = -screenWorldWidth / 2 + spacing;
 
-        float P2TargetXPosition = centerPosition.x + targetSpacing;
-       // spawnPoints[2].transform.position = new Vector3(P2TargetXPosition, 0,-10);
-        spawnPoints[2].transform.DOMoveX(P2TargetXPosition, speed).SetEase(Ease.Linear);
-        
+        for (int i = 0; i < objects.Count; i++)
+        {
+            float halfWidth = widths[i] / 2;
+            objects[i].transform.position = new Vector3(currentX + halfWidth, 0, -10);
+            currentX += widths[i] + spacing;
+        }
     }
 
-    public void CalculateP0P2()
+    /// <summary>
+    /// Objeleri ekranda yumuşak bir şekilde hareket ettirerek hizalar.
+    /// </summary>
+    public async UniTask PositionObjectsSmooth()
     {
-        Debug.Log(" CalculateP0P2 ");
-        Vector2 P0Spacing = P0.GetSizeAtRotation(Mathf.RoundToInt(P0.TargetAngle));
-        float p0RightSpacing = P0Spacing.y;
-        
-        Vector2 P2Spacing = P2.GetSizeAtRotation(Mathf.RoundToInt(P2.TargetAngle));
-        float p2LeftSpacing = P2Spacing.x;
+        if (objects == null || objects.Count == 0)
+        {
+            Debug.LogWarning("Liste boş, hizalama yapılmadı.");
+            return;
+        }
 
-        float targetSpacing = (p0RightSpacing + p2LeftSpacing + extraSpacing) * .5f;
-        float P0TargetXPosition = centerPosition.x - targetSpacing;
-       // spawnPoints[0].transform.position = new Vector3(P0TargetXPosition, 0,-10);
-       spawnPoints[0].transform.DOMoveX(P0TargetXPosition, speed).SetEase(Ease.Linear);
+        float screenWorldWidth = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 10)).x * 2;
+        float[] widths = new float[objects.Count];
+        float totalWidth = 0;
 
-        float P2TargetXPosition = centerPosition.x + targetSpacing;
-        //spawnPoints[2].transform.position = new Vector3(P2TargetXPosition, 0,-10);
-        spawnPoints[2].transform.DOMoveX(P2TargetXPosition, speed).SetEase(Ease.Linear);
-        
+        for (int i = 0; i < objects.Count; i++)
+        {
+            Collider col = objects[i].Collider;
+            if (col != null)
+            {
+                widths[i] = col.bounds.size.x;
+                totalWidth += widths[i];
+            }
+        }
+
+        float totalSpacing = screenWorldWidth - totalWidth;
+        float spacing = totalSpacing / (objects.Count + 1);
+        float currentX = -screenWorldWidth / 2 + spacing;
+
+        List<UniTask> moveTasks = new List<UniTask>(); // Paralel hareket işlemleri için liste
+
+        for (int i = 0; i < objects.Count; i++)
+        {
+            float halfWidth = widths[i] / 2;
+            Vector3 targetPosition = new Vector3(currentX + halfWidth, 0, -10);
+            
+            // UniTask yerine klasik DoTween kullanımı
+            moveTasks.Add(UniTask.Create(async () => 
+                await objects[i].transform.DOMove(targetPosition, moveDuration).SetEase(Ease.OutQuad).AsyncWaitForCompletion()));
+
+            currentX += widths[i] + spacing;
+        }
+
+        await UniTask.WhenAll(moveTasks); // Tüm hareketlerin tamamlanmasını bekle
     }
 
-    public void CalculateP0P1P2()
+    /// <summary>
+    /// Editor'de obje listesi değiştiğinde otomatik olarak güncellenmesini sağlar.
+    /// </summary>
+    private void OnValidate()
     {
-        
-        Debug.Log(" CalculateP0P1P2 ");
-        Vector2 P0Spacing = P0.GetSizeAtRotation(Mathf.RoundToInt(P0.TargetAngle));
-        float p0RightSpacing = P0Spacing.y;
-        
-        Vector2 P1Spacing = P1.GetSizeAtRotation(Mathf.RoundToInt(P1.TargetAngle));
-        float p1LeftSpacing = P1Spacing.x;
-        float p1RightSpacing = P1Spacing.y;
-        
-        Vector2 P2Spacing = P2.GetSizeAtRotation(Mathf.RoundToInt(P2.TargetAngle));
-        float p2LeftSpacing = P2Spacing.x;
-
-        float targetSpacingP0P1 = (p0RightSpacing + p1LeftSpacing + extraSpacing);
-        float P0TargetXPosition = centerPosition.x - targetSpacingP0P1;
-        
-        float targetSpacingP1P2 = (p1RightSpacing + p2LeftSpacing + extraSpacing);
-        float P2TargetXPosition = centerPosition.x + targetSpacingP1P2;
-
-        float newXOffset = 0;
-        // if (P0TargetXPosition < -6 && P2TargetXPosition < 6)
-        // {
-        //     newXOffset =Mathf.Abs(-6 - P0TargetXPosition);
-        // }
-        // else if (P0TargetXPosition > -6 && P2TargetXPosition > 6)
-        // {
-        //     newXOffset = P2TargetXPosition - 6;
-        //     newXOffset *= -1;
-        // }
-
-        P0TargetXPosition += newXOffset;
-        //spawnPoints[0].transform.position = new Vector3(P0TargetXPosition, 0,-10);
-        spawnPoints[0].transform.DOMoveX(P0TargetXPosition, speed).SetEase(Ease.Linear);
-
-       // spawnPoints[1].transform.position = centerPosition;
-       spawnPoints[1].transform.DOMoveX(newXOffset, .05f).SetEase(Ease.Linear);
-
-        P2TargetXPosition += newXOffset;
-        //spawnPoints[2].transform.position = new Vector3(P2TargetXPosition, 0,-10);
-        spawnPoints[2].transform.DOMoveX(P2TargetXPosition, speed).SetEase(Ease.Linear);
+        UpdateLayout();
     }
 
 }
