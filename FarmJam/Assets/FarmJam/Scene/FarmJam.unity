@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objects: []
-  moveDuration: 0.1
+  moveDuration: 0.05
 --- !u!4 &227207388
 Transform:
   m_ObjectHideFlags: 0
@@ -651,8 +651,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce48eb25a22ada4a9f89238eff572cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HasEmptyBox: 0
-  EmptyBox: {fileID: 0}
 --- !u!1 &1547549529
 GameObject:
   m_ObjectHideFlags: 0
