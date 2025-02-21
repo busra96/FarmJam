@@ -194,11 +194,12 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
             float halfWidth = widths[i] / 2;
             Vector3 targetPosition = new Vector3(currentX + halfWidth, 0, -10);
 
-            // DoTween ile animasyonu başlat
-            moveTasks.Add(UniTask.Create(async () =>
-                await objects[i].transform.DOMove(targetPosition, moveDuration)
-                    .SetEase(Ease.OutQuad)
-                    .AsyncWaitForCompletion()));
+            moveTasks.Add(objects[i].transform
+                .DOMove(targetPosition, moveDuration)
+                .SetEase(Ease.InOutQuad)
+                .SetUpdate(UpdateType.Normal, true)
+                .AsyncWaitForCompletion().AsUniTask()); // HATAYI DÜZELTEN KOD
+
 
             currentX += widths[i] + spacing;
         }

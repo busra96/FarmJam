@@ -6,8 +6,9 @@ public class EmptyBoxMovement : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform rotatePoint;
-    private Camera mainCamera;
     [SerializeField] private LayerMask planeLayer;
+    
+    private Camera mainCamera;
 
     [Header("Settings")]
     [SerializeField] private float maxYPos = 1.25f;
@@ -18,18 +19,17 @@ public class EmptyBoxMovement : MonoBehaviour
 
     private bool isMouseDown;
     private float clickTimer;
-    private Vector3 startPosition;
     private Vector3 movingPosition;
     private Vector3 lastMouseWorldPosition;
     private Tween scaleTween;
     
     private bool isActive;
 
-    public void Init()
+     public void Init()
     {
         mainCamera = Camera.main;
-        InitializeValues();
-        
+        ResetScale();
+
         InputSignals.OnInputGetMouseHold.AddListener(HandleMouseHold);
     }
 
@@ -38,68 +38,74 @@ public class EmptyBoxMovement : MonoBehaviour
         InputSignals.OnInputGetMouseHold.RemoveListener(HandleMouseHold);
     }
 
-    private void InitializeValues()
+    private void ResetScale()
     {
-        startPosition = transform.position;
-        movingPosition = startPosition;
         transform.localScale = initialScale;
     }
 
+    /// <summary>
+    /// Kullanıcı bir objeye tıkladığında çalışır.
+    /// Objeyi **direkt olarak mouse'un olduğu noktaya yerleştirir** ve takibe başlar.
+    /// </summary>
     public void HandleMouseDown(Vector3 mousePosition)
     {
         isMouseDown = true;
         clickTimer = clickTimerDuration;
+        isActive = true; // Objeyi mouse ile sürükleyebiliriz
 
-        ScaleTweenTo(clickScale, 0.25f);
-
-        movingPosition = transform.position;
-        lastMouseWorldPosition = GetMouseWorldPosition(mousePosition);
+        ScaleTweenTo(clickScale, 0.15f);
         
-        isActive = true;
+        // **Objeyi direkt mouse'un olduğu noktaya taşı!**
+        lastMouseWorldPosition = GetMouseWorldPosition(mousePosition);
+        transform.position = new Vector3(lastMouseWorldPosition.x, maxYPos, lastMouseWorldPosition.z);
     }
 
+    /// <summary>
+    /// Kullanıcı mouse'u basılı tutuyorsa, obje mouse'u takip eder.
+    /// </summary>
     private void HandleMouseHold(Vector3 pos)
     {
-        if(!isActive) return;
-        
+        if (!isActive) return;
+
         clickTimer = Mathf.Max(clickTimer - Time.deltaTime, 0);
 
         Vector3 currentMouseWorldPos = GetMouseWorldPosition(pos);
-
         Vector3 velocity = currentMouseWorldPos - lastMouseWorldPosition;
-        velocity.y = 0; 
+        velocity.y = 0; // Y ekseninde hareket engellendi
 
-        movingPosition += velocity;
-
-        Vector3 targetPos = new Vector3(movingPosition.x, maxYPos, movingPosition.z);
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-
-        lastMouseWorldPosition = currentMouseWorldPos;
+        transform.position += velocity; // **Hareket farkı kadar pozisyon güncellendi**
+        lastMouseWorldPosition = currentMouseWorldPos; // Yeni mouse konumu kaydedildi
     }
 
+    /// <summary>
+    /// Kullanıcı mouse'u bıraktığında çalışır.
+    /// Eğer kısa sürede bırakılmışsa, objeyi döndür.
+    /// </summary>
     public void HandleMouseUp()
     {
+        if (!isActive) return;
+
         isActive = false;
-        
+
         if (isMouseDown && clickTimer > 0)
         {
             RotateObject();
         }
 
-        ResetObjectPositionAndScale();
+        ResetObjectState();
     }
 
     private void RotateObject()
     {
         isMouseDown = false;
 
-        float currentYRotation = rotatePoint.eulerAngles.y;
-        float newYRotation = currentYRotation + 90f;
-
-        rotatePoint.DORotateQuaternion(Quaternion.Euler(0, newYRotation, 0), 0.1f).SetEase(Ease.Linear).OnComplete(()=> EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch());
+        rotatePoint
+            .DORotateQuaternion(Quaternion.Euler(0, rotatePoint.eulerAngles.y + 90f, 0), 0.1f)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch());
     }
 
-    private void ResetObjectPositionAndScale()
+    private void ResetObjectState()
     {
         isMouseDown = false;
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this);
@@ -116,11 +122,8 @@ public class EmptyBoxMovement : MonoBehaviour
     {
         Ray ray = mainCamera.ScreenPointToRay(mousePos);
 
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, planeLayer))
-        {
-            return hitInfo.point;
-        }
-
-        return lastMouseWorldPosition; // Eğer bir yere vurmazsa son pozisyonu döndür
+        return Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, planeLayer) 
+            ? hitInfo.point 
+            : lastMouseWorldPosition;
     }
 }

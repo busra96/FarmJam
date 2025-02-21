@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -16,34 +17,35 @@ public class EmptyBox : MonoBehaviour
     
     private bool isActive;
     private CancellationTokenSource _cancellationTokenSource;
-    
 
     public void Init()
     {
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
         _emptyBoxMovement.Init();
-        EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
+        
         _cancellationTokenSource = new CancellationTokenSource();
-
+        
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one * 0.7f, .2f).SetEase(Ease.InBounce);
         
+        EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnBoxReturnedToStart);
         EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
-        SelectableColliderIsActive(true);
+        
+        SetSelectableColliderActive(true);
     }
 
     public void Disable()
     {
         _emptyBoxMovement.Disable();
-        EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.RemoveListener(OnTheBoxHasCompletedTheMovementToTheStartingPosition);
         _cancellationTokenSource?.Cancel();
+        EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.RemoveListener(OnBoxReturnedToStart);
     }
     
     public void Selected(Vector3 pos)
     {
         _emptyBoxMovement.HandleMouseDown(pos);
-        SelectableColliderIsActive(false);
-        CheckInput().Forget();
+        SetSelectableColliderActive(false);
+        TrackInput().Forget();
         
         EmptyBoxSignals.OnRemovedEmptyBox?.Dispatch(this);
     }
@@ -51,96 +53,77 @@ public class EmptyBox : MonoBehaviour
     public void Deselected(Vector3 pos)
     {
          isActive = false;
-         MouseUpRaycastCheck();
+         HandleMouseUpRaycastCheck();
     }
 
-    private void SelectableColliderIsActive(bool isActive)
+    private void SetSelectableColliderActive(bool isActive)
     {
         foreach (var gridControlCollider in GridControlColliders)
             gridControlCollider.gameObject.SetActive(_onGridTile ? isActive : !isActive);
     }
     
-    private async UniTask CheckInput()
+    private async UniTask TrackInput()
     {
         isActive = true;
 
         while (isActive && !_cancellationTokenSource.IsCancellationRequested)
         {
-            RaycastCheck();
+            CheckRaycast();
             await UniTask.Yield();
         }
     }
 
-    public void RaycastCheck()
+    private void CheckRaycast()
     {
-        bool isOkey = true;
-        for (int i = 0; i < GridControlColliders.Count; i++)
-        {
-            GridControlCollider gridControlCollider = GridControlColliders[i];
-            if (gridControlCollider.ReturnOnGridTileIsAvailable() == false)
-            {
-                isOkey = false;
-                break;
-            }
-        }
+        bool isPlacementValid = GridControlColliders.All(collider => collider.ReturnOnGridTileIsAvailable());
 
-        for (int i = 0; i < GridControlColliders.Count; i++)
+        foreach (var gridControlCollider in GridControlColliders)
         {
-            GridControlCollider gridControlCollider = GridControlColliders[i];
-            if (gridControlCollider.GridTile == null)
-                continue;
-            
-            gridControlCollider.GridTile.IsGridOkeyAndNotOkey(isOkey);
+            gridControlCollider.GridTile?.IsGridOkeyAndNotOkey(isPlacementValid);
         }
-     
     }
 
-    public void MouseUpRaycastCheck()
+    private void HandleMouseUpRaycastCheck()
     {
-        bool isOkey = true;
-        for (int i = 0; i < GridControlColliders.Count; i++)
-        {
-            GridControlCollider gridControlCollider = GridControlColliders[i];
-            if (!gridControlCollider.ReturnOnGridTileIsAvailable())
-            {
-                isOkey = false;
-                break;
-            }
-        }
+        bool isPlacementValid = GridControlColliders.All(collider => collider.ReturnOnGridTileIsAvailable());
 
-        if (isOkey)
+        if (isPlacementValid)
         {
-            for (int i = 0; i < GridControlColliders.Count; i++)
-            {
-                if (GridControlColliders[i].IsMain)
-                {
-                   UnitBox.JumpToGridTile(GridControlColliders[i].GridTile);
-                   EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
-                   DestroySelf().Forget();
-                   EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
-                   break;
-                }
-            } 
+            PlaceOnGrid();
         }
         else
         {
-            for (int i = 0; i < GridControlColliders.Count; i++)
-            {
-                GridControlCollider gridControlCollider = GridControlColliders[i];
-                gridControlCollider.GridTile = null;
-            }
-
-            EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(this);
-            _emptyBoxMovement.HandleMouseUp();
-          
+            ResetToStart();
         }
     }
+
+    private void PlaceOnGrid()
+    {
+        var mainCollider = GridControlColliders.FirstOrDefault(c => c.IsMain);
+
+        if (mainCollider == null) return;
+
+        UnitBox.JumpToGridTile(mainCollider.GridTile);
+        EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
+        DestroySelf().Forget();
+        EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
+    }
+
+    private void ResetToStart()
+    {
+        foreach (var gridControlCollider in GridControlColliders)
+        {
+            gridControlCollider.GridTile = null;
+        }
+
+        EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(this);
+        _emptyBoxMovement.HandleMouseUp();
+    }
     
-    private void OnTheBoxHasCompletedTheMovementToTheStartingPosition(EmptyBoxMovement emptyBoxMovement)
+    private void OnBoxReturnedToStart(EmptyBoxMovement emptyBoxMovement)
     {
         if(emptyBoxMovement != _emptyBoxMovement) return;
-        
-        SelectableColliderIsActive(true);
+        SetSelectableColliderActive(true);
     }
     
     private async UniTaskVoid DestroySelf()
@@ -148,23 +131,14 @@ public class EmptyBox : MonoBehaviour
         if (this == null || _emptyBoxMovement == null) return;
 
         Disable();
-        // UniTask işlemlerini durdur
         isActive = false;
         _cancellationTokenSource?.Cancel();
 
-        // _emptyBoxMovement bileşenini devre dışı bırak
-        if (_emptyBoxMovement != null)
-        {
-            _emptyBoxMovement.enabled = false;
-        }
+        _emptyBoxMovement.enabled = false;
 
-        // Bir frame bekleyerek UniTask süreçlerinin kapanmasını sağla
         await UniTask.DelayFrame(1);
 
-        // Eğer nesne hala varsa yok et
         if (this != null)
-        {
             Destroy(gameObject);
-        }
     }
 }
