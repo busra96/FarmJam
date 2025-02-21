@@ -27,3 +27,11 @@ public enum EmptyBoxType
     T,
     Z
 }
+
+public enum GameStateType
+{
+    Load,
+    Gameplay,
+    Win,
+    Fail
+}

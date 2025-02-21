@@ -9,7 +9,6 @@ public class UnitBoxColorTypeAndMat : MonoBehaviour
    
    public ColorType ColorType;
 
-   [ContextMenu("Get ColorTypeAndUnitBoxMaterialList")]
    public void ActiveColor()
    {
       foreach (var parameter in ColorTypeAndUnitBoxMaterialList)

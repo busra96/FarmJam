@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using VContainer;
 
 public class CollectableBox : MonoBehaviour
 {
     public Transform BoxcastStartPoint;
     public bool IsLocked;
-    [Inject] public UnitBoxManager unitBoxManager;
     public List<CollectableParameter> CollectableParameters;
+   
     private bool jumping = false;
     private bool onDestroyed = false;
+    private UnitBoxManager _unitBoxManager;
 
     public ColorType ColorType;
 
-    private void Start()
+    public void Init(UnitBoxManager unitBoxManager)
     {
-        SetColor(); 
+        _unitBoxManager = unitBoxManager;
     }
 
-    [ContextMenu(" Set Color ")]
     public void SetColor()
     {
         foreach (CollectableParameter collectableParameter in CollectableParameters)
@@ -36,7 +35,7 @@ public class CollectableBox : MonoBehaviour
         {
             if(collectableParameter.Collectable == null) continue;
             
-            UnitBox unitBox = unitBoxManager.GetUnitBox(ColorType);
+            UnitBox unitBox = _unitBoxManager.GetUnitBox(ColorType);
             if (unitBox == null)
                 return;
             
@@ -114,7 +113,6 @@ public class CollectableBox : MonoBehaviour
         Vector3 boxCenter = BoxcastStartPoint.position;    // Kutunun merkez noktası
         Gizmos.DrawWireCube(boxCenter, halfExtents );   // Yarı boyutların tam kutu boyutuna dönüşümü
     }
-    
 }
 
 [Serializable]

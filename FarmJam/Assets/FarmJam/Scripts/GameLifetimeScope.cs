@@ -9,6 +9,8 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private UnitBoxManager _unitBoxManager;
     [SerializeField] private EmptyBoxSpawner _emptyBoxSpawner;
     [SerializeField] private CollectableBoxManager _collectableBoxManager;
+    [SerializeField] private UIManager _uiManager;
+    [SerializeField] private LevelManager _levelManager;
 
     [SerializeField] private EmptyBoxContainer _emptyBoxContainer;
     
@@ -18,12 +20,15 @@ public class GameLifetimeScope : LifetimeScope
          builder.RegisterComponent(_unitBoxManager);
          builder.RegisterComponent(_emptyBoxSpawner);
          builder.RegisterComponent(_collectableBoxManager);
+         builder.RegisterComponent(_uiManager);
+         builder.RegisterComponent(_levelManager);
          
          builder.RegisterComponent(_emptyBoxContainer);
         
          builder.Register<InputManager>(Lifetime.Singleton);
          builder.Register<GridTileFactory>(Lifetime.Singleton);
          builder.Register<SelectManager>(Lifetime.Singleton);
+         builder.Register<GameStateManager>(Lifetime.Singleton);
         
          builder.RegisterEntryPoint<GameEntry>().As<IStartable, IDisposable>();
     }

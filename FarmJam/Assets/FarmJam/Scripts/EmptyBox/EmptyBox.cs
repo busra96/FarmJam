@@ -18,12 +18,14 @@ public class EmptyBox : MonoBehaviour
     private bool isActive;
     private CancellationTokenSource _cancellationTokenSource;
 
-    public void Init()
+    public void Init(ColorType colorType)
     {
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
         _emptyBoxMovement.Init();
         
         _cancellationTokenSource = new CancellationTokenSource();
+
+        UnitBox.Init(colorType);
         
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one * 0.7f, .2f).SetEase(Ease.InBounce);

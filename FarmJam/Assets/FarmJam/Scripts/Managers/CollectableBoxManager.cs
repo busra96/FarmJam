@@ -1,16 +1,39 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Signals;
 using UnityEngine;
 using VContainer;
 
 public class CollectableBoxManager : MonoBehaviour
 {
+    [Inject] private LevelManager _levelManager;
     [Inject] private UnitBoxManager unitBoxManager;
     public List<CollectableBox> CollectableBoxes;
     private bool isProcessing = false;
-
-    private void Start()
+    
+    public void Init()
     {
+        SpawnCollectableBoxParent(_levelManager.LevelSpawnData);
+    }
+
+    public void Disable()
+    {
+        
+    }
+
+    public void SpawnCollectableBoxParent(LevelSpawnData levelSpawnData)
+    {
+        CollectableBoxParent collectableBoxParent = Instantiate(levelSpawnData.CollectableBoxParent);
+        collectableBoxParent.transform.SetParent(transform);
+        collectableBoxParent.Init();
+
+        foreach (var collectableBox in collectableBoxParent.CollectableBoxList)
+        {
+            CollectableBoxes.Add(collectableBox);
+            collectableBox.Init(unitBoxManager);
+        }
+            
+        
         UTProcessCollectableBoxes().Forget();
     }
     
@@ -38,5 +61,7 @@ public class CollectableBoxManager : MonoBehaviour
 
             await UniTask.Delay(500); // 2 saniye bekleyerek tekrar kontrol et
         }
+        
+        GameStateSignals.OnGameWin?.Dispatch();
     }
 }

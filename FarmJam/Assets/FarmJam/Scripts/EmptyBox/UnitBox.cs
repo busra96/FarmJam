@@ -17,11 +17,12 @@ public class UnitBox : MonoBehaviour
 
    public UnitBoxColorTypeAndMat UnitBoxColorTypeAndMat;
 
-   private void Start()
+   public void Init(ColorType colorType)
    {
       for (int i = 0; i < Points.Count; i++)
          Points[i].Init(this);
 
+      UnitBoxColorTypeAndMat.ColorType = colorType;
       UnitBoxColorTypeAndMat.ActiveColor();
       UnitBoxSignals.OnThisUnitBoxIsFullCheck.AddListener(CheckIsFull);
    }
