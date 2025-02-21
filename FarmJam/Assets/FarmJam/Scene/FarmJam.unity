@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objects: []
-  moveDuration: 0.05
+  moveDuration: 0.1
 --- !u!4 &227207388
 Transform:
   m_ObjectHideFlags: 0
@@ -775,6 +775,7 @@ MonoBehaviour:
   _unitBoxManager: {fileID: 704363653}
   _emptyBoxSpawner: {fileID: 97663234}
   _collectableBoxManager: {fileID: 1915287748}
+  _emptyBoxContainer: {fileID: 11400000, guid: 63e64e97ca25e924ebdd38f891642cd4, type: 2}
 --- !u!4 &1736584115
 Transform:
   m_ObjectHideFlags: 0

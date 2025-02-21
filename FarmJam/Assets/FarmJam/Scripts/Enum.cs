@@ -14,3 +14,16 @@ public enum ColorType
     Red,
     Yellow
 }
+
+public enum EmptyBoxType
+{
+    L,
+    Large,
+    LargeL,
+    Middle,
+    OnePiece,
+    Small,
+    Square,
+    T,
+    Z
+}
