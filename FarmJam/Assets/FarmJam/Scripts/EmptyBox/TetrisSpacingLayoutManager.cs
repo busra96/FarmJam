@@ -7,7 +7,7 @@ using UnityEngine;
 public class TetrisSpacingLayoutManager : MonoBehaviour
 {
     public List<EmptyBox> objects = new List<EmptyBox>(); // Dinamik obje listesi
-    public float moveDuration = 0.5f; // Yumuşak geçiş süresi (saniye cinsinden)
+    public float moveDuration = 0.1f; // Yumuşak geçiş süresi (saniye cinsinden)
     
     // Çıkarılan objelerin eski index'lerini saklayan dictionary
     private Dictionary<EmptyBox, int> removedIndexes = new Dictionary<EmptyBox, int>();
@@ -18,7 +18,7 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
     private void OnEnable()
     {
         EmptyBoxSignals.OnAddedEmptyBox.AddListener(OnSpawnedEmptyBox);
-        EmptyBoxSignals.OnTheEmptyBoxRemoved.AddListener(OnRemovedEmptyBox);
+      //  EmptyBoxSignals.OnTheEmptyBoxRemoved.AddListener(OnRemovedEmptyBox);
         EmptyBoxSignals.OnRemovedEmptyBox.AddListener(OnRemovedEmptyBox);
         EmptyBoxSignals.OnUpdateTetrisLayout.AddListener(OnUpdateTetrisLayout);
     }
@@ -29,7 +29,7 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
     private void OnDisable()
     {
         EmptyBoxSignals.OnAddedEmptyBox.RemoveListener(OnSpawnedEmptyBox);
-        EmptyBoxSignals.OnTheEmptyBoxRemoved.RemoveListener(OnRemovedEmptyBox);
+      //  EmptyBoxSignals.OnTheEmptyBoxRemoved.RemoveListener(OnRemovedEmptyBox);
         EmptyBoxSignals.OnRemovedEmptyBox.RemoveListener(OnRemovedEmptyBox);
         EmptyBoxSignals.OnUpdateTetrisLayout.RemoveListener(OnUpdateTetrisLayout);
     }
@@ -70,9 +70,9 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
     /// </summary>
     public async UniTask UpdateTetrisLayout()
     {
-        await UniTask.DelayFrame(20);
+        await UniTask.DelayFrame(5);
         UpdateLayout();
-        await UniTask.DelayFrame(20);
+        await UniTask.DelayFrame(5);
         await PositionObjectsSmooth(); // Smooth geçişi başlat
     }
 

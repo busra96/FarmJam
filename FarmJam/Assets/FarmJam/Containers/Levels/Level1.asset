@@ -13,6 +13,14 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   EmptyBoxTypes:
+  - ColorType: 3
+    EmptyBox: {fileID: 6144613632627860039, guid: 76c8c5c01ee0fd64ea330743f8b40956, type: 3}
   - ColorType: 1
+    EmptyBox: {fileID: 7995068885107227935, guid: ad8c024ae452cf245abed7786fd7712f, type: 3}
+  - ColorType: 2
     EmptyBox: {fileID: 9041354124900317610, guid: 44dc7160acdd51a46b3b7ef06e8ba446, type: 3}
+  - ColorType: 4
+    EmptyBox: {fileID: 1373710579974153233, guid: 361ee25b7f7d37949ad5d06f91243a24, type: 3}
+  - ColorType: 0
+    EmptyBox: {fileID: 5353241661263168940, guid: 4c0f8dfc982a06f4b960cc740e7024f8, type: 3}
   CollectableBoxParent: {fileID: 1240315287288003649, guid: 63d04e5db0af66e4fa1fb6db0cb0d637, type: 3}

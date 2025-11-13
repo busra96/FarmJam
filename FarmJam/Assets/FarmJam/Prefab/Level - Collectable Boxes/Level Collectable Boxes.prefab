@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CollectableBoxList:
   - {fileID: 2223988378715242383}
-  ColorType: 1
+  ColorType: 3
 --- !u!1001 &775555640867622222
 PrefabInstance:
   m_ObjectHideFlags: 0

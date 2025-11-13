@@ -100,7 +100,7 @@ public class EmptyBoxMovement : MonoBehaviour
         isMouseDown = false;
 
         rotatePoint
-            .DORotateQuaternion(Quaternion.Euler(0, rotatePoint.eulerAngles.y + 90f, 0), 0.1f)
+            .DORotateQuaternion(Quaternion.Euler(0, rotatePoint.eulerAngles.y + 90f, 0), 0f)
             .SetEase(Ease.Linear)
             .OnComplete(() => EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch());
     }

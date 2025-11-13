@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Signals;
-using UnityEngine;
 using VContainer;
 
-public class CollectableBoxManager : MonoBehaviour
+public class CollectableBoxManager
 {
     [Inject] private LevelManager _levelManager;
     [Inject] private UnitBoxManager unitBoxManager;
-    public List<CollectableBox> CollectableBoxes;
+    [Inject] private CollectableBoxParentFactory _collectableBoxParentFactory;
+    
+    public List<CollectableBox> CollectableBoxes = new List<CollectableBox>();
     private bool isProcessing = false;
     
     public void Init()
@@ -23,8 +24,7 @@ public class CollectableBoxManager : MonoBehaviour
 
     public void SpawnCollectableBoxParent(LevelSpawnData levelSpawnData)
     {
-        CollectableBoxParent collectableBoxParent = Instantiate(levelSpawnData.CollectableBoxParent);
-        collectableBoxParent.transform.SetParent(transform);
+        CollectableBoxParent collectableBoxParent = _collectableBoxParentFactory.Create(levelSpawnData.CollectableBoxParent);
         collectableBoxParent.Init();
 
         foreach (var collectableBox in collectableBoxParent.CollectableBoxList)
