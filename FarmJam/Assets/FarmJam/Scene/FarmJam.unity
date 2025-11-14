@@ -418,7 +418,7 @@ MonoBehaviour:
   xValue: 6
   yValue: 6
   MiddlePoint: {fileID: 924880745}
-  GreyMat: {fileID: 2100000, guid: c5e906d65f024b04d88bbd6de954113b, type: 2}
+  GreyMat: {fileID: 2100000, guid: a30955e7b3b6a9c4d9113ffdadfcee43, type: 2}
   WhiteMat: {fileID: 2100000, guid: aa3c7c65e15d7104498ad53df5238e91, type: 2}
 --- !u!1 &704363652
 GameObject:
