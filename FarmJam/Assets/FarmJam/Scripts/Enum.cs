@@ -28,6 +28,12 @@ public enum EmptyBoxType
     Z
 }
 
+public enum GridState
+{
+    Empty,
+    Full
+}
+
 public enum GameStateType
 {
     Load,
