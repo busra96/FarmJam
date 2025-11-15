@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class EmptyBox : MonoBehaviour
 {
+    public EmptyBoxType EmptyBoxType;
     public UnitBox UnitBox;
     private EmptyBoxMovement _emptyBoxMovement;
     public Collider Collider;
@@ -109,6 +110,7 @@ public class EmptyBox : MonoBehaviour
         EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
         DestroySelf().Forget();
         EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
+        EmptyBoxSignals.OnFailConditionCheck?.Dispatch();
     }
 
     private void ResetToStart()

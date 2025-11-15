@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b38b1c6e39e588c4d86646c4833c7ed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EmptyBoxType: 7
   UnitBox: {fileID: 4759070765791222105}
   Collider: {fileID: 3061676482722752152}
   GridControlColliders:
@@ -69,7 +70,6 @@ MonoBehaviour:
   planeLayer:
     serializedVersion: 2
     m_Bits: 64
-  TetrisSpacing: {fileID: 0}
   maxYPos: 1.25
   moveSpeed: 50
   clickTimerDuration: 0.25

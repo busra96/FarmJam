@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Signals;
 using UnityEngine;
 using VContainer;
@@ -6,6 +7,7 @@ using VContainer;
 public class EmptyBoxSpawner : MonoBehaviour
 {
     [Inject] private LevelManager _levelManager;
+    [Inject] private GridTileManager _gridTileManager;
     private int index;
     public Transform SpawnPoint;
 
@@ -14,11 +16,13 @@ public class EmptyBoxSpawner : MonoBehaviour
     private void OnEnable()
     {
         EmptyBoxSignals.OnTheEmptyBoxRemoved.AddListener(RemoveEmptyBoxFromList);
+        EmptyBoxSignals.OnFailConditionCheck.AddListener(CheckFailCondition);
     }
 
     private void OnDisable()
     {
         EmptyBoxSignals.OnTheEmptyBoxRemoved.RemoveListener(RemoveEmptyBoxFromList);
+        EmptyBoxSignals.OnFailConditionCheck.RemoveListener(CheckFailCondition);
     }
 
     public void Init()
@@ -43,27 +47,60 @@ public class EmptyBoxSpawner : MonoBehaviour
        index++;
     }
 
-    public void AddedEmptyBoxToList(EmptyBox emptyBox)
-    {
-        if(EmptyBoxList.Contains(emptyBox))
-            return;
-        
-        EmptyBoxList.Add(emptyBox);
-    }
-
-    public void RemoveEmptyBoxFromList(EmptyBox emptyBox)
-    {
-        if (!EmptyBoxList.Contains(emptyBox))
-            return;
-        
-        EmptyBoxList.Remove(emptyBox);
-        
-        if(index >= _levelManager.LevelSpawnData.EmptyBoxTypes.Count)
+    #region Added - Remove EmptyBox 
+        public void AddedEmptyBoxToList(EmptyBox emptyBox)
         {
-            Debug.Log(" DAHA SPAWNLANABILCEK KUTU YOK ");
-            return;
+            if(EmptyBoxList.Contains(emptyBox))
+                return;
+            
+            EmptyBoxList.Add(emptyBox);
+
+          
         }
 
-        SpawnEmptyBox();
-    }
+        public void RemoveEmptyBoxFromList(EmptyBox emptyBox)
+        {
+            if (!EmptyBoxList.Contains(emptyBox))
+                return;
+            
+            EmptyBoxList.Remove(emptyBox);
+            
+            if(index >= _levelManager.LevelSpawnData.EmptyBoxTypes.Count)
+            {
+                Debug.Log(" DAHA SPAWNLANABILCEK KUTU YOK ");
+                return;
+            }
+
+            SpawnEmptyBox();
+        }
+    #endregion
+    
+    #region Fail Condition Check 
+
+        private void CheckFailCondition()
+        {
+            UTCheckFailCondition().Forget();
+        }
+
+        private async UniTask UTCheckFailCondition()
+        {
+            await UniTask.DelayFrame(10);
+            bool failCondition = true;
+            for (int i = 0; i < EmptyBoxList.Count; i++)
+            {
+                if (_gridTileManager.HasAnyValidPlacement(EmptyBoxList[i].EmptyBoxType))
+                {
+                    failCondition = false;
+                    break;
+                }
+            }
+
+            if (failCondition)
+            {
+                Debug.Log(" EMPTY BOX KOYACAK YER KALMADI");
+                GameStateSignals.OnGameFail?.Dispatch();
+            }
+        }
+    
+    #endregion
 }

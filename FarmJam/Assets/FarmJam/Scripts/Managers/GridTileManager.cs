@@ -112,4 +112,107 @@ public class GridTileManager : MonoBehaviour
                 return currentPosition;
         }
     }
+
+
+    #region  EmptyBox a göre GridTile kalıp kalmadıgına bakma 
+        /// <summary>
+        /// Verilen EmptyBoxType için grid üzerinde (herhangi bir rotasyonda) 
+        /// yerleştirilebilecek en az bir boş pozisyon var mı?
+        /// </summary>
+        public bool HasAnyValidPlacement(EmptyBoxType emptyBoxType)
+        {
+            if (!EmptyBoxRotationData.Shapes.TryGetValue(emptyBoxType, out var shape))
+            {
+                Debug.LogError($"[GridTileManager] Shape not found for type: {emptyBoxType}");
+                return false;
+            }
+
+            // Griddeki her tile'i origin gibi düşün
+            foreach (var originTile in TileList)
+            {
+                // Origin pozisyonu (grid koordinatı)
+                Vector2Int originPos = Vector2Int.RoundToInt(originTile.Tile.GridPosition);
+
+                // Bu shape’in tüm rotasyonlarını dene
+                foreach (var rotationOffsets in shape.Rotations)
+                {
+                    if (CanPlaceShapeAt(originPos, rotationOffsets))
+                    {
+                        // En az 1 geçerli pozisyon bulduk → yer var
+                        return true;
+                    }
+                }
+            }
+
+            // Hiçbir tile + rotasyon kombinasyonunda sığmadı → yer yok
+            return false;
+        }
+        
+        /// <summary>
+        /// Belirli bir origin grid pozisyonunda ve verilen offset pattern’i ile
+        /// bu shape'i yerleştirebiliyor muyuz?
+        /// </summary>
+        private bool CanPlaceShapeAt(Vector2Int origin, Vector2Int[] offsets)
+        {
+            foreach (var offset in offsets)
+            {
+                Vector2Int targetPos = origin + offset;
+
+                GridTile targetTile = GetTileAt(targetPos);
+
+                // Grid dışında kalıyorsa
+                if (targetTile == null)
+                    return false;
+
+                // Hücre doluysa
+                if (targetTile.UnitBox != null)
+                    return false;
+            }
+
+            // Tüm hücreler grid içinde ve boş ise → buraya bu shape sığar
+            return true;
+        }
+        
+
+        /// <summary>
+        /// Verilen grid koordinatındaki GridTile'ı bulur.
+        /// (Performans gerekirse bunu dictionary'e çevirebiliriz.)
+        /// </summary>
+        private GridTile GetTileAt(Vector2Int gridPos)
+        {
+            return TileList.Find(t =>
+            {
+                Vector2Int pos = Vector2Int.RoundToInt(t.Tile.GridPosition);
+                return pos == gridPos;
+            });
+        }
+    #endregion
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
