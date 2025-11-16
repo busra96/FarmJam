@@ -1,18 +1,24 @@
 using Signals;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public GameObject WinPanel;
     public GameObject FailPanel;
     public GameObject GameplayPanel;
+    public Button NextLevelButton;
+    public Button RetryLevelButton;
     
     public void Init()
     {
         UISignals.OnWinPanelActive.AddListener(OnWinPanelActive);
         UISignals.OnFailPanelActive.AddListener(OnFailPanelActive);
         UISignals.OnGameplayPanelActive.AddListener(OnGameplayPanelActive);
+        NextLevelButton.onClick.AddListener(LoadNextLevel);
+        RetryLevelButton.onClick.AddListener(LoadCurrentLevel);
     }
+
     public void Disable()
     {
         UISignals.OnWinPanelActive.RemoveListener(OnWinPanelActive);
@@ -37,5 +43,13 @@ public class UIManager : MonoBehaviour
     {
         GameplayPanel.SetActive(false);
         WinPanel.SetActive(true);
+    }
+    
+    private void LoadCurrentLevel()
+    {
+    }
+
+    private void LoadNextLevel()
+    {
     }
 }
