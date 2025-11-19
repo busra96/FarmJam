@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Signals;
@@ -95,7 +96,7 @@ public class EmptyBoxSpawner : MonoBehaviour
 
         private async UniTask UTCheckFailCondition()
         {
-            await UniTask.DelayFrame(10);
+            await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
             bool failCondition = true;
             for (int i = 0; i < EmptyBoxList.Count; i++)
             {

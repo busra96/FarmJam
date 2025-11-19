@@ -29,7 +29,8 @@ public class EmptyBoxMovement : MonoBehaviour
     {
         mainCamera = Camera.main;
         ResetScale();
-
+        rotatePoint.transform.localPosition = Vector3.zero;
+        
         InputSignals.OnInputGetMouseHold.AddListener(HandleMouseHold);
     }
 
@@ -109,6 +110,7 @@ public class EmptyBoxMovement : MonoBehaviour
     {
         isMouseDown = false;
         EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this);
+        rotatePoint.transform.localPosition = Vector3.zero;
         ScaleTweenTo(initialScale, 0.1f);
     }
 
