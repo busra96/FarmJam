@@ -9,6 +9,7 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private UnitBoxManager _unitBoxManager;
     [SerializeField] private EmptyBoxSpawner _emptyBoxSpawner;
     [SerializeField] private UIManager _uiManager;
+    [SerializeField] private TetrisSpacingLayoutManager _tetrisSpacingLayoutManager;
     [SerializeField] private LevelManager _levelManager;
 
     [SerializeField] private EmptyBoxContainer _emptyBoxContainer;
@@ -20,6 +21,7 @@ public class GameLifetimeScope : LifetimeScope
          builder.RegisterComponent(_unitBoxManager);
          builder.RegisterComponent(_emptyBoxSpawner);
          builder.RegisterComponent(_uiManager);
+         builder.RegisterComponent(_tetrisSpacingLayoutManager);
          builder.RegisterComponent(_levelManager);
          
          builder.RegisterComponent(_emptyBoxContainer);

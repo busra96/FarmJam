@@ -48,4 +48,9 @@ public class UnitBoxManager : MonoBehaviour
 
       return null;
    } 
+   
+   public void ClearUnitBoxList()
+   {
+      UnitBoxes.Clear();
+   }
 }

@@ -33,6 +33,12 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
         EmptyBoxSignals.OnRemovedEmptyBox.RemoveListener(OnRemovedEmptyBox);
         EmptyBoxSignals.OnUpdateTetrisLayout.RemoveListener(OnUpdateTetrisLayout);
     }
+    
+    public void ClearEmptyBoxList()
+    {
+        objects.Clear();
+        removedIndexes.Clear();
+    }
 
     /// <summary>
     /// Objelerin layout'unu günceller.

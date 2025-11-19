@@ -80,6 +80,12 @@ public class EmptyBoxSpawner : MonoBehaviour
         }
     #endregion
     
+    public void ClearEmptyBoxList()
+    {
+        index = 0;
+        EmptyBoxList.Clear();
+    }
+    
     #region Fail Condition Check 
 
         private void CheckFailCondition()

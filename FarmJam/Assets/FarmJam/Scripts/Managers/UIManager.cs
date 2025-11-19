@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public Button PlayLevelButton;
     public Button NextLevelButton;
     public Button RetryLevelButton;
+    public Button GameplayRetryButton;
     
     public void Init()
     {
@@ -20,13 +21,14 @@ public class UIManager : MonoBehaviour
         PlayLevelButton.onClick.AddListener(OnPlayLevelButtonClicked);
         NextLevelButton.onClick.AddListener(OnClickedNextButtonClicked);
         RetryLevelButton.onClick.AddListener(OnClickedRetryButtonClicked);
+        GameplayRetryButton.onClick.AddListener(OnClickedGameplayRetryButtonClicked);
         
         MainPanel.SetActive(true);
     }
 
+
     public void Disable()
     {
-        
         UISignals.OnWinPanelActive.RemoveListener(OnWinPanelActive);
         UISignals.OnFailPanelActive.RemoveListener(OnFailPanelActive);
         UISignals.OnGameplayPanelActive.RemoveListener(OnGameplayPanelActive);
@@ -41,13 +43,11 @@ public class UIManager : MonoBehaviour
 
     private void OnFailPanelActive()
     {
-        GameplayPanel.SetActive(false);
         FailPanel.SetActive(true);
     }
 
     private void OnWinPanelActive()
     {
-        GameplayPanel.SetActive(false);
         WinPanel.SetActive(true);
     }
     
@@ -59,9 +59,17 @@ public class UIManager : MonoBehaviour
     
     private void OnClickedRetryButtonClicked()
     {
+        LevelManagerSignals.OnLoadCurrentLevel?.Dispatch();
+        FailPanel.SetActive(false);
     }
 
     private void OnClickedNextButtonClicked()
     {
+        LevelManagerSignals.OnLoadNextLevel?.Dispatch();
+        WinPanel.SetActive(false);
+    }
+    private void OnClickedGameplayRetryButtonClicked()
+    {
+        LevelManagerSignals.OnLoadCurrentLevel?.Dispatch();
     }
 }
