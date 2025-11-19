@@ -6,12 +6,13 @@ using VContainer;
 
 public class EmptyBoxSpawner : MonoBehaviour
 {
-    [Inject] private LevelManager _levelManager;
     [Inject] private GridTileManager _gridTileManager;
     private int index;
     public Transform SpawnPoint;
 
     [SerializeField] private List<EmptyBox> EmptyBoxList = new List<EmptyBox>();
+
+    private Level CurrentLevel;
 
     private void OnEnable()
     {
@@ -28,18 +29,21 @@ public class EmptyBoxSpawner : MonoBehaviour
     public void Init()
     {
         index = 0;
-        
-        for (int i = 0; i < 3; i++)
-            SpawnEmptyBox();
     }
 
+    public void SetCurrentLevel(Level level)
+    {
+        CurrentLevel = level;
+    }
+    
 
     public void SpawnEmptyBox()
     {
-        if(index >= _levelManager.LevelSpawnData.EmptyBoxTypes.Count) return;
+        if(index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count) return;
         
-       EmptyBox emptyBox = Instantiate(_levelManager.LevelSpawnData.EmptyBoxTypes[index].EmptyBox, SpawnPoint.position, Quaternion.identity);
-       emptyBox.Init(_levelManager.LevelSpawnData.EmptyBoxTypes[index].ColorType);
+       EmptyBox emptyBox = Instantiate(CurrentLevel.LevelSpawnData.EmptyBoxTypes[index].EmptyBox, SpawnPoint.position, Quaternion.identity);
+       emptyBox.transform.SetParent(CurrentLevel.transform);
+       emptyBox.Init(CurrentLevel.LevelSpawnData.EmptyBoxTypes[index].ColorType);
        emptyBox.transform.position = SpawnPoint.position;
        AddedEmptyBoxToList(emptyBox);
        EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(emptyBox);
@@ -54,8 +58,6 @@ public class EmptyBoxSpawner : MonoBehaviour
                 return;
             
             EmptyBoxList.Add(emptyBox);
-
-          
         }
 
         public void RemoveEmptyBoxFromList(EmptyBox emptyBox)
@@ -63,9 +65,12 @@ public class EmptyBoxSpawner : MonoBehaviour
             if (!EmptyBoxList.Contains(emptyBox))
                 return;
             
+            if(CurrentLevel == null)
+                return;
+            
             EmptyBoxList.Remove(emptyBox);
             
-            if(index >= _levelManager.LevelSpawnData.EmptyBoxTypes.Count)
+            if(index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count)
             {
                 Debug.Log(" DAHA SPAWNLANABILCEK KUTU YOK ");
                 return;

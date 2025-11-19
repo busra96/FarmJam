@@ -4,9 +4,11 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public GameObject MainPanel;
     public GameObject WinPanel;
     public GameObject FailPanel;
     public GameObject GameplayPanel;
+    public Button PlayLevelButton;
     public Button NextLevelButton;
     public Button RetryLevelButton;
     
@@ -15,12 +17,16 @@ public class UIManager : MonoBehaviour
         UISignals.OnWinPanelActive.AddListener(OnWinPanelActive);
         UISignals.OnFailPanelActive.AddListener(OnFailPanelActive);
         UISignals.OnGameplayPanelActive.AddListener(OnGameplayPanelActive);
-        NextLevelButton.onClick.AddListener(LoadNextLevel);
-        RetryLevelButton.onClick.AddListener(LoadCurrentLevel);
+        PlayLevelButton.onClick.AddListener(OnPlayLevelButtonClicked);
+        NextLevelButton.onClick.AddListener(OnClickedNextButtonClicked);
+        RetryLevelButton.onClick.AddListener(OnClickedRetryButtonClicked);
+        
+        MainPanel.SetActive(true);
     }
 
     public void Disable()
     {
+        
         UISignals.OnWinPanelActive.RemoveListener(OnWinPanelActive);
         UISignals.OnFailPanelActive.RemoveListener(OnFailPanelActive);
         UISignals.OnGameplayPanelActive.RemoveListener(OnGameplayPanelActive);
@@ -45,11 +51,17 @@ public class UIManager : MonoBehaviour
         WinPanel.SetActive(true);
     }
     
-    private void LoadCurrentLevel()
+    private void OnPlayLevelButtonClicked()
+    {
+        MainPanel.SetActive(false);
+        LevelManagerSignals.OnLoadCurrentLevel?.Dispatch();
+    }
+    
+    private void OnClickedRetryButtonClicked()
     {
     }
 
-    private void LoadNextLevel()
+    private void OnClickedNextButtonClicked()
     {
     }
 }

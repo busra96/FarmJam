@@ -17,9 +17,6 @@ public class GridTileManager : MonoBehaviour
 
     public void Init()
     {
-        GenerateGridTiles();
-        LinkNeighbors(); 
-        CalculateMiddlePoint();
     }
 
     public void Disable()
@@ -27,35 +24,27 @@ public class GridTileManager : MonoBehaviour
         
     }
 
-    private void Update()
+    public void SpawnGrids(int xCount, int yCount, Transform parentTransform)
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            if(TileList.Count == 0) return;
-            
-            for (int i = 0; i < TileList.Count; i++)
-                Destroy(TileList[i].gameObject);
-            
-            TileList.Clear();
-        }
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            GenerateGridTiles();
-            LinkNeighbors();
-            CalculateMiddlePoint();
-        }
+        xValue = xCount;
+        yValue = yCount;
+        
+        GenerateGridTiles(parentTransform);
+        LinkNeighbors(); 
+        CalculateMiddlePoint();
     }
 
-    private void GenerateGridTiles()
+
+    private void GenerateGridTiles(Transform parentTransform)
     {
         for (int i = 0; i < xValue; i++)
         {
             for (int j = 0; j < yValue; j++)
-                SpawmnGridTile(i,j);
+                SpawmnGridTile(i,j,parentTransform);
         }
     }
 
-    private void SpawmnGridTile(int x, int y)
+    private void SpawmnGridTile(int x, int y,Transform parentTransform)
     {
         Vector3 pos = new Vector3(x *2,0, y * 2* -1f);
         Quaternion rot = Quaternion.identity;
@@ -64,6 +53,7 @@ public class GridTileManager : MonoBehaviour
         else gridTile.SetMaterial(GreyMat);
       
         gridTile.Tile.GridPosition = new Vector2(x, y);
+        gridTile.transform.parent = parentTransform;
         TileList.Add(gridTile);
     }
 
@@ -113,6 +103,15 @@ public class GridTileManager : MonoBehaviour
         }
     }
 
+    public void DestroyAllGrids()
+    {
+        if(TileList.Count == 0) return;
+            
+        for (int i = 0; i < TileList.Count; i++)
+            Destroy(TileList[i].gameObject);
+            
+        TileList.Clear();
+    }
 
     #region  EmptyBox a göre GridTile kalıp kalmadıgına bakma 
         /// <summary>

@@ -15,6 +15,7 @@ public class GameLifetimeScope : LifetimeScope
     
     protected override void Configure(IContainerBuilder builder)
     {
+     
          builder.RegisterComponent(_gridTileManager);
          builder.RegisterComponent(_unitBoxManager);
          builder.RegisterComponent(_emptyBoxSpawner);

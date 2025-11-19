@@ -19,6 +19,7 @@ public class CollectableBox : MonoBehaviour
     public void Init(UnitBoxManager unitBoxManager)
     {
         _unitBoxManager = unitBoxManager;
+        SetColor();
     }
 
     public void SetColor()

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -11,6 +12,7 @@ public class GameEntry : IStartable,IDisposable
     [Inject] private GameStateManager _gameStateManager;
     [Inject] private EmptyBoxSpawner _emptyBoxSpawner;
     [Inject] private UIManager _uiManager;
+    [Inject] private LevelManager _levelManager;
   
     
     public void Start()
@@ -22,6 +24,8 @@ public class GameEntry : IStartable,IDisposable
         _uiManager.Init();
         _gameStateManager.Init();
         _emptyBoxSpawner.Init();
+        _levelManager.Init();
+
     }
 
     public void Dispose()
@@ -32,5 +36,6 @@ public class GameEntry : IStartable,IDisposable
         _collectableBoxManager.Disable();
         _uiManager.Disable();
         _gameStateManager.Disable();
+        _levelManager.Disable();
     }
 }

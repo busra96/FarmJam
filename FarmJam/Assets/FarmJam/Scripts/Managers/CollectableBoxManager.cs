@@ -5,7 +5,6 @@ using VContainer;
 
 public class CollectableBoxManager
 {
-    [Inject] private LevelManager _levelManager;
     [Inject] private UnitBoxManager unitBoxManager;
     [Inject] private CollectableBoxParentFactory _collectableBoxParentFactory;
     
@@ -14,7 +13,6 @@ public class CollectableBoxManager
     
     public void Init()
     {
-        SpawnCollectableBoxParent(_levelManager.LevelSpawnData);
     }
 
     public void Disable()
@@ -22,9 +20,10 @@ public class CollectableBoxManager
         
     }
 
-    public void SpawnCollectableBoxParent(LevelSpawnData levelSpawnData)
+    public void SpawnCollectableBoxParent(Level level)
     {
-        CollectableBoxParent collectableBoxParent = _collectableBoxParentFactory.Create(levelSpawnData.CollectableBoxParent);
+        CollectableBoxParent collectableBoxParent = _collectableBoxParentFactory.Create(level.LevelSpawnData.CollectableBoxParent);
+        collectableBoxParent.transform.SetParent(level.transform);
         collectableBoxParent.Init();
 
         foreach (var collectableBox in collectableBoxParent.CollectableBoxList)
