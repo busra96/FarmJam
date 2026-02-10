@@ -1688,6 +1688,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1276876109}
   m_CullTransparentMesh: 1
+--- !u!1 &1366288646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1366288647}
+  - component: {fileID: 1366288648}
+  m_Layer: 0
+  m_Name: FailPanelController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1366288647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366288646}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1366288648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366288646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca3a61e732f32ff41b1090e028fe2960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RedOverlay: {fileID: 1552934521}
+  PanelCanvasGroup: {fileID: 1552934523}
+  PanelTransform: {fileID: 1552934520}
+  RedColor: {r: 1, g: 0.2, b: 0.2, a: 0.7}
 --- !u!1 &1371041101
 GameObject:
   m_ObjectHideFlags: 0
@@ -2139,6 +2187,7 @@ GameObject:
   - component: {fileID: 1552934520}
   - component: {fileID: 1552934522}
   - component: {fileID: 1552934521}
+  - component: {fileID: 1552934523}
   m_Layer: 5
   m_Name: FailPanel
   m_TagString: Untagged
@@ -2205,6 +2254,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1552934519}
   m_CullTransparentMesh: 1
+--- !u!225 &1552934523
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552934519}
+  m_Enabled: 0
+  m_Alpha: 0.97
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1622926571
 GameObject:
   m_ObjectHideFlags: 0
@@ -2752,6 +2813,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 382877839}
   - {fileID: 109686083}
+  - {fileID: 1366288647}
   - {fileID: 1736584115}
   - {fileID: 227207388}
   - {fileID: 767360370}

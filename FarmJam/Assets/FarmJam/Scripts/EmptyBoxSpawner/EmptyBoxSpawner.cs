@@ -99,9 +99,13 @@ public class EmptyBoxSpawner : MonoBehaviour
     {
         await UniTask.Delay(TimeSpan.FromSeconds(FAIL_CHECK_DELAY_SECONDS));
 
+        // Check if any active EmptyBox can be placed on the grid
+        // For each EmptyBox type, check all possible positions and rotations
         bool hasValidPlacement = false;
         foreach (var emptyBox in EmptyBoxList)
         {
+            // HasAnyValidPlacement checks if this specific EmptyBox type
+            // can fit anywhere on the grid in any rotation
             if (_gridTileManager.HasAnyValidPlacement(emptyBox.EmptyBoxType))
             {
                 hasValidPlacement = true;
@@ -109,6 +113,7 @@ public class EmptyBoxSpawner : MonoBehaviour
             }
         }
 
+        // If no EmptyBox can be placed anywhere on the grid, game fails
         if (!hasValidPlacement)
         {
             GameStateSignals.OnGameFail?.Dispatch();
