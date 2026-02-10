@@ -6,13 +6,14 @@ using VContainer;
 
 public class LevelManager : MonoBehaviour
 {
+    private const int LEVEL_TRANSITION_DELAY_FRAMES = 5;
+
     [Inject] private EmptyBoxSpawner emptyBoxSpawner;
     [Inject] private CollectableBoxManager collectableBoxManager;
     [Inject] private GridTileManager gridTileManager;
     [Inject] private TetrisSpacingLayoutManager tetrisSpacingLayoutManager;
     [Inject] private UnitBoxManager unitBoxManager;
-    
-    
+
     public List<Level> Levels;
 
     private Level CurrentLevel;
@@ -20,7 +21,6 @@ public class LevelManager : MonoBehaviour
     
     public void Init()
     {
-        Debug.Log( " _level maanager ınit");
         LevelManagerSignals.OnLoadCurrentLevel.AddListener(OnLoadCurrentLevel);
         LevelManagerSignals.OnLoadNextLevel.AddListener(OnLoadNextLevel);
     }
@@ -30,44 +30,42 @@ public class LevelManager : MonoBehaviour
         LevelManagerSignals.OnLoadCurrentLevel.RemoveListener(OnLoadCurrentLevel);
         LevelManagerSignals.OnLoadNextLevel.RemoveListener(OnLoadNextLevel);
     }
-    
+
     private void OnLoadNextLevel()
     {
         currentLevelCount++;
-        LoadLevel();
+        LoadLevel().Forget();
     }
 
     private void OnLoadCurrentLevel()
     {
-        LoadLevel();
+        LoadLevel().Forget();
     }
 
-    public async UniTask LoadLevel()
+    private async UniTask LoadLevel()
     {
         await DestroyLevel();
-        await UniTask.DelayFrame(5);
+        await UniTask.DelayFrame(LEVEL_TRANSITION_DELAY_FRAMES);
         await SpawnLevel();
     }
 
-    
-    
-    public async UniTask SpawnLevel()
+    private async UniTask SpawnLevel()
     {
-        CurrentLevel = Instantiate(Levels[currentLevelCount % Levels.Count].gameObject, Vector3.zero, Quaternion.identity).GetComponent<Level>();
-        CurrentLevel.Init(emptyBoxSpawner, collectableBoxManager,gridTileManager);
+        int levelIndex = currentLevelCount % Levels.Count;
+        CurrentLevel = Instantiate(Levels[levelIndex].gameObject, Vector3.zero, Quaternion.identity).GetComponent<Level>();
+        CurrentLevel.Init(emptyBoxSpawner, collectableBoxManager, gridTileManager);
     }
 
-    public async UniTask DestroyLevel()
+    private async UniTask DestroyLevel()
     {
         if (CurrentLevel == null)
             return;
-        
+
         tetrisSpacingLayoutManager.ClearEmptyBoxList();
         emptyBoxSpawner.ClearEmptyBoxList();
         gridTileManager.DestroyAllGrids();
         unitBoxManager.ClearUnitBoxList();
         Destroy(CurrentLevel.gameObject);
         CurrentLevel = null;
-
     }
 }

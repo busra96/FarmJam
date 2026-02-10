@@ -1,23 +1,30 @@
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Signals;
 using VContainer;
 
 public class CollectableBoxManager
 {
+    private const int PROCESS_DELAY_MS = 500;
+
     [Inject] private UnitBoxManager unitBoxManager;
     [Inject] private CollectableBoxParentFactory _collectableBoxParentFactory;
-    
+
     public List<CollectableBox> CollectableBoxes = new List<CollectableBox>();
     private bool isProcessing = false;
-    
+    private CancellationTokenSource _cancellationTokenSource;
+
     public void Init()
     {
+        _cancellationTokenSource = new CancellationTokenSource();
     }
 
     public void Disable()
     {
-        
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = null;
     }
 
     public void SpawnCollectableBoxParent(Level level)
@@ -31,36 +38,44 @@ public class CollectableBoxManager
             CollectableBoxes.Add(collectableBox);
             collectableBox.Init(unitBoxManager);
         }
-            
-        
-        UTProcessCollectableBoxes().Forget();
+
+        ProcessCollectableBoxes().Forget();
     }
-    
-    public async UniTask UTProcessCollectableBoxes()
+
+    private async UniTask ProcessCollectableBoxes()
     {
+        if (isProcessing || _cancellationTokenSource == null)
+            return;
+
         isProcessing = true;
-        while (true) // Sonsuz döngü
+
+        try
         {
-            // Eğer tüm CollectableBox'lar yok olduysa döngüyü sonlandır
-            CollectableBoxes.RemoveAll(box => box == null);
-            if (CollectableBoxes.Count == 0)
+            while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                isProcessing = false;
-                break; // Döngüden çık
-            }
+                CollectableBoxes.RemoveAll(box => box == null);
 
-            // Tüm aktif CollectableBox nesneleri sırayla işlenir
-            foreach (var collectableBox in CollectableBoxes)
-            {
-                if (collectableBox != null && collectableBox.gameObject.activeInHierarchy)
+                if (CollectableBoxes.Count == 0)
                 {
-                    await collectableBox.FindUnitBox();
+                    isProcessing = false;
+                    GameStateSignals.OnGameWin?.Dispatch();
+                    break;
                 }
-            }
 
-            await UniTask.Delay(500); // 2 saniye bekleyerek tekrar kontrol et
+                foreach (var collectableBox in CollectableBoxes)
+                {
+                    if (collectableBox != null && collectableBox.gameObject.activeInHierarchy)
+                    {
+                        await collectableBox.FindUnitBox();
+                    }
+                }
+
+                await UniTask.Delay(PROCESS_DELAY_MS, cancellationToken: _cancellationTokenSource.Token);
+            }
         }
-        
-        GameStateSignals.OnGameWin?.Dispatch();
+        catch (System.OperationCanceledException)
+        {
+            isProcessing = false;
+        }
     }
 }

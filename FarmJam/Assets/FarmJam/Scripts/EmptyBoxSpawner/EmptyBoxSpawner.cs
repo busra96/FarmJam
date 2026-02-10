@@ -7,6 +7,8 @@ using VContainer;
 
 public class EmptyBoxSpawner : MonoBehaviour
 {
+    private const float FAIL_CHECK_DELAY_SECONDS = 1.5f;
+
     [Inject] private GridTileManager _gridTileManager;
     private int index;
     public Transform SpawnPoint;
@@ -36,83 +38,82 @@ public class EmptyBoxSpawner : MonoBehaviour
     {
         CurrentLevel = level;
     }
-    
 
     public void SpawnEmptyBox()
     {
-        if(index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count) return;
-        
-       EmptyBox emptyBox = Instantiate(CurrentLevel.LevelSpawnData.EmptyBoxTypes[index].EmptyBox, SpawnPoint.position, Quaternion.identity);
-       emptyBox.transform.SetParent(CurrentLevel.transform);
-       emptyBox.Init(CurrentLevel.LevelSpawnData.EmptyBoxTypes[index].ColorType);
-       emptyBox.transform.position = SpawnPoint.position;
-       AddedEmptyBoxToList(emptyBox);
-       EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(emptyBox);
+        if (index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count) return;
 
-       index++;
+        var emptyBoxData = CurrentLevel.LevelSpawnData.EmptyBoxTypes[index];
+        EmptyBox emptyBox = Instantiate(emptyBoxData.EmptyBox, SpawnPoint.position, Quaternion.identity);
+        emptyBox.transform.SetParent(CurrentLevel.transform);
+        emptyBox.Init(emptyBoxData.ColorType);
+        emptyBox.transform.position = SpawnPoint.position;
+        AddedEmptyBoxToList(emptyBox);
+        EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(emptyBox);
+
+        index++;
     }
 
-    #region Added - Remove EmptyBox 
-        public void AddedEmptyBoxToList(EmptyBox emptyBox)
-        {
-            if(EmptyBoxList.Contains(emptyBox))
-                return;
-            
-            EmptyBoxList.Add(emptyBox);
-        }
+    #region EmptyBox List Management
 
-        public void RemoveEmptyBoxFromList(EmptyBox emptyBox)
-        {
-            if (!EmptyBoxList.Contains(emptyBox))
-                return;
-            
-            if(CurrentLevel == null)
-                return;
-            
-            EmptyBoxList.Remove(emptyBox);
-            
-            if(index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count)
-            {
-                Debug.Log(" DAHA SPAWNLANABILCEK KUTU YOK ");
-                return;
-            }
+    public void AddedEmptyBoxToList(EmptyBox emptyBox)
+    {
+        if (EmptyBoxList.Contains(emptyBox))
+            return;
 
-            SpawnEmptyBox();
-        }
+        EmptyBoxList.Add(emptyBox);
+    }
+
+    public void RemoveEmptyBoxFromList(EmptyBox emptyBox)
+    {
+        if (!EmptyBoxList.Contains(emptyBox))
+            return;
+
+        if (CurrentLevel == null)
+            return;
+
+        EmptyBoxList.Remove(emptyBox);
+
+        if (index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count)
+            return;
+
+        SpawnEmptyBox();
+    }
+
     #endregion
-    
+
     public void ClearEmptyBoxList()
     {
         index = 0;
         EmptyBoxList.Clear();
     }
-    
-    #region Fail Condition Check 
 
-        private void CheckFailCondition()
+    #region Fail Condition Check
+
+    private void CheckFailCondition()
+    {
+        CheckFailConditionAsync().Forget();
+    }
+
+    private async UniTask CheckFailConditionAsync()
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(FAIL_CHECK_DELAY_SECONDS));
+
+        bool hasValidPlacement = false;
+        foreach (var emptyBox in EmptyBoxList)
         {
-            UTCheckFailCondition().Forget();
-        }
-
-        private async UniTask UTCheckFailCondition()
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
-            bool failCondition = true;
-            for (int i = 0; i < EmptyBoxList.Count; i++)
+            if (_gridTileManager.HasAnyValidPlacement(emptyBox.EmptyBoxType))
             {
-                if (_gridTileManager.HasAnyValidPlacement(EmptyBoxList[i].EmptyBoxType))
-                {
-                    failCondition = false;
-                    break;
-                }
-            }
-
-            if (failCondition)
-            {
-                Debug.Log(" EMPTY BOX KOYACAK YER KALMADI");
-                GameStateSignals.OnGameFail?.Dispatch();
+                hasValidPlacement = true;
+                break;
             }
         }
-    
+
+        if (!hasValidPlacement)
+        {
+            GameStateSignals.OnGameFail?.Dispatch();
+        }
+    }
+
     #endregion
 }

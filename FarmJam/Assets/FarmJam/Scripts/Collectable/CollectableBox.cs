@@ -6,11 +6,15 @@ using UnityEngine;
 
 public class CollectableBox : MonoBehaviour
 {
+    private const int COLLECTABLE_DELAY_MS = 250;
+    private const int POST_PROCESS_DELAY_MS = 100;
+    private const float DESTROY_SCALE = 0.15f;
+    private const float DESTROY_DURATION = 0.25f;
+
     public Transform BoxcastStartPoint;
     public bool IsLocked;
     public List<CollectableParameter> CollectableParameters;
-   
-    private bool jumping = false;
+
     private bool onDestroyed = false;
     private UnitBoxManager _unitBoxManager;
 
@@ -30,34 +34,34 @@ public class CollectableBox : MonoBehaviour
 
     public async UniTask FindUnitBox()
     {
-        if(IsLocked) return;
-        
+        if (IsLocked) return;
+
         foreach (var collectableParameter in CollectableParameters)
         {
-            if(collectableParameter.Collectable == null) continue;
-            
+            if (collectableParameter.Collectable == null) continue;
+
             UnitBox unitBox = _unitBoxManager.GetUnitBox(ColorType);
             if (unitBox == null)
                 return;
-            
+
             UnityBoxPoint unityBoxPoint = unitBox.GetEmptyBoxPoint();
-            if(unityBoxPoint == null)
+            if (unityBoxPoint == null)
                 return;
 
             unityBoxPoint.SetCollectable(collectableParameter.Collectable);
             collectableParameter.Collectable.JumpToTarget(unityBoxPoint.transform);
             collectableParameter.Collectable = null;
 
-            await UniTask.Delay(250);
+            await UniTask.Delay(COLLECTABLE_DELAY_MS);
         }
 
-        await UniTask.Delay(100);
+        await UniTask.Delay(POST_PROCESS_DELAY_MS);
         DestroyAnimCheck();
     }
 
-    private bool isEmpty = true;
     private void DestroyAnimCheck()
     {
+        bool isEmpty = true;
         foreach (var collectableParameter in CollectableParameters)
         {
             if (collectableParameter.Collectable != null)
@@ -69,7 +73,7 @@ public class CollectableBox : MonoBehaviour
 
         if (isEmpty)
         {
-            transform.DOScale(Vector3.one * 0.15f, 0.25f)
+            transform.DOScale(Vector3.one * DESTROY_SCALE, DESTROY_DURATION)
                 .SetEase(Ease.Linear)
                 .OnComplete(() => Destroy(gameObject));
         }
@@ -78,41 +82,34 @@ public class CollectableBox : MonoBehaviour
     [ContextMenu(" Set Color")]
     public void CheckIsLocked()
     {
-        Vector3 halfExtents = lockBoxScale; 
+        Vector3 halfExtents = lockBoxScale;
         Vector3 boxCenter = BoxcastStartPoint.position;
 
         Collider[] colliders = Physics.OverlapBox(boxCenter, halfExtents, Quaternion.identity);
 
         bool hasBoxAbove = false;
-            
+
         foreach (var collider in colliders)
         {
             if (collider != null && collider.gameObject != gameObject)
             {
                 hasBoxAbove = true;
-                break; //
+                break;
             }
         }
 
-        if (!hasBoxAbove)
-        {
-            //Debug.Log("Üzerimde başka kutu yok, kilit açıldı: " + gameObject.name);
-            IsLocked = false; 
-        }
-        else
-        {
-            //Debug.Log("Üzerimde başka bir kutu var: " + gameObject.name);
-            IsLocked = true; 
-        }
+        IsLocked = hasBoxAbove;
     }
         
     public Vector3 lockBoxScale = Vector3.one;
-    void OnDrawGizmos()
+
+    private void OnDrawGizmos()
     {
+        if (BoxcastStartPoint == null) return;
+
         Gizmos.color = Color.blue;
-        Vector3 halfExtents = lockBoxScale; // Kutunun yarı boyutları
-        Vector3 boxCenter = BoxcastStartPoint.position;    // Kutunun merkez noktası
-        Gizmos.DrawWireCube(boxCenter, halfExtents );   // Yarı boyutların tam kutu boyutuna dönüşümü
+        Vector3 boxCenter = BoxcastStartPoint.position;
+        Gizmos.DrawWireCube(boxCenter, lockBoxScale);
     }
 }
 

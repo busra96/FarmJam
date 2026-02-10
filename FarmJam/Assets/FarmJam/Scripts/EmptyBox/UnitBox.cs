@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class UnitBox : MonoBehaviour
 {
+   private const float DESTROY_DURATION = 0.25f;
+
    public bool IsFull;
    public GameObject UnitBoxModel;
    private GridTile GridTile;
@@ -19,8 +21,8 @@ public class UnitBox : MonoBehaviour
 
    public void Init(ColorType colorType)
    {
-      for (int i = 0; i < Points.Count; i++)
-         Points[i].Init(this);
+      foreach (var point in Points)
+         point.Init(this);
 
       UnitBoxColorTypeAndMat.ColorType = colorType;
       UnitBoxColorTypeAndMat.ActiveColor();
@@ -38,20 +40,20 @@ public class UnitBox : MonoBehaviour
       transform.SetParent(GridTile.transform);
       transform.localPosition = Vector3.zero;
 
-      for (int i = 0; i < GridControlColliders.Count; i++)
+      foreach (var collider in GridControlColliders)
       {
-         GridTiles.Add(GridControlColliders[i].GridTile);
-         GridControlColliders[i].GridTile.UnitBox = this;
+         GridTiles.Add(collider.GridTile);
+         collider.GridTile.UnitBox = this;
       }
-      
+
       GridTileSignals.OnAddedUnitBox?.Dispatch(this);
    }
 
    public void CheckIsFull()
    {
-      if(onDestroyed)
+      if (onDestroyed)
          return;
-      
+
       bool isFull = true;
       foreach (var point in Points)
       {
@@ -72,13 +74,18 @@ public class UnitBox : MonoBehaviour
    private async UniTask DestroyAnim()
    {
       UnitBoxSignals.OnThisUnitBoxDestroyed?.Dispatch(this);
-      UnitBoxModel.transform.DOScale(Vector3.zero, .25f).SetEase(Ease.OutBounce).OnComplete(() => Destroy(gameObject));
+      UnitBoxModel.transform.DOScale(Vector3.zero, DESTROY_DURATION)
+         .SetEase(Ease.OutBounce)
+         .OnComplete(() => Destroy(gameObject));
    }
 
    public UnityBoxPoint GetEmptyBoxPoint()
    {
       foreach (var unitBoxPoint in Points)
-         if(unitBoxPoint.Collectable == null) return unitBoxPoint;
+      {
+         if (unitBoxPoint.Collectable == null)
+            return unitBoxPoint;
+      }
 
       return null;
    }

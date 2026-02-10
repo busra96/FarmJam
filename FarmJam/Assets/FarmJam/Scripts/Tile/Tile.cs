@@ -9,13 +9,12 @@ public class Tile
     
     [Header("Neighbors")]
     public List<Neighbor> Neighbors = new List<Neighbor>();
+    private Dictionary<Direction, GridTile> _neighborDict = new Dictionary<Direction, GridTile>();
     
     public void AddNeighbor(Direction direction, GridTile neighborGridTile)
     {
-        foreach (var n in Neighbors)
-        {
-            if (n.Direction == direction) return; 
-        }
+        if (_neighborDict.ContainsKey(direction))
+            return;
 
         Neighbor newNeighbor = new Neighbor
         {
@@ -23,16 +22,13 @@ public class Tile
             GridTile = neighborGridTile
         };
         Neighbors.Add(newNeighbor);
+        _neighborDict[direction] = neighborGridTile;
     }
 
     public GridTile GetNeighbor(Direction direction)
     {
-        foreach (var neighbor in Neighbors)
-        {
-            if (neighbor.Direction == direction)
-                return neighbor.GridTile;
-        }
-        return null; 
+        _neighborDict.TryGetValue(direction, out GridTile neighbor);
+        return neighbor;
     }
 }
 
