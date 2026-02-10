@@ -17,9 +17,11 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
     private Dictionary<EmptyBox, int> removedIndexes = new Dictionary<EmptyBox, int>();
 
     private CancellationTokenSource cts;
+    private Camera _mainCamera;
 
     private void OnEnable()
     {
+        _mainCamera = Camera.main;
         EmptyBoxSignals.OnAddedEmptyBox.AddListener(OnSpawnedEmptyBox);
         EmptyBoxSignals.OnRemovedEmptyBox.AddListener(OnRemovedEmptyBox);
         EmptyBoxSignals.OnUpdateTetrisLayout.AddListener(OnUpdateTetrisLayout);
@@ -138,7 +140,8 @@ public class TetrisSpacingLayoutManager : MonoBehaviour
             return;
         }
 
-        float screenWorldWidth = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 10)).x * 2;
+        if (_mainCamera == null) _mainCamera = Camera.main;
+        float screenWorldWidth = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, 10)).x * 2;
         float[] widths = new float[objects.Count];
         float totalWidth = 0;
 

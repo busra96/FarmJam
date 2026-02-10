@@ -53,7 +53,12 @@ public class CollectableBoxManager
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                CollectableBoxes.RemoveAll(box => box == null);
+                // Remove null boxes without lambda allocation
+                for (int i = CollectableBoxes.Count - 1; i >= 0; i--)
+                {
+                    if (CollectableBoxes[i] == null)
+                        CollectableBoxes.RemoveAt(i);
+                }
 
                 if (CollectableBoxes.Count == 0)
                 {

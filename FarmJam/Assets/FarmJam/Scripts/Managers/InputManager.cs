@@ -1,38 +1,32 @@
-using Cysharp.Threading.Tasks;
 using Signals;
 using UnityEngine;
 
-public class InputManager
+public class InputManager : MonoBehaviour
 {
     private bool isActive;
-    
+
     public void Init()
     {
-        CheckInput().Forget();
+        isActive = true;
     }
 
-    private async UniTask CheckInput()
+    private void Update()
     {
-        isActive = true;
+        if (!isActive) return;
 
-        while (isActive)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                InputSignals.OnInputGetMouseDown?.Dispatch(Input.mousePosition);
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                InputSignals.OnInputGetMouseHold?.Dispatch(Input.mousePosition);
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                InputSignals.OnInputGetMouseUp?.Dispatch(Input.mousePosition);
-            }
-
-            await UniTask.Yield();
+            InputSignals.OnInputGetMouseDown?.Dispatch(Input.mousePosition);
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            InputSignals.OnInputGetMouseHold?.Dispatch(Input.mousePosition);
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            InputSignals.OnInputGetMouseUp?.Dispatch(Input.mousePosition);
         }
     }
-    
+
     public void DisableInput() => isActive = false;
 }

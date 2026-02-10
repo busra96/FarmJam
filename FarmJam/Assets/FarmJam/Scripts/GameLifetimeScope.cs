@@ -5,6 +5,7 @@ using VContainer.Unity;
 
 public class GameLifetimeScope : LifetimeScope
 {
+    [SerializeField] private InputManager _inputManager;
     [SerializeField] private GridTileManager _gridTileManager;
     [SerializeField] private UnitBoxManager _unitBoxManager;
     [SerializeField] private EmptyBoxSpawner _emptyBoxSpawner;
@@ -18,6 +19,7 @@ public class GameLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
      
+         builder.RegisterComponent(_inputManager);
          builder.RegisterComponent(_gridTileManager);
          builder.RegisterComponent(_unitBoxManager);
          builder.RegisterComponent(_emptyBoxSpawner);
@@ -30,7 +32,7 @@ public class GameLifetimeScope : LifetimeScope
         
          builder.Register<CollectableBoxParentFactory>(Lifetime.Singleton);
          builder.Register<CollectableBoxManager>(Lifetime.Singleton);
-         builder.Register<InputManager>(Lifetime.Singleton);
+        // builder.Register<InputManager>(Lifetime.Singleton);
          builder.Register<GridTileFactory>(Lifetime.Singleton);
          builder.Register<SelectManager>(Lifetime.Singleton);
          builder.Register<GameStateManager>(Lifetime.Singleton);
