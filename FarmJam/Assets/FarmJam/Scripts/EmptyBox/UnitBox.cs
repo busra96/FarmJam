@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UnitBox : MonoBehaviour
 {
-   private const float DESTROY_DURATION = 0.25f;
+   private const float DESTROY_DURATION = 0.2f;
 
    public bool IsFull;
    public GameObject UnitBoxModel;
@@ -18,6 +18,8 @@ public class UnitBox : MonoBehaviour
    private bool onDestroyed = false;
 
    public UnitBoxColorTypeAndMat UnitBoxColorTypeAndMat;
+
+   public UnitBoxAudio UnitBoxAudio;
 
    public void Init(ColorType colorType)
    {
@@ -73,9 +75,10 @@ public class UnitBox : MonoBehaviour
 
    private async UniTask DestroyAnim()
    {
+      UnitBoxAudio.PlayWinClip();
       UnitBoxSignals.OnThisUnitBoxDestroyed?.Dispatch(this);
       UnitBoxModel.transform.DOScale(Vector3.zero, DESTROY_DURATION)
-         .SetEase(Ease.OutBounce)
+         .SetEase(Ease.Linear)
          .OnComplete(() => Destroy(gameObject));
    }
 

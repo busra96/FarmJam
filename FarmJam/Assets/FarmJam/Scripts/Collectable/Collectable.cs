@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Collectable : MonoBehaviour
 {
+    public CollectableAudio CollectableAudio;
     [SerializeField] private CollectableColorAndMesh _collectableColorAndMesh;
     
     public bool isJumping;
@@ -23,7 +24,7 @@ public class Collectable : MonoBehaviour
         await transform.DOMove(backwardPos, 0.1f)
             .SetEase(Ease.OutQuad)
             .AsyncWaitForCompletion();
-        
+        CollectableAudio.PlayJumpClip();
         transform.parent = target;
         await transform.DOLocalJump(new Vector3(0, .6f, 0), 1, 1, 0.2f)
             .SetEase(Ease.OutBack).OnComplete(()=>

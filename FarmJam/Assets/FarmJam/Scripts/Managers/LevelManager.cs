@@ -47,6 +47,7 @@ public class LevelManager : MonoBehaviour
         await DestroyLevel();
         await UniTask.DelayFrame(LEVEL_TRANSITION_DELAY_FRAMES);
         await SpawnLevel();
+        AudioSignals.OnGameplayAmbientSoundPlay?.Dispatch();
     }
 
     private async UniTask SpawnLevel()

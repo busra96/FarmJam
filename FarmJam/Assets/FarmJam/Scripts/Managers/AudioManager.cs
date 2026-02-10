@@ -10,14 +10,14 @@ public class AudioManager : MonoBehaviour
 
     public void Init()
     {
+        AudioSignals.OnGameplayAmbientSoundPlay.AddListener(PlayBackgroundSound);
         AudioSignals.OnGameFailSoundPlay.AddListener(PlayFailSound);
         AudioSignals.OnGameWinSoundPlay.AddListener(PlayWinSound);
-
-        PlayBackgroundSound();
     }
 
     public void Disable()
     {
+        AudioSignals.OnGameplayAmbientSoundPlay.RemoveListener(PlayBackgroundSound);
         AudioSignals.OnGameFailSoundPlay.RemoveListener(PlayFailSound);
         AudioSignals.OnGameWinSoundPlay.RemoveListener(PlayWinSound);
     }
