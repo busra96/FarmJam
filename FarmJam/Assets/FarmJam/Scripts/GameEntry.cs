@@ -13,6 +13,7 @@ public class GameEntry : IStartable,IDisposable
     [Inject] private EmptyBoxSpawner _emptyBoxSpawner;
     [Inject] private UIManager _uiManager;
     [Inject] private LevelManager _levelManager;
+    [Inject] private AudioManager _audioManager;
   
     
     public void Start()
@@ -25,6 +26,7 @@ public class GameEntry : IStartable,IDisposable
         _gameStateManager.Init();
         _emptyBoxSpawner.Init();
         _levelManager.Init();
+        _audioManager.Init();
 
     }
 
@@ -37,5 +39,6 @@ public class GameEntry : IStartable,IDisposable
         _uiManager.Disable();
         _gameStateManager.Disable();
         _levelManager.Disable();
+        _audioManager.Disable();
     }
 }

@@ -11,7 +11,8 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private UIManager _uiManager;
     [SerializeField] private TetrisSpacingLayoutManager _tetrisSpacingLayoutManager;
     [SerializeField] private LevelManager _levelManager;
-
+    [SerializeField] private AudioManager _audioManager;
+    
     [SerializeField] private EmptyBoxContainer _emptyBoxContainer;
     
     protected override void Configure(IContainerBuilder builder)
@@ -23,6 +24,7 @@ public class GameLifetimeScope : LifetimeScope
          builder.RegisterComponent(_uiManager);
          builder.RegisterComponent(_tetrisSpacingLayoutManager);
          builder.RegisterComponent(_levelManager);
+         builder.RegisterComponent(_audioManager);
          
          builder.RegisterComponent(_emptyBoxContainer);
         

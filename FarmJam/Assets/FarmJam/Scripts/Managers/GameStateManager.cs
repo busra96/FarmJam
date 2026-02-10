@@ -38,6 +38,7 @@ public class GameStateManager : MonoBehaviour
    {
       if(GameStateType == GameStateType.Win || GameStateType == GameStateType.Fail) return;
       GameStateType = GameStateType.Win;
+      AudioSignals.OnGameWinSoundPlay?.Dispatch();
       UISignals.OnWinPanelActive?.Dispatch();
    }
 
@@ -45,6 +46,7 @@ public class GameStateManager : MonoBehaviour
    {
       if(GameStateType == GameStateType.Fail || GameStateType == GameStateType.Win) return;
       GameStateType = GameStateType.Fail;
+      AudioSignals.OnGameFailSoundPlay?.Dispatch();
       UISignals.OnFailPanelActive?.Dispatch();
    }
 }

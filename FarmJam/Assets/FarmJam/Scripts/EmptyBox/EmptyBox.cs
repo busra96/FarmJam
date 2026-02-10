@@ -11,6 +11,7 @@ public class EmptyBox : MonoBehaviour
     public EmptyBoxType EmptyBoxType;
     public UnitBox UnitBox;
     private EmptyBoxMovement _emptyBoxMovement;
+    private EmptyBoxAudio _emptyBoxAudio;
     public Collider Collider;
     
     public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
@@ -22,8 +23,10 @@ public class EmptyBox : MonoBehaviour
     public void Init(ColorType colorType)
     {
         _emptyBoxMovement = GetComponent<EmptyBoxMovement>();
+        _emptyBoxAudio = GetComponent<EmptyBoxAudio>();
         _cancellationTokenSource = new CancellationTokenSource();
         
+        _emptyBoxAudio.PlayAudioClip(EmptyBoxAudioClipType.Spawn);
         transform.localScale = Vector3.zero;
         transform.DOScale(Vector3.one * 0.7f, .2f).SetEase(Ease.InBounce);
         
@@ -45,6 +48,7 @@ public class EmptyBox : MonoBehaviour
     
     public void Selected(Vector3 pos)
     {
+        _emptyBoxAudio.PlayAudioClip(EmptyBoxAudioClipType.Select);
         _emptyBoxMovement.HandleMouseDown(pos);
         SetSelectableColliderActive(false);
         TrackInput().Forget();
@@ -114,6 +118,7 @@ public class EmptyBox : MonoBehaviour
 
     private void ResetToStart()
     {
+        _emptyBoxAudio.PlayAudioClip(EmptyBoxAudioClipType.Back);
         foreach (var gridControlCollider in GridControlColliders)
         {
             gridControlCollider.GridTile = null;
