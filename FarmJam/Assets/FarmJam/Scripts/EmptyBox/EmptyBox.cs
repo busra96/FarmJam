@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -8,6 +7,9 @@ using UnityEngine;
 
 public class EmptyBox : MonoBehaviour
 {
+    private const float SPAWN_SCALE = 0.7f;
+    private const float SPAWN_DURATION = 0.2f;
+
     public EmptyBoxType EmptyBoxType;
     public UnitBox UnitBox;
     private EmptyBoxMovement _emptyBoxMovement;
@@ -28,7 +30,7 @@ public class EmptyBox : MonoBehaviour
         
         _emptyBoxAudio.PlayAudioClip(EmptyBoxAudioClipType.Spawn);
         transform.localScale = Vector3.zero;
-        transform.DOScale(Vector3.one * 0.7f, .2f).SetEase(Ease.InBounce);
+        transform.DOScale(Vector3.one * SPAWN_SCALE, SPAWN_DURATION).SetEase(Ease.InBounce);
         
         UnitBox.Init(colorType);
         _emptyBoxMovement.Init();
@@ -81,7 +83,7 @@ public class EmptyBox : MonoBehaviour
 
     private void CheckRaycast()
     {
-        bool isPlacementValid = GridControlColliders.All(collider => collider.ReturnOnGridTileIsAvailable());
+        bool isPlacementValid = IsPlacementValid();
 
         foreach (var gridControlCollider in GridControlColliders)
         {
@@ -91,7 +93,7 @@ public class EmptyBox : MonoBehaviour
 
     private void HandleMouseUpRaycastCheck()
     {
-        bool isPlacementValid = GridControlColliders.All(collider => collider.ReturnOnGridTileIsAvailable());
+        bool isPlacementValid = IsPlacementValid();
 
         if (isPlacementValid)
         {
@@ -103,9 +105,27 @@ public class EmptyBox : MonoBehaviour
         }
     }
 
+    private bool IsPlacementValid()
+    {
+        for (int i = 0; i < GridControlColliders.Count; i++)
+        {
+            if (!GridControlColliders[i].ReturnOnGridTileIsAvailable())
+                return false;
+        }
+        return true;
+    }
+
     private void PlaceOnGrid()
     {
-        var mainCollider = GridControlColliders.FirstOrDefault(c => c.IsMain);
+        GridControlCollider mainCollider = null;
+        for (int i = 0; i < GridControlColliders.Count; i++)
+        {
+            if (GridControlColliders[i].IsMain)
+            {
+                mainCollider = GridControlColliders[i];
+                break;
+            }
+        }
 
         if (mainCollider == null) return;
 

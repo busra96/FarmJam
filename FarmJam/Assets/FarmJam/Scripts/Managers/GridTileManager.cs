@@ -6,7 +6,7 @@ public class GridTileManager : MonoBehaviour
 {
     private const float TILE_SPACING = 2f;
 
-    [Inject] private GridTileFactory _gridTileFactory;
+    [Inject] private readonly GridTileFactory _gridTileFactory;
 
     public List<GridTile> TileList = new List<GridTile>();
     private Dictionary<Vector2Int, GridTile> _tileDict = new Dictionary<Vector2Int, GridTile>();
@@ -76,11 +76,13 @@ public class GridTileManager : MonoBehaviour
 
     private void LinkNeighbors()
     {
+        Direction[] directions = (Direction[])System.Enum.GetValues(typeof(Direction));
+        
         foreach (var currentTile in TileList)
         {
             Vector2Int currentPos = Vector2Int.RoundToInt(currentTile.Tile.GridPosition);
 
-            foreach (Direction direction in System.Enum.GetValues(typeof(Direction)))
+            foreach (Direction direction in directions)
             {
                 Vector2Int neighborPosition = GetNeighborPosition(currentPos, direction);
 

@@ -9,7 +9,7 @@ public class EmptyBoxSpawner : MonoBehaviour
 {
     private const float FAIL_CHECK_DELAY_SECONDS = 1.5f;
 
-    [Inject] private GridTileManager _gridTileManager;
+    [Inject] private readonly GridTileManager _gridTileManager;
     private int index;
     public Transform SpawnPoint;
 
@@ -98,49 +98,19 @@ public class EmptyBoxSpawner : MonoBehaviour
     private async UniTask CheckFailConditionAsync()
     {
         await UniTask.Delay(TimeSpan.FromSeconds(FAIL_CHECK_DELAY_SECONDS));
-
-        // Check if any active EmptyBox can be placed on the grid
-        // For each EmptyBox type, check all possible positions and rotations
-        bool hasValidPlacement = false;
-        foreach (var emptyBox in EmptyBoxList)
-        {
-            // HasAnyValidPlacement checks if this specific EmptyBox type
-            // can fit anywhere on the grid in any rotation
-            if (_gridTileManager.HasAnyValidPlacement(emptyBox.EmptyBoxType))
-            {
-                hasValidPlacement = true;
-                break;
-            }
-        }
-
-        // If no EmptyBox can be placed anywhere on the grid, game fails
-        if (!hasValidPlacement)
-        {
-           // GameStateSignals.OnGameFail?.Dispatch();
-        }
     }
 
     public bool FailCheck()
     {
-        bool hasValidPlacement = false;
-        foreach (var emptyBox in EmptyBoxList)
+        for (int i = 0; i < EmptyBoxList.Count; i++)
         {
-            // HasAnyValidPlacement checks if this specific EmptyBox type
-            // can fit anywhere on the grid in any rotation
-            if (_gridTileManager.HasAnyValidPlacement(emptyBox.EmptyBoxType))
+            if (_gridTileManager.HasAnyValidPlacement(EmptyBoxList[i].EmptyBoxType))
             {
-                hasValidPlacement = true;
-                break;
+                return true;
             }
         }
-
-       /* // If no EmptyBox can be placed anywhere on the grid, game fails
-        if (!hasValidPlacement)
-        {
-            GameStateSignals.OnGameFail?.Dispatch();
-        }*/
         
-        return  hasValidPlacement;
+        return false;
     }
 
     #endregion

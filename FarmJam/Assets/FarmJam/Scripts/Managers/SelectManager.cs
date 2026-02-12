@@ -21,17 +21,17 @@ public class SelectManager
    
    private void OnInputGetMouseDown(Vector3 mousePosition)
    {
-      Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+      Ray ray = mainCamera.ScreenPointToRay(mousePosition);
 
       if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("EmptyBoxLayer")))
       {
-         if (hitInfo.collider.tag == "EmptyBox")
+         if (hitInfo.collider.CompareTag("EmptyBox"))
          {
-             EmptyBox emptyBox = hitInfo.collider.gameObject.GetComponentInParent<EmptyBox>();
+             EmptyBox emptyBox = hitInfo.collider.GetComponentInParent<EmptyBox>();
              if (emptyBox != null)
              {
                 SelectedEmptyBox = emptyBox;
-                SelectedEmptyBox.Selected(Input.mousePosition);
+                SelectedEmptyBox.Selected(mousePosition);
              }
          }
       }

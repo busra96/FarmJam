@@ -8,8 +8,8 @@ public class LevelWinFailCheck : MonoBehaviour
     private float currentTimer;
     private bool isControlling;
 
-    [Inject] private EmptyBoxSpawner EmptyBoxSpawner;
-    [Inject] private CollectableBoxManager CollectableBoxManager;
+    [Inject] private readonly EmptyBoxSpawner EmptyBoxSpawner;
+    [Inject] private readonly CollectableBoxManager CollectableBoxManager;
     
     public void Init()
     {
@@ -44,17 +44,11 @@ public class LevelWinFailCheck : MonoBehaviour
     {
         if (CollectableBoxManager.WinCheck())
         {
-            Debug.Log(" WIN ");
             GameStateSignals.OnGameWin?.Dispatch();
         }
-        else if (EmptyBoxSpawner.FailCheck() == false)
+        else if (!EmptyBoxSpawner.FailCheck())
         {
-            Debug.Log( " FAIL ");
             GameStateSignals.OnGameFail?.Dispatch();
-        }
-        else
-        {
-            Debug.Log(" OYUN DEVAM EDIYOR ");
         }
     }
 }

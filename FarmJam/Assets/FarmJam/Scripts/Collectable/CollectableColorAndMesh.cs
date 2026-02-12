@@ -6,15 +6,19 @@ public class CollectableColorAndMesh : MonoBehaviour
 {
     public List<ColorTypeAndCollectableObj> ColorTypeAndCollectableObjList;
     public ColorType ColorType;
+    public CollectableMesh CollectableMesh;
 
     public void ActiveColorObject()
     {
         foreach (var parameter in ColorTypeAndCollectableObjList)
         {
             if (parameter.ColorType == ColorType)
-                parameter.CollectableMeshRenderer.enabled = true;
+            {
+                CollectableMesh = parameter.CollectableMesh;
+                CollectableMesh.Mesh.enabled = true;
+            }
             else 
-                parameter.CollectableMeshRenderer.enabled = false;
+                parameter.CollectableMesh.Mesh.enabled = false;
         }
     }
 }
@@ -24,5 +28,5 @@ public class CollectableColorAndMesh : MonoBehaviour
 public class ColorTypeAndCollectableObj
 {
     public ColorType ColorType;
-    public MeshRenderer CollectableMeshRenderer;
+    public CollectableMesh CollectableMesh;
 }

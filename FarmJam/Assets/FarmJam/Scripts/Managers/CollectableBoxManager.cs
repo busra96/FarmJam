@@ -8,8 +8,8 @@ public class CollectableBoxManager
 {
     private const int PROCESS_DELAY_MS = 500;
 
-    [Inject] private UnitBoxManager unitBoxManager;
-    [Inject] private CollectableBoxParentFactory _collectableBoxParentFactory;
+    [Inject] private readonly UnitBoxManager unitBoxManager;
+    [Inject] private readonly CollectableBoxParentFactory _collectableBoxParentFactory;
 
     public List<CollectableBox> CollectableBoxes = new List<CollectableBox>();
     private bool isProcessing = false;
@@ -63,7 +63,6 @@ public class CollectableBoxManager
                 if (CollectableBoxes.Count == 0)
                 {
                     isProcessing = false;
-                  //  GameStateSignals.OnGameWin?.Dispatch();
                     break;
                 }
 
@@ -86,7 +85,6 @@ public class CollectableBoxManager
     
     public bool WinCheck()
     {
-        bool isWin = CollectableBoxes.Count == 0;
-        return isWin;
+        return CollectableBoxes.Count == 0;
     }
 }

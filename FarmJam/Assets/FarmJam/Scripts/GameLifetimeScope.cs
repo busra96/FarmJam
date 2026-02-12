@@ -36,10 +36,8 @@ public class GameLifetimeScope : LifetimeScope
         
          builder.Register<CollectableBoxParentFactory>(Lifetime.Singleton);
          builder.Register<CollectableBoxManager>(Lifetime.Singleton);
-        // builder.Register<InputManager>(Lifetime.Singleton);
          builder.Register<GridTileFactory>(Lifetime.Singleton);
          builder.Register<SelectManager>(Lifetime.Singleton);
-        // builder.Register<GameStateManager>(Lifetime.Singleton);
         
          builder.RegisterEntryPoint<GameEntry>().As<IStartable, IDisposable>();
     }

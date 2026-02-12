@@ -7,6 +7,7 @@ using UnityEngine;
 public class UnitBox : MonoBehaviour
 {
    private const float DESTROY_DURATION = 0.2f;
+   private const float INITIAL_SCALE = 0.7f;
 
    public bool IsFull;
    public GameObject UnitBoxModel;

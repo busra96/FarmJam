@@ -69,16 +69,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ColorTypeAndCollectableObjList:
   - ColorType: 0
-    CollectableMeshRenderer: {fileID: 6887718583603106223}
+    CollectableMesh: {fileID: 8647700966466486236}
   - ColorType: 1
-    CollectableMeshRenderer: {fileID: 5549412703755184344}
+    CollectableMesh: {fileID: 1534804067724736887}
   - ColorType: 2
-    CollectableMeshRenderer: {fileID: 436736592995682684}
+    CollectableMesh: {fileID: 1626832108679451071}
   - ColorType: 3
-    CollectableMeshRenderer: {fileID: 8491782487246630400}
+    CollectableMesh: {fileID: 7375389320259693784}
   - ColorType: 4
-    CollectableMeshRenderer: {fileID: 389212954666193511}
+    CollectableMesh: {fileID: 861501565586701844}
   ColorType: 0
+  CollectableMesh: {fileID: 0}
 --- !u!114 &3949473077334686068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,6 +321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e5982e92ab050146901cee18797db8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mesh: {fileID: 436736592995682684}
   mainCamera: {fileID: 0}
   fixedRotation: {x: 60, y: 0, z: 0}
 --- !u!1001 &1344138392442064611
@@ -417,6 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e5982e92ab050146901cee18797db8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mesh: {fileID: 389212954666193511}
   mainCamera: {fileID: 0}
   fixedRotation: {x: 50, y: 0, z: 0}
 --- !u!1001 &5212778231847423275
@@ -504,6 +507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e5982e92ab050146901cee18797db8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mesh: {fileID: 6887718583603106223}
   mainCamera: {fileID: 0}
   fixedRotation: {x: -70, y: 180, z: 0}
 --- !u!4 &5754821128876649152 stripped
@@ -606,6 +610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e5982e92ab050146901cee18797db8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mesh: {fileID: 5549412703755184344}
   mainCamera: {fileID: 0}
   fixedRotation: {x: 45, y: 0, z: 0}
 --- !u!4 &6721716654415401911 stripped
@@ -703,6 +708,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e5982e92ab050146901cee18797db8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mesh: {fileID: 8491782487246630400}
   mainCamera: {fileID: 0}
   fixedRotation: {x: 45, y: 0, z: 0}
 --- !u!23 &8491782487246630400 stripped

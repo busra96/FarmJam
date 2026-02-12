@@ -8,11 +8,11 @@ public class LevelManager : MonoBehaviour
 {
     private const int LEVEL_TRANSITION_DELAY_FRAMES = 5;
 
-    [Inject] private EmptyBoxSpawner emptyBoxSpawner;
-    [Inject] private CollectableBoxManager collectableBoxManager;
-    [Inject] private GridTileManager gridTileManager;
-    [Inject] private TetrisSpacingLayoutManager tetrisSpacingLayoutManager;
-    [Inject] private UnitBoxManager unitBoxManager;
+    [Inject] private readonly EmptyBoxSpawner emptyBoxSpawner;
+    [Inject] private readonly CollectableBoxManager collectableBoxManager;
+    [Inject] private readonly GridTileManager gridTileManager;
+    [Inject] private readonly TetrisSpacingLayoutManager tetrisSpacingLayoutManager;
+    [Inject] private readonly UnitBoxManager unitBoxManager;
 
     public List<Level> Levels;
 
