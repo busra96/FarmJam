@@ -49,6 +49,7 @@ public class UnitBox : MonoBehaviour
       }
 
       GridTileSignals.OnAddedUnitBox?.Dispatch(this);
+      LevelManagerSignals.OnLevelWinFailCheckTimerRestart?.Dispatch();
    }
 
    public void CheckIsFull()

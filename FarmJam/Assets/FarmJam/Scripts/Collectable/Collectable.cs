@@ -31,6 +31,7 @@ public class Collectable : MonoBehaviour
             {
                 isJumping = false;
                 UnitBoxSignals.OnThisUnitBoxIsFullCheck?.Dispatch();
+                LevelManagerSignals.OnLevelWinFailCheckTimerRestart?.Dispatch();
             })
             .AsyncWaitForCompletion();
     }

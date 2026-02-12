@@ -116,8 +116,31 @@ public class EmptyBoxSpawner : MonoBehaviour
         // If no EmptyBox can be placed anywhere on the grid, game fails
         if (!hasValidPlacement)
         {
-            GameStateSignals.OnGameFail?.Dispatch();
+           // GameStateSignals.OnGameFail?.Dispatch();
         }
+    }
+
+    public bool FailCheck()
+    {
+        bool hasValidPlacement = false;
+        foreach (var emptyBox in EmptyBoxList)
+        {
+            // HasAnyValidPlacement checks if this specific EmptyBox type
+            // can fit anywhere on the grid in any rotation
+            if (_gridTileManager.HasAnyValidPlacement(emptyBox.EmptyBoxType))
+            {
+                hasValidPlacement = true;
+                break;
+            }
+        }
+
+       /* // If no EmptyBox can be placed anywhere on the grid, game fails
+        if (!hasValidPlacement)
+        {
+            GameStateSignals.OnGameFail?.Dispatch();
+        }*/
+        
+        return  hasValidPlacement;
     }
 
     #endregion

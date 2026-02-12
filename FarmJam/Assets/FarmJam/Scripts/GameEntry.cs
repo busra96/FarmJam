@@ -14,6 +14,7 @@ public class GameEntry : IStartable,IDisposable
     [Inject] private UIManager _uiManager;
     [Inject] private LevelManager _levelManager;
     [Inject] private AudioManager _audioManager;
+    [Inject] private LevelWinFailCheck _levelWinFailCheck;
   
     
     public void Start()
@@ -27,6 +28,7 @@ public class GameEntry : IStartable,IDisposable
         _emptyBoxSpawner.Init();
         _levelManager.Init();
         _audioManager.Init();
+        _levelWinFailCheck.Init();
 
     }
 
@@ -40,5 +42,6 @@ public class GameEntry : IStartable,IDisposable
         _gameStateManager.Disable();
         _levelManager.Disable();
         _audioManager.Disable();
+        _levelWinFailCheck.Disable();
     }
 }

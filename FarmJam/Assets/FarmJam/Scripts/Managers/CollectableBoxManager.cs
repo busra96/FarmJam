@@ -63,7 +63,7 @@ public class CollectableBoxManager
                 if (CollectableBoxes.Count == 0)
                 {
                     isProcessing = false;
-                    GameStateSignals.OnGameWin?.Dispatch();
+                  //  GameStateSignals.OnGameWin?.Dispatch();
                     break;
                 }
 
@@ -82,5 +82,11 @@ public class CollectableBoxManager
         {
             isProcessing = false;
         }
+    }
+    
+    public bool WinCheck()
+    {
+        bool isWin = CollectableBoxes.Count == 0;
+        return isWin;
     }
 }

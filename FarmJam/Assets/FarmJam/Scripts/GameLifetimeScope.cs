@@ -5,6 +5,7 @@ using VContainer.Unity;
 
 public class GameLifetimeScope : LifetimeScope
 {
+    [SerializeField] private GameStateManager _gameStateManager;
     [SerializeField] private InputManager _inputManager;
     [SerializeField] private GridTileManager _gridTileManager;
     [SerializeField] private UnitBoxManager _unitBoxManager;
@@ -13,12 +14,14 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private TetrisSpacingLayoutManager _tetrisSpacingLayoutManager;
     [SerializeField] private LevelManager _levelManager;
     [SerializeField] private AudioManager _audioManager;
+    [SerializeField] private LevelWinFailCheck _levelWinFailCheck;
     
     [SerializeField] private EmptyBoxContainer _emptyBoxContainer;
     
     protected override void Configure(IContainerBuilder builder)
     {
      
+         builder.RegisterComponent(_gameStateManager);
          builder.RegisterComponent(_inputManager);
          builder.RegisterComponent(_gridTileManager);
          builder.RegisterComponent(_unitBoxManager);
@@ -27,6 +30,7 @@ public class GameLifetimeScope : LifetimeScope
          builder.RegisterComponent(_tetrisSpacingLayoutManager);
          builder.RegisterComponent(_levelManager);
          builder.RegisterComponent(_audioManager);
+         builder.RegisterComponent(_levelWinFailCheck);
          
          builder.RegisterComponent(_emptyBoxContainer);
         
@@ -35,7 +39,7 @@ public class GameLifetimeScope : LifetimeScope
         // builder.Register<InputManager>(Lifetime.Singleton);
          builder.Register<GridTileFactory>(Lifetime.Singleton);
          builder.Register<SelectManager>(Lifetime.Singleton);
-         builder.Register<GameStateManager>(Lifetime.Singleton);
+        // builder.Register<GameStateManager>(Lifetime.Singleton);
         
          builder.RegisterEntryPoint<GameEntry>().As<IStartable, IDisposable>();
     }

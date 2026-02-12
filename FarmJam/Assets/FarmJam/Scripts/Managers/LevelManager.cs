@@ -44,6 +44,7 @@ public class LevelManager : MonoBehaviour
 
     private async UniTask LoadLevel()
     {
+        GameStateSignals.OnGameLoad?.Dispatch();
         await DestroyLevel();
         await UniTask.DelayFrame(LEVEL_TRANSITION_DELAY_FRAMES);
         await SpawnLevel();
@@ -55,6 +56,7 @@ public class LevelManager : MonoBehaviour
         int levelIndex = currentLevelCount % Levels.Count;
         CurrentLevel = Instantiate(Levels[levelIndex].gameObject, Vector3.zero, Quaternion.identity).GetComponent<Level>();
         CurrentLevel.Init(emptyBoxSpawner, collectableBoxManager, gridTileManager);
+        GameStateSignals.OnGamePlay?.Dispatch();
     }
 
     private async UniTask DestroyLevel()
