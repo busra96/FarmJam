@@ -18,12 +18,12 @@ namespace FarmBlast
         private void OnEnable()
         {
             GridTileSignals.OnGridMaterialCheck.AddListener(GridTileMaterialCheck);
-            UnitBoxSignals.OnThisUnitBoxDestroyed.AddListener(OnThisUnitBoxDestroyedControl);
+           // UnitBoxSignals.OnThisUnitBoxDestroyed.AddListener(OnThisUnitBoxDestroyedControl);
         }
         private void OnDisable()
         {
             GridTileSignals.OnGridMaterialCheck.RemoveListener(GridTileMaterialCheck);
-            UnitBoxSignals.OnThisUnitBoxDestroyed.RemoveListener(OnThisUnitBoxDestroyedControl);
+           // UnitBoxSignals.OnThisUnitBoxDestroyed.RemoveListener(OnThisUnitBoxDestroyedControl);
         }
 
         private void GridTileMaterialCheck()
