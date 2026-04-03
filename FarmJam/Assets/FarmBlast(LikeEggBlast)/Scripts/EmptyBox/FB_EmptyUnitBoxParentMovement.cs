@@ -69,7 +69,7 @@ namespace FarmBlast
             clickTimer = clickTimerDuration;
 
             moveTween?.Kill();
-            ScaleTweenTo(clickScale, 0.15f);
+            ScaleTweenTo(clickScale, 0.05f);
 
             if (!TryGetMouseWorldPosition(mousePosition, out lastMouseWorldPosition))
             {
@@ -151,7 +151,7 @@ namespace FarmBlast
         {
             isMouseDown = false;
             FB_EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition?.Dispatch(this);
-            ScaleTweenTo(initialScale, 0.1f);
+            ScaleTweenTo(initialScale, 0.05f);
         }
 
         private void ScaleTweenTo(Vector3 targetScale, float duration)
