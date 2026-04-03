@@ -45,6 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eceb6b585f1d0dc4dbc9f1c5b566f1cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EmptyBoxSpawnArea
+  _emptyUnitBoxParentPrefab: {fileID: 8927112906485417543, guid: 3a35108e7868a184b957bb221f0e3e5f, type: 3}
+  _spawnParent: {fileID: 0}
+  _spawnOnStart: 1
+  _replaceExistingSpawn: 1
+  _unitSpacing: 2.1
+  _defaultLayoutType: 0
+  _spawnableLayouts: 
+  _spawnedParents: []
 --- !u!1 &6689003124142527966
 GameObject:
   m_ObjectHideFlags: 0
@@ -61,7 +69,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6827655454026495676
 Transform:
   m_ObjectHideFlags: 0
