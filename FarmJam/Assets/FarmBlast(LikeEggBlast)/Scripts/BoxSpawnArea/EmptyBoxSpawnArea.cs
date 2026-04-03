@@ -1,10 +1,19 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Signals;
 using UnityEngine;
 
 namespace FarmBlast
 {
     public class EmptyBoxSpawnArea : MonoBehaviour
     {
+        private const int RESPAWN_CHECK_DELAY_FRAMES = 2;
+
+        private static readonly List<EmptyBoxSpawnArea> REGISTERED_SPAWN_AREAS = new List<EmptyBoxSpawnArea>();
+        private static bool _isListeningSignals;
+        private static bool _isRespawnCheckQueued;
+        private static bool _isRespawningAll;
+
         [SerializeField] private FB_EmptyUnitBoxParent _emptyUnitBoxParentPrefab;
         [SerializeField] private Transform _spawnParent;
         [SerializeField] private bool _spawnOnStart = true;
@@ -22,6 +31,16 @@ namespace FarmBlast
             {
                 _spawnParent = transform;
             }
+        }
+
+        private void OnEnable()
+        {
+            RegisterSpawnArea(this);
+        }
+
+        private void OnDisable()
+        {
+            UnregisterSpawnArea(this);
         }
 
         private void Start()
@@ -131,6 +150,115 @@ namespace FarmBlast
             }
 
             DestroyImmediate(parentObject);
+        }
+
+        private static void RegisterSpawnArea(EmptyBoxSpawnArea spawnArea)
+        {
+            if (spawnArea == null || REGISTERED_SPAWN_AREAS.Contains(spawnArea))
+            {
+                SubscribeToSignalsIfNeeded();
+                return;
+            }
+
+            REGISTERED_SPAWN_AREAS.Add(spawnArea);
+            SubscribeToSignalsIfNeeded();
+        }
+
+        private static void UnregisterSpawnArea(EmptyBoxSpawnArea spawnArea)
+        {
+            if (spawnArea != null)
+            {
+                REGISTERED_SPAWN_AREAS.Remove(spawnArea);
+            }
+
+            if (REGISTERED_SPAWN_AREAS.Count == 0 && _isListeningSignals)
+            {
+                FB_EmptyBoxSignals.OnTheEmptyBoxRemoved.RemoveListener(OnAnyEmptyBoxParentRemoved);
+                _isListeningSignals = false;
+            }
+        }
+
+        private static void SubscribeToSignalsIfNeeded()
+        {
+            if (_isListeningSignals)
+            {
+                return;
+            }
+
+            FB_EmptyBoxSignals.OnTheEmptyBoxRemoved.RemoveListener(OnAnyEmptyBoxParentRemoved);
+            FB_EmptyBoxSignals.OnTheEmptyBoxRemoved.AddListener(OnAnyEmptyBoxParentRemoved);
+            _isListeningSignals = true;
+        }
+
+        private static void OnAnyEmptyBoxParentRemoved(FB_EmptyUnitBoxParent removedParent)
+        {
+            if (_isRespawningAll || _isRespawnCheckQueued || removedParent == null)
+            {
+                return;
+            }
+
+            WaitAndRespawnAllIfNeeded().Forget();
+        }
+
+        private static async UniTaskVoid WaitAndRespawnAllIfNeeded()
+        {
+            _isRespawnCheckQueued = true;
+
+            try
+            {
+                await UniTask.DelayFrame(RESPAWN_CHECK_DELAY_FRAMES);
+
+                CleanupRegisteredAreas();
+                if (!ShouldRespawnAllAreas())
+                {
+                    return;
+                }
+
+                _isRespawningAll = true;
+                for (int i = 0; i < REGISTERED_SPAWN_AREAS.Count; i++)
+                {
+                    EmptyBoxSpawnArea spawnArea = REGISTERED_SPAWN_AREAS[i];
+                    if (spawnArea == null || !spawnArea.isActiveAndEnabled)
+                    {
+                        continue;
+                    }
+
+                    spawnArea.Spawn();
+                }
+            }
+            finally
+            {
+                _isRespawningAll = false;
+                _isRespawnCheckQueued = false;
+            }
+        }
+
+        private static void CleanupRegisteredAreas()
+        {
+            REGISTERED_SPAWN_AREAS.RemoveAll(spawnArea => spawnArea == null || !spawnArea.isActiveAndEnabled);
+
+            for (int i = 0; i < REGISTERED_SPAWN_AREAS.Count; i++)
+            {
+                REGISTERED_SPAWN_AREAS[i].CleanupDestroyedParents();
+            }
+        }
+
+        private static bool ShouldRespawnAllAreas()
+        {
+            if (REGISTERED_SPAWN_AREAS.Count == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < REGISTERED_SPAWN_AREAS.Count; i++)
+            {
+                if (REGISTERED_SPAWN_AREAS[i]._spawnedParents.Count > 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
