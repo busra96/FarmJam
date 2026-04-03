@@ -29,6 +29,7 @@ namespace FarmBlast
         private const float DEFAULT_SPACING = 2.1f;
         private const float SPAWN_SCALE = 0.7f;
         private const float SPAWN_DURATION = 0.2f;
+        private static readonly ColorType[] AVAILABLE_COLOR_TYPES = (ColorType[])System.Enum.GetValues(typeof(ColorType));
 
         private static readonly FB_EmptyUnitBoxLayoutType[] SPAWNABLE_LAYOUT_TYPES =
         {
@@ -173,7 +174,7 @@ namespace FarmBlast
             FB_EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.RemoveListener(OnBoxReturnedToStart);
             FB_EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnBoxReturnedToStart);
 
-            InitializeUnitBoxes(ColorType.Orange);
+            InitializeUnitBoxesWithRandomColors();
         }
         
         [ContextMenu("Rebuild Current Layout")]
@@ -250,7 +251,7 @@ namespace FarmBlast
 
             RemoveUnusedUnitBoxes(existingUnitBoxes, cells.Length);
             RefreshUnitBoxCollections();
-            InitializeUnitBoxes(ColorType.Orange);
+            InitializeUnitBoxesWithRandomColors();
         }
 
         private void CacheExistingUnitBoxes()
@@ -290,15 +291,65 @@ namespace FarmBlast
             CacheExistingUnitBoxes();
         }
 
-        private void InitializeUnitBoxes(ColorType colorType)
+        private void InitializeUnitBoxesWithRandomColors()
         {
+            if (_emptyUnitBoxes.Count == 0 || AVAILABLE_COLOR_TYPES.Length == 0)
+            {
+                return;
+            }
+
+            ColorType firstAssignedColor = GetRandomColorType();
+            bool hasDifferentColor = false;
+
             for (int i = 0; i < _emptyUnitBoxes.Count; i++)
             {
-                if (_emptyUnitBoxes[i] != null)
+                if (_emptyUnitBoxes[i] == null)
                 {
-                    _emptyUnitBoxes[i].Init(colorType);
+                    continue;
+                }
+
+                ColorType randomColor = GetRandomColorType();
+                _emptyUnitBoxes[i].Init(randomColor);
+
+                if (i == 0)
+                {
+                    firstAssignedColor = randomColor;
+                }
+                else if (randomColor != firstAssignedColor)
+                {
+                    hasDifferentColor = true;
                 }
             }
+
+            if (_emptyUnitBoxes.Count > 1 && !hasDifferentColor && AVAILABLE_COLOR_TYPES.Length > 1)
+            {
+                UnitBox lastUnitBox = _emptyUnitBoxes[_emptyUnitBoxes.Count - 1];
+                if (lastUnitBox != null)
+                {
+                    lastUnitBox.Init(GetRandomColorTypeExcept(firstAssignedColor));
+                }
+            }
+        }
+
+        private static ColorType GetRandomColorType()
+        {
+            return AVAILABLE_COLOR_TYPES[Random.Range(0, AVAILABLE_COLOR_TYPES.Length)];
+        }
+
+        private static ColorType GetRandomColorTypeExcept(ColorType excludedColor)
+        {
+            if (AVAILABLE_COLOR_TYPES.Length <= 1)
+            {
+                return excludedColor;
+            }
+
+            ColorType randomColor = excludedColor;
+            while (randomColor == excludedColor)
+            {
+                randomColor = GetRandomColorType();
+            }
+
+            return randomColor;
         }
 
         private UnitBox ResolveTemplate(List<UnitBox> existingUnitBoxes)
