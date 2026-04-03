@@ -111,6 +111,8 @@ namespace FarmBlast
         [SerializeField] private float _spacing = DEFAULT_SPACING;
         [SerializeField] private FB_EmptyUnitBoxLayoutType _layoutType = FB_EmptyUnitBoxLayoutType.Single;
         [SerializeField] private List<UnitBox> _emptyUnitBoxes = new List<UnitBox>();
+        [SerializeField] private BoxCollider _selectionCollider;
+        [SerializeField] private Vector3 _selectionColliderPadding = new Vector3(0.75f, 0.5f, 0.75f);
 
         public IReadOnlyList<UnitBox> EmptyUnitBoxes => _emptyUnitBoxes;
         public FB_EmptyUnitBoxLayoutType LayoutType => _layoutType;
@@ -122,11 +124,16 @@ namespace FarmBlast
         public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
         private bool _onGridTile;
         private bool isActive;
+        private GridTileManager _gridTileManager;
         
         private CancellationTokenSource _cancellationTokenSource;
         
         private void Awake()
         {
+            _gridTileManager = Object.FindFirstObjectByType<GridTileManager>();
+            EnsureSelectionCollider();
+            ConfigureSelectableRoot();
+
             if (_unitBoxPrefab == null)
             {
                 _unitBoxPrefab = GetComponentInChildren<UnitBox>(true);
@@ -139,6 +146,8 @@ namespace FarmBlast
         private void OnValidate()
         {
             _spacing = Mathf.Max(0.01f, _spacing);
+            EnsureSelectionCollider();
+            ConfigureSelectableRoot();
 
             if (_unitBoxPrefab == null)
             {
@@ -260,6 +269,109 @@ namespace FarmBlast
             _emptyUnitBoxes.AddRange(GetComponentsInChildren<UnitBox>(true));
             UnitBox = _emptyUnitBoxes.Count > 0 ? _emptyUnitBoxes[0] : null;
             RefreshGridControlColliders();
+            RefreshSelectionCollider();
+        }
+
+        private void EnsureSelectionCollider()
+        {
+            if (_selectionCollider == null)
+            {
+                _selectionCollider = GetComponent<BoxCollider>();
+            }
+
+            if (_selectionCollider == null)
+            {
+                _selectionCollider = gameObject.AddComponent<BoxCollider>();
+            }
+
+            _selectionCollider.isTrigger = true;
+        }
+
+        private void ConfigureSelectableRoot()
+        {
+            int emptyBoxLayer = LayerMask.NameToLayer("EmptyBoxLayer");
+            if (emptyBoxLayer >= 0)
+            {
+                gameObject.layer = emptyBoxLayer;
+            }
+
+            if (gameObject.tag != "EmptyBox")
+            {
+                gameObject.tag = "EmptyBox";
+            }
+        }
+
+        private void RefreshSelectionCollider()
+        {
+            if (_selectionCollider == null)
+            {
+                return;
+            }
+
+            bool hasBounds = false;
+            Bounds combinedBounds = default;
+
+            for (int i = 0; i < _emptyUnitBoxes.Count; i++)
+            {
+                UnitBox emptyUnitBox = _emptyUnitBoxes[i];
+                if (emptyUnitBox == null)
+                {
+                    continue;
+                }
+
+                Collider sourceCollider = GetSelectionSourceCollider(emptyUnitBox);
+                if (sourceCollider == null)
+                {
+                    continue;
+                }
+
+                if (!hasBounds)
+                {
+                    combinedBounds = sourceCollider.bounds;
+                    hasBounds = true;
+                }
+                else
+                {
+                    combinedBounds.Encapsulate(sourceCollider.bounds);
+                }
+            }
+
+            if (!hasBounds)
+            {
+                _selectionCollider.center = Vector3.zero;
+                _selectionCollider.size = Vector3.one * 2f;
+                return;
+            }
+
+            _selectionCollider.center = transform.InverseTransformPoint(combinedBounds.center);
+
+            Vector3 localSize = transform.InverseTransformVector(combinedBounds.size);
+            localSize = new Vector3(Mathf.Abs(localSize.x), Mathf.Abs(localSize.y), Mathf.Abs(localSize.z));
+            localSize += _selectionColliderPadding;
+            _selectionCollider.size = localSize;
+        }
+
+        private static Collider GetSelectionSourceCollider(UnitBox emptyUnitBox)
+        {
+            if (emptyUnitBox.UnitBoxModel != null)
+            {
+                Collider modelCollider = emptyUnitBox.UnitBoxModel.GetComponent<Collider>();
+                if (modelCollider != null)
+                {
+                    return modelCollider;
+                }
+            }
+
+            Collider[] colliders = emptyUnitBox.GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                if (colliders[i] != null && colliders[i].GetComponent<GridControlCollider>() == null)
+                {
+                    return colliders[i];
+                }
+            }
+
+            return null;
         }
 
         private void RefreshGridControlColliders()
@@ -536,6 +648,13 @@ namespace FarmBlast
             PlacementTarget placementTarget = placementTargets[i];
             placementTarget.UnitBox.JumpToGridTile(placementTarget.MainCollider.GridTile);
         }
+
+        if (_gridTileManager == null)
+        {
+            _gridTileManager = Object.FindFirstObjectByType<GridTileManager>();
+        }
+
+        _gridTileManager?.ResolveMatches();
 
         GridControlColliders.Clear();
         _emptyUnitBoxes.Clear();

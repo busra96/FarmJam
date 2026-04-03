@@ -6,6 +6,7 @@ namespace FarmBlast
 {
    public class GridTileManager : MonoBehaviour
    {
+        private const int MIN_MATCH_COUNT = 3;
         private const float TILE_SPACING = 2f;
 
         [Inject] private readonly GridTileFactory _gridTileFactory;
@@ -123,6 +124,103 @@ namespace FarmBlast
 
             TileList.Clear();
             _tileDict.Clear();
+        }
+
+        public void ResolveMatches()
+        {
+            HashSet<UnitBox> matchedUnitBoxes = FindMatchedUnitBoxes();
+            if (matchedUnitBoxes.Count == 0)
+            {
+                return;
+            }
+
+            foreach (UnitBox matchedUnitBox in matchedUnitBoxes)
+            {
+                if (matchedUnitBox != null)
+                {
+                    matchedUnitBox.PopFromGrid();
+                }
+            }
+        }
+
+        private HashSet<UnitBox> FindMatchedUnitBoxes()
+        {
+            HashSet<GridTile> visitedTiles = new HashSet<GridTile>();
+            HashSet<UnitBox> matchedUnitBoxes = new HashSet<UnitBox>();
+
+            for (int i = 0; i < TileList.Count; i++)
+            {
+                GridTile originTile = TileList[i];
+                if (originTile == null || originTile.UnitBox == null || visitedTiles.Contains(originTile))
+                {
+                    continue;
+                }
+
+                HashSet<GridTile> connectedTiles = CollectConnectedTiles(originTile, visitedTiles);
+                HashSet<UnitBox> connectedUnitBoxes = CollectUnitBoxes(connectedTiles);
+
+                if (connectedUnitBoxes.Count < MIN_MATCH_COUNT)
+                {
+                    continue;
+                }
+
+                foreach (UnitBox connectedUnitBox in connectedUnitBoxes)
+                {
+                    matchedUnitBoxes.Add(connectedUnitBox);
+                }
+            }
+
+            return matchedUnitBoxes;
+        }
+
+        private HashSet<GridTile> CollectConnectedTiles(GridTile originTile, HashSet<GridTile> visitedTiles)
+        {
+            HashSet<GridTile> connectedTiles = new HashSet<GridTile>();
+            Queue<GridTile> tilesToVisit = new Queue<GridTile>();
+            ColorType targetColor = originTile.UnitBox.ColorType;
+
+            tilesToVisit.Enqueue(originTile);
+            visitedTiles.Add(originTile);
+
+            while (tilesToVisit.Count > 0)
+            {
+                GridTile currentTile = tilesToVisit.Dequeue();
+                connectedTiles.Add(currentTile);
+
+                for (int i = 0; i < currentTile.Tile.Neighbors.Count; i++)
+                {
+                    GridTile neighborTile = currentTile.Tile.Neighbors[i].GridTile;
+                    if (!IsMatchCandidate(neighborTile, targetColor) || visitedTiles.Contains(neighborTile))
+                    {
+                        continue;
+                    }
+
+                    visitedTiles.Add(neighborTile);
+                    tilesToVisit.Enqueue(neighborTile);
+                }
+            }
+
+            return connectedTiles;
+        }
+
+        private static HashSet<UnitBox> CollectUnitBoxes(HashSet<GridTile> connectedTiles)
+        {
+            HashSet<UnitBox> connectedUnitBoxes = new HashSet<UnitBox>();
+
+            foreach (GridTile connectedTile in connectedTiles)
+            {
+                if (connectedTile != null && connectedTile.UnitBox != null)
+                {
+                    connectedUnitBoxes.Add(connectedTile.UnitBox);
+                }
+            }
+
+            return connectedUnitBoxes;
+        }
+
+        private static bool IsMatchCandidate(GridTile gridTile, ColorType targetColor)
+        {
+            return gridTile != null && gridTile.UnitBox != null && gridTile.UnitBox.ColorType == targetColor;
         }
 
         #region EmptyBox Placement Validation
