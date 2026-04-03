@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 32675087494434785}
   - component: {fileID: 8927112906485417543}
+  - component: {fileID: 5419284546230572846}
   m_Layer: 0
   m_Name: FB_EmptyUnitBoxParent
   m_TagString: Untagged
@@ -45,6 +46,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9685c304d9843b499a21b161f613534, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FB_EmptyUnitBoxParent
+  _unitBoxPrefab: {fileID: 202135479136663577}
+  _spacing: 2.1
+  _layoutType: 0
+  _emptyUnitBoxes:
+  - {fileID: 202135479136663577}
+  _emptyUnitBoxMovement: {fileID: 5419284546230572846}
+  UnitBox: {fileID: 202135479136663577}
+  GridControlColliders:
+  - {fileID: 4507418260016477002}
+--- !u!114 &5419284546230572846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776812304049638082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5cfe822417a10b4ba240aad73039847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FB_EmptyUnitBoxParentMovement
+  planeLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  maxYPos: 1.25
+  moveSpeed: 50
+  clickTimerDuration: 0.25
+  initialScale: {x: 0.7, y: 0.7, z: 0.7}
+  clickScale: {x: 1, y: 1, z: 1}
 --- !u!1001 &5771089076974489699
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -102,8 +132,30 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 206800fd9b6223c4aa4c6f95c57db3b1, type: 3}
+--- !u!114 &202135479136663577 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5969846580432480378, guid: 206800fd9b6223c4aa4c6f95c57db3b1, type: 3}
+  m_PrefabInstance: {fileID: 5771089076974489699}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f83bba10c3d04a4bbe327db0c412c1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &371456867842823097 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6138592099925558234, guid: 206800fd9b6223c4aa4c6f95c57db3b1, type: 3}
   m_PrefabInstance: {fileID: 5771089076974489699}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4507418260016477002 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7969849576932221737, guid: 206800fd9b6223c4aa4c6f95c57db3b1, type: 3}
+  m_PrefabInstance: {fileID: 5771089076974489699}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04a22d24702366439523acae5a159ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

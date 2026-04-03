@@ -16,6 +16,7 @@ namespace FarmBlast
             builder.RegisterComponent(_gridTileManager);
             
             builder.Register<GridTileFactory>(Lifetime.Singleton);
+            builder.Register<SelectManager>(Lifetime.Singleton);
             
             builder.RegisterEntryPoint<GameEntry>().As<IStartable, IDisposable>();
         }

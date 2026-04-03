@@ -24,6 +24,8 @@ namespace FarmBlast
       public UnitBoxColorTypeAndMat UnitBoxColorTypeAndMat;
       public UnitBoxAudio UnitBoxAudio;
 
+      public IReadOnlyList<GridControlCollider> Colliders => GridControlColliders;
+
       public void Init(ColorType colorType)
       {
          UnitBoxColorTypeAndMat.ColorType = colorType;
@@ -36,17 +38,28 @@ namespace FarmBlast
       
       public void JumpToGridTile(GridTile tile)
       {
+         GridTiles.Clear();
          GridTile = tile;
          transform.SetParent(GridTile.transform);
          transform.localPosition = Vector3.zero;
 
          foreach (var collider in GridControlColliders)
          {
+            if (collider == null || collider.GridTile == null)
+            {
+               continue;
+            }
+
             GridTiles.Add(collider.GridTile);
             collider.GridTile.UnitBox = this;
          }
 
         // GridTileSignals.OnAddedUnitBox?.Dispatch(this);
+      }
+
+      public GridControlCollider GetMainGridControlCollider()
+      {
+         return GridControlColliders.Find(collider => collider != null && collider.IsMain);
       }
 
       public UnityBoxPoint GetEmptyBoxPoint() => Points.Find(point => point.Collectable == null);

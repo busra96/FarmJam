@@ -1,4 +1,8 @@
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using Signals;
 using UnityEngine;
 
 namespace FarmBlast
@@ -16,7 +20,15 @@ namespace FarmBlast
 
     public class FB_EmptyUnitBoxParent : MonoBehaviour
     {
+        private struct PlacementTarget
+        {
+            public UnitBox UnitBox;
+            public GridControlCollider MainCollider;
+        }
+
         private const float DEFAULT_SPACING = 2.1f;
+        private const float SPAWN_SCALE = 0.7f;
+        private const float SPAWN_DURATION = 0.2f;
 
         private static readonly FB_EmptyUnitBoxLayoutType[] SPAWNABLE_LAYOUT_TYPES =
         {
@@ -104,6 +116,14 @@ namespace FarmBlast
         public float Spacing => _spacing;
         public static IReadOnlyList<FB_EmptyUnitBoxLayoutType> SpawnableLayoutTypes => SPAWNABLE_LAYOUT_TYPES;
 
+        public FB_EmptyUnitBoxParentMovement _emptyUnitBoxMovement;
+        public UnitBox UnitBox;
+        public List<GridControlCollider> GridControlColliders = new List<GridControlCollider>();
+        private bool _onGridTile;
+        private bool isActive;
+        
+        private CancellationTokenSource _cancellationTokenSource;
+        
         private void Awake()
         {
             if (_unitBoxPrefab == null)
@@ -112,6 +132,7 @@ namespace FarmBlast
             }
 
             CacheExistingUnitBoxes();
+            Init();
         }
 
         private void OnValidate()
@@ -125,7 +146,36 @@ namespace FarmBlast
 
             CacheExistingUnitBoxes();
         }
+        
+        public void Disable()
+        {
+            if (_emptyUnitBoxMovement != null)
+            {
+                _emptyUnitBoxMovement.Disable();
+            }
 
+            _cancellationTokenSource?.Cancel();
+            FB_EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.RemoveListener(OnBoxReturnedToStart);
+        }
+        
+        public void Init()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            transform.localScale = Vector3.zero;
+            transform.DOScale(Vector3.one * SPAWN_SCALE, SPAWN_DURATION).SetEase(Ease.InBounce);
+
+            if (_emptyUnitBoxMovement != null)
+            {
+                _emptyUnitBoxMovement.Init();
+            }
+
+            FB_EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.RemoveListener(OnBoxReturnedToStart);
+            FB_EmptyBoxSignals.OnTheBoxHasCompletedTheMovementToTheStartingPosition.AddListener(OnBoxReturnedToStart);
+
+            InitializeUnitBoxes(ColorType.Orange);
+        }
+        
         [ContextMenu("Rebuild Current Layout")]
         public void RebuildCurrentLayout()
         {
@@ -199,12 +249,56 @@ namespace FarmBlast
             }
 
             RemoveUnusedUnitBoxes(existingUnitBoxes, cells.Length);
+            RefreshUnitBoxCollections();
+            InitializeUnitBoxes(ColorType.Orange);
         }
 
         private void CacheExistingUnitBoxes()
         {
             _emptyUnitBoxes.Clear();
             _emptyUnitBoxes.AddRange(GetComponentsInChildren<UnitBox>(true));
+            UnitBox = _emptyUnitBoxes.Count > 0 ? _emptyUnitBoxes[0] : null;
+            RefreshGridControlColliders();
+        }
+
+        private void RefreshGridControlColliders()
+        {
+            GridControlColliders.Clear();
+
+            for (int i = 0; i < _emptyUnitBoxes.Count; i++)
+            {
+                UnitBox emptyUnitBox = _emptyUnitBoxes[i];
+                if (emptyUnitBox == null)
+                {
+                    continue;
+                }
+
+                IReadOnlyList<GridControlCollider> colliders = emptyUnitBox.Colliders;
+                for (int j = 0; j < colliders.Count; j++)
+                {
+                    GridControlCollider collider = colliders[j];
+                    if (collider != null)
+                    {
+                        GridControlColliders.Add(collider);
+                    }
+                }
+            }
+        }
+
+        private void RefreshUnitBoxCollections()
+        {
+            CacheExistingUnitBoxes();
+        }
+
+        private void InitializeUnitBoxes(ColorType colorType)
+        {
+            for (int i = 0; i < _emptyUnitBoxes.Count; i++)
+            {
+                if (_emptyUnitBoxes[i] != null)
+                {
+                    _emptyUnitBoxes[i].Init(colorType);
+                }
+            }
         }
 
         private UnitBox ResolveTemplate(List<UnitBox> existingUnitBoxes)
@@ -294,5 +388,187 @@ namespace FarmBlast
 
             Object.DestroyImmediate(unitBoxObject);
         }
+        
+        public void Selected(Vector3 pos)
+        {
+            RefreshUnitBoxCollections();
+            _emptyUnitBoxMovement.HandleMouseDown(pos);
+            SetSelectableColliderActive(false);
+            TrackInput().Forget();
+        
+            FB_EmptyBoxSignals.OnRemovedEmptyBox?.Dispatch(this);
+        }
+
+        public void Deselected(Vector3 pos)
+        {
+            isActive = false;
+            HandleMouseUpRaycastCheck();
+        }
+        
+         private void SetSelectableColliderActive(bool isActive)
+    {
+        foreach (var gridControlCollider in GridControlColliders)
+        {
+            if (gridControlCollider != null)
+            {
+                gridControlCollider.gameObject.SetActive(_onGridTile ? isActive : !isActive);
+            }
+        }
     }
+    
+    private async UniTask TrackInput()
+    {
+        isActive = true;
+
+        while (isActive && !_cancellationTokenSource.IsCancellationRequested)
+        {
+            CheckRaycast();
+            await UniTask.Yield();
+        }
+    }
+
+    private void CheckRaycast()
+    {
+        bool isPlacementValid = IsPlacementValid();
+
+        foreach (var gridControlCollider in GridControlColliders)
+        {
+            gridControlCollider.GridTile?.IsGridOkeyAndNotOkey(isPlacementValid);
+        }
+    }
+
+    private void HandleMouseUpRaycastCheck()
+    {
+        bool isPlacementValid = IsPlacementValid();
+
+        if (isPlacementValid)
+        {
+            PlaceOnGrid();
+        }
+        else
+        {
+            ResetToStart();
+        }
+    }
+
+    private bool IsPlacementValid()
+    {
+        HashSet<GridTile> targetedTiles = new HashSet<GridTile>();
+
+        for (int i = 0; i < GridControlColliders.Count; i++)
+        {
+            GridControlCollider gridControlCollider = GridControlColliders[i];
+            if (gridControlCollider == null || !gridControlCollider.ReturnOnGridTileIsAvailable())
+            {
+                return false;
+            }
+
+            if (!targetedTiles.Add(gridControlCollider.GridTile))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void PlaceOnGrid()
+    {
+        if (!TryCollectPlacementTargets(out List<PlacementTarget> placementTargets))
+        {
+            ResetToStart();
+            return;
+        }
+
+        for (int i = 0; i < placementTargets.Count; i++)
+        {
+            PlacementTarget placementTarget = placementTargets[i];
+            placementTarget.UnitBox.JumpToGridTile(placementTarget.MainCollider.GridTile);
+        }
+
+        GridControlColliders.Clear();
+        _emptyUnitBoxes.Clear();
+        FB_EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
+        DestroySelf().Forget();
+        EmptyBoxSignals.OnUpdateTetrisLayout?.Dispatch();
+        EmptyBoxSignals.OnFailConditionCheck?.Dispatch();
+    }
+
+    private bool TryCollectPlacementTargets(out List<PlacementTarget> placementTargets)
+    {
+        placementTargets = new List<PlacementTarget>();
+        HashSet<GridTile> targetedTiles = new HashSet<GridTile>();
+
+        for (int i = 0; i < _emptyUnitBoxes.Count; i++)
+        {
+            UnitBox emptyUnitBox = _emptyUnitBoxes[i];
+            if (emptyUnitBox == null)
+            {
+                return false;
+            }
+
+            GridControlCollider mainCollider = emptyUnitBox.GetMainGridControlCollider();
+            if (mainCollider == null || mainCollider.GridTile == null || mainCollider.GridTile.UnitBox != null)
+            {
+                return false;
+            }
+
+            if (!targetedTiles.Add(mainCollider.GridTile))
+            {
+                return false;
+            }
+
+            placementTargets.Add(new PlacementTarget
+            {
+                UnitBox = emptyUnitBox,
+                MainCollider = mainCollider
+            });
+        }
+
+        return placementTargets.Count > 0;
+    }
+
+    private void ResetToStart()
+    {
+        foreach (var gridControlCollider in GridControlColliders)
+        {
+            if (gridControlCollider != null)
+            {
+                gridControlCollider.GridTile = null;
+            }
+        }
+
+        FB_EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(this);
+
+        if (_emptyUnitBoxMovement != null)
+        {
+            _emptyUnitBoxMovement.ReturnToStart();
+            return;
+        }
+
+        SetSelectableColliderActive(true);
+    }
+    
+    private void OnBoxReturnedToStart(FB_EmptyUnitBoxParentMovement emptyBoxMovement)
+    {
+        if(emptyBoxMovement != _emptyUnitBoxMovement) return;
+        SetSelectableColliderActive(true);
+    }
+    
+    private async UniTaskVoid DestroySelf()
+    {
+        if (this == null || _emptyUnitBoxMovement == null) return;
+
+        Disable();
+        isActive = false;
+        _cancellationTokenSource?.Cancel();
+
+        _emptyUnitBoxMovement.enabled = false;
+
+        await UniTask.DelayFrame(1);
+
+        if (this != null)
+            Destroy(gameObject);
+    }
+   }
 }
