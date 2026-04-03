@@ -29,12 +29,26 @@ namespace FarmBlast
 
       public void Init(ColorType colorType)
       {
+         onDestroyed = false;
+         IsFull = false;
+
+         for (int i = 0; i < Points.Count; i++)
+         {
+            if (Points[i] != null)
+            {
+               Points[i].Init(this);
+            }
+         }
+
          UnitBoxColorTypeAndMat.ColorType = colorType;
          UnitBoxColorTypeAndMat.ActiveColor();
+         FB_UnitBoxSignals.OnThisUnitBoxIsFullCheck.RemoveListener(CheckIsFull);
+         FB_UnitBoxSignals.OnThisUnitBoxIsFullCheck.AddListener(CheckIsFull);
       }
 
       private void OnDisable()
       {
+         FB_UnitBoxSignals.OnThisUnitBoxIsFullCheck.RemoveListener(CheckIsFull);
       }
       
       public void JumpToGridTile(GridTile tile)
@@ -57,7 +71,7 @@ namespace FarmBlast
             collider.GridTile.UnitBox = this;
          }
 
-        // GridTileSignals.OnAddedUnitBox?.Dispatch(this);
+         FB_GridTileSignals.OnAddedUnitBox?.Dispatch(this);
       }
 
       public GridControlCollider GetMainGridControlCollider()
@@ -73,6 +87,9 @@ namespace FarmBlast
          }
 
          onDestroyed = true;
+         IsFull = true;
+         FB_UnitBoxSignals.OnThisUnitBoxDestroyed?.Dispatch(this);
+         FB_GridTileSignals.OnRemovedUnitBox?.Dispatch(this);
          ClearGridReferences();
 
          if (UnitBoxAudio != null)
@@ -89,6 +106,35 @@ namespace FarmBlast
                   Destroy(gameObject);
                }
             });
+      }
+
+      public void CheckIsFull()
+      {
+         if (onDestroyed)
+         {
+            return;
+         }
+
+         IsFull = HasAllCollectablesPlaced();
+      }
+
+      public bool HasAllCollectablesPlaced()
+      {
+         if (onDestroyed)
+         {
+            return false;
+         }
+
+         for (int i = 0; i < Points.Count; i++)
+         {
+            UnityBoxPoint point = Points[i];
+            if (point == null || point.Collectable == null || point.Collectable.isJumping)
+            {
+               return false;
+            }
+         }
+
+         return true;
       }
 
       private void ClearGridReferences()
@@ -117,6 +163,14 @@ namespace FarmBlast
             }
          }
 
+         for (int i = 0; i < Points.Count; i++)
+         {
+            if (Points[i] != null)
+            {
+               Points[i].SetCollectable(null);
+            }
+         }
+
          GridTiles.Clear();
          GridTile = null;
       }
@@ -124,5 +178,3 @@ namespace FarmBlast
       public UnityBoxPoint GetEmptyBoxPoint() => Points.Find(point => point.Collectable == null);
    }
 }
-
-

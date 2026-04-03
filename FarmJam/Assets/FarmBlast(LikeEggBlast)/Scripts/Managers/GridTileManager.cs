@@ -151,7 +151,7 @@ namespace FarmBlast
             for (int i = 0; i < TileList.Count; i++)
             {
                 GridTile originTile = TileList[i];
-                if (originTile == null || originTile.UnitBox == null || visitedTiles.Contains(originTile))
+                if (originTile == null || originTile.UnitBox == null || !originTile.UnitBox.HasAllCollectablesPlaced() || visitedTiles.Contains(originTile))
                 {
                     continue;
                 }
@@ -220,7 +220,10 @@ namespace FarmBlast
 
         private static bool IsMatchCandidate(GridTile gridTile, ColorType targetColor)
         {
-            return gridTile != null && gridTile.UnitBox != null && gridTile.UnitBox.ColorType == targetColor;
+            return gridTile != null &&
+                   gridTile.UnitBox != null &&
+                   gridTile.UnitBox.ColorType == targetColor &&
+                   gridTile.UnitBox.HasAllCollectablesPlaced();
         }
 
         #region EmptyBox Placement Validation

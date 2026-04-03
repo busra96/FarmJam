@@ -654,8 +654,6 @@ namespace FarmBlast
             _gridTileManager = Object.FindFirstObjectByType<GridTileManager>();
         }
 
-        _gridTileManager?.ResolveMatches();
-
         GridControlColliders.Clear();
         _emptyUnitBoxes.Clear();
         FB_EmptyBoxSignals.OnTheEmptyBoxRemoved?.Dispatch(this);
