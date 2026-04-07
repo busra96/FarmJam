@@ -9,6 +9,7 @@ namespace FarmBlast
         public class CollectableBoxManager
         { 
             private const int PROCESS_DELAY_MS = 150;
+            private const int RESPAWN_DELAY_MS = 150;
 
             [Inject] private readonly UnitBoxManager unitBoxManager;
             [Inject] private readonly GridTileManager _gridTileManager;
@@ -35,18 +36,7 @@ namespace FarmBlast
                 if (collectableBoxParent == null || spawnPoint == null)
                     return;
 
-                CollectableBoxParent _collectableBoxParent = _collectableBoxParentFactory.Create(collectableBoxParent);
-                _collectableBoxParent.transform.SetParent(spawnPoint.transform);
-                _collectableBoxParent.transform.localPosition = Vector3.zero;
-                _collectableBoxParent.transform.localRotation = Quaternion.identity;
-                _collectableBoxParent.transform.localScale = Vector3.one;
-                _collectableBoxParent.Init();
-
-                foreach (var collectableBox in _collectableBoxParent.CollectableBoxList)
-                {
-                    CollectableBoxes.Add(collectableBox);
-                    collectableBox.Init(unitBoxManager);
-                }
+                SpawnCollectableBoxParentInternal(collectableBoxParent, spawnPoint);
 
                 ProcessCollectableBoxes().Forget();
             }
@@ -77,8 +67,10 @@ namespace FarmBlast
                             break;
                         }
 
-                        foreach (var collectableBox in CollectableBoxes)
+                        List<CollectableBox> currentCollectableBoxes = new List<CollectableBox>(CollectableBoxes);
+                        for (int i = 0; i < currentCollectableBoxes.Count; i++)
                         {
+                            CollectableBox collectableBox = currentCollectableBoxes[i];
                             if (collectableBox != null && !collectableBox.IsDestroying && collectableBox.gameObject.activeInHierarchy)
                             {
                                 movedAnyCollectable |= await collectableBox.FindUnitBox();
@@ -97,6 +89,77 @@ namespace FarmBlast
                 {
                     isProcessing = false;
                 }
+            }
+
+            private void SpawnCollectableBoxParentInternal(CollectableBoxParent collectableBoxParent, GameObject spawnPoint)
+            {
+                CollectableBoxParent spawnedCollectableBoxParent = _collectableBoxParentFactory.Create(collectableBoxParent);
+                spawnedCollectableBoxParent.transform.SetParent(spawnPoint.transform);
+                spawnedCollectableBoxParent.transform.localPosition = Vector3.zero;
+                spawnedCollectableBoxParent.transform.localRotation = Quaternion.identity;
+                spawnedCollectableBoxParent.transform.localScale = Vector3.one;
+                spawnedCollectableBoxParent.Init();
+
+                foreach (var collectableBox in spawnedCollectableBoxParent.CollectableBoxList)
+                {
+                    if (collectableBox == null)
+                    {
+                        continue;
+                    }
+
+                    CollectableBoxes.Add(collectableBox);
+                    collectableBox.Init(unitBoxManager, OnCollectableBoxDestroyed);
+                }
+            }
+
+            private void OnCollectableBoxDestroyed(CollectableBox destroyedCollectableBox)
+            {
+                if (destroyedCollectableBox == null)
+                {
+                    return;
+                }
+
+                CollectableBoxes.Remove(destroyedCollectableBox);
+                CollectableBoxParent collectableBoxParent = destroyedCollectableBox.GetComponentInParent<CollectableBoxParent>();
+                int respawnSlotId = destroyedCollectableBox.RespawnSlotId;
+                if (collectableBoxParent == null || respawnSlotId < 0)
+                {
+                    return;
+                }
+
+                RespawnCollectableBoxWithDelay(collectableBoxParent, respawnSlotId).Forget();
+            }
+
+            private async UniTaskVoid RespawnCollectableBoxWithDelay(CollectableBoxParent collectableBoxParent, int respawnSlotId)
+            {
+                if (_cancellationTokenSource == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    await UniTask.Delay(RESPAWN_DELAY_MS, cancellationToken: _cancellationTokenSource.Token);
+                }
+                catch (System.OperationCanceledException)
+                {
+                    return;
+                }
+
+                if (collectableBoxParent == null)
+                {
+                    return;
+                }
+
+                CollectableBox respawnedCollectableBox = collectableBoxParent.RespawnCollectableBox(respawnSlotId);
+                if (respawnedCollectableBox == null)
+                {
+                    return;
+                }
+
+                CollectableBoxes.Add(respawnedCollectableBox);
+                respawnedCollectableBox.Init(unitBoxManager, OnCollectableBoxDestroyed);
+                ProcessCollectableBoxes().Forget();
             }
     }
 }

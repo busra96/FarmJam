@@ -18,18 +18,45 @@ namespace FarmBlast
     public Transform BoxcastStartPoint;
     public bool IsLocked;
     public bool IsDestroying { get; private set; }
+    public bool IsTemplate { get; private set; }
     public List<CollectableParameter> CollectableParameters;
 
     private UnitBoxManager _unitBoxManager;
     private Collider[] _overlapResults;
+    private Action<CollectableBox> _onDestroyedCallback;
 
     public ColorType ColorType;
+    public int RespawnSlotId { get; private set; } = -1;
 
-    public void Init(UnitBoxManager unitBoxManager)
+    public void Init(UnitBoxManager unitBoxManager, Action<CollectableBox> onDestroyedCallback = null)
     {
+        IsTemplate = false;
+        IsDestroying = false;
         _unitBoxManager = unitBoxManager;
+        _onDestroyedCallback = onDestroyedCallback;
         _overlapResults = new Collider[MAX_OVERLAP_COLLIDERS];
+        transform.localScale = Vector3.one;
         SetColor();
+    }
+
+    public void SetRespawnSlot(int respawnSlotId)
+    {
+        RespawnSlotId = respawnSlotId;
+    }
+
+    public void MarkAsTemplate()
+    {
+        IsTemplate = true;
+        gameObject.SetActive(false);
+    }
+
+    public void PrepareRespawnedInstance(int respawnSlotId)
+    {
+        RespawnSlotId = respawnSlotId;
+        IsTemplate = false;
+        IsDestroying = false;
+        gameObject.SetActive(true);
+        transform.localScale = Vector3.one;
     }
 
     public void SetColor()
@@ -45,7 +72,7 @@ namespace FarmBlast
 
     public async UniTask<bool> FindUnitBox()
     {
-        if (this == null || IsLocked || IsDestroying) return false;
+        if (this == null || IsTemplate || IsLocked || IsDestroying) return false;
 
         bool movedAnyCollectable = false;
         CancellationToken cancellationToken = this.GetCancellationTokenOnDestroy();
@@ -122,6 +149,7 @@ namespace FarmBlast
                 {
                     if (this != null)
                     {
+                        _onDestroyedCallback?.Invoke(this);
                         Destroy(gameObject);
                     }
                 });
