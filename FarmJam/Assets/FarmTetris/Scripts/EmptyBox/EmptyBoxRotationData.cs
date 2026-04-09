@@ -377,6 +377,17 @@
 
             return shape.Rotations[rotationIndex];
         }
+
+        public static Vector2Int[] GetBaseShapeCells(EmptyBoxType type)
+        {
+            if (!Shapes.TryGetValue(type, out EmptyBoxShape shape) || shape.Rotations.Count == 0)
+            {
+                Debug.LogError($"Base shape not found for type: {type}");
+                return null;
+            }
+
+            return shape.Rotations[0];
+        }
     }
 
 

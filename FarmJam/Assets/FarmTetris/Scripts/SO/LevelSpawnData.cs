@@ -11,7 +11,7 @@
         public struct  EmptyBoxParameter
         {
             public ColorType ColorType;
-            public EmptyBox EmptyBox;
+            public EmptyBoxType EmptyBoxType;
         }
         
         public List<EmptyBoxParameter> EmptyBoxTypes;

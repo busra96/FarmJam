@@ -41,6 +41,7 @@
                     isJumping = false;
                     _collectableColorAndMesh.CollectableMesh.Rotate();
                     UnitBoxSignals.OnThisUnitBoxIsFullCheck?.Dispatch();
+                    GridTileSignals.OnUnitBoxStateCheckCompleted?.Dispatch();
                     LevelManagerSignals.OnLevelWinFailCheckTimerRestart?.Dispatch();
                 })
                 .AsyncWaitForCompletion();

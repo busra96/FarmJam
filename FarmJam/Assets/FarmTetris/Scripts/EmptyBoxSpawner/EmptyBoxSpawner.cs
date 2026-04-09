@@ -11,6 +11,7 @@
         private const float FAIL_CHECK_DELAY_SECONDS = 1.5f;
 
         [Inject] private readonly GridTileManager _gridTileManager;
+        [Inject] private readonly EmptyBoxContainer _emptyBoxContainer;
         private int index;
         public Transform SpawnPoint;
 
@@ -45,10 +46,20 @@
             if (index >= CurrentLevel.LevelSpawnData.EmptyBoxTypes.Count) return;
 
             var emptyBoxData = CurrentLevel.LevelSpawnData.EmptyBoxTypes[index];
-            EmptyBox emptyBox = Instantiate(emptyBoxData.EmptyBox, SpawnPoint.position, Quaternion.identity);
+            EmptyBox emptyBoxPrefab = _emptyBoxContainer != null
+                ? _emptyBoxContainer.ReturnEmptyBox(emptyBoxData.EmptyBoxType)
+                : null;
+
+            if (emptyBoxPrefab == null)
+            {
+                Debug.LogError("[EmptyBoxSpawner] Generic EmptyBox prefab not found.", this);
+                return;
+            }
+
+            EmptyBox emptyBox = Instantiate(emptyBoxPrefab, SpawnPoint.position, Quaternion.identity);
             emptyBox.transform.SetParent(CurrentLevel.transform);
-            emptyBox.Init(emptyBoxData.ColorType);
             emptyBox.transform.position = SpawnPoint.position;
+            emptyBox.Init(emptyBoxData.ColorType, emptyBoxData.EmptyBoxType);
             AddedEmptyBoxToList(emptyBox);
             EmptyBoxSignals.OnAddedEmptyBox?.Dispatch(emptyBox);
 

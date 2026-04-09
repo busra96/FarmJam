@@ -1,9 +1,8 @@
-﻿namespace FarmTetris
+namespace FarmTetris
 {
     using System.Collections.Generic;
     using UnityEngine;
     using VContainer;
-
 
     public class GridTileManager : MonoBehaviour
     {
@@ -12,7 +11,7 @@
         [Inject] private readonly GridTileFactory _gridTileFactory;
 
         public List<GridTile> TileList = new List<GridTile>();
-        private Dictionary<Vector2Int, GridTile> _tileDict = new Dictionary<Vector2Int, GridTile>();
+        private readonly Dictionary<Vector2Int, GridTile> _tileDict = new Dictionary<Vector2Int, GridTile>();
         public GridTile GridTilePrefab;
         public int xValue;
         public int yValue;
@@ -20,6 +19,16 @@
 
         public Material GreyMat;
         public Material WhiteMat;
+
+        private void OnEnable()
+        {
+            GridTileSignals.OnUnitBoxStateCheckCompleted.AddListener(ResolveCompletedLines);
+        }
+
+        private void OnDisable()
+        {
+            GridTileSignals.OnUnitBoxStateCheckCompleted.RemoveListener(ResolveCompletedLines);
+        }
 
         public void Init()
         {
@@ -44,7 +53,9 @@
             for (int i = 0; i < xValue; i++)
             {
                 for (int j = 0; j < yValue; j++)
+                {
                     SpawnGridTile(i, j, parentTransform);
+                }
             }
         }
 
@@ -72,7 +83,9 @@
             MiddlePoint.position = new Vector3(xMiddlePos, 0, zMiddlePos);
 
             foreach (var tile in TileList)
+            {
                 tile.transform.parent = MiddlePoint.transform;
+            }
 
             MiddlePoint.position = Vector3.zero;
         }
@@ -116,13 +129,111 @@
 
         public void DestroyAllGrids()
         {
-            if (TileList.Count == 0) return;
+            if (TileList.Count == 0)
+            {
+                return;
+            }
 
             foreach (var tile in TileList)
+            {
                 Destroy(tile.gameObject);
+            }
 
             TileList.Clear();
             _tileDict.Clear();
+        }
+
+        public void ResolveCompletedLines()
+        {
+            HashSet<UnitBox> matchedUnitBoxes = FindCompletedLineUnitBoxes();
+            if (matchedUnitBoxes.Count == 0)
+            {
+                return;
+            }
+
+            foreach (UnitBox matchedUnitBox in matchedUnitBoxes)
+            {
+                matchedUnitBox?.PopFromGrid();
+            }
+        }
+
+        private HashSet<UnitBox> FindCompletedLineUnitBoxes()
+        {
+            HashSet<UnitBox> completedLineUnitBoxes = new HashSet<UnitBox>();
+
+            for (int y = 0; y < yValue; y++)
+            {
+                if (TryGetCompletedRowUnitBoxes(y, out List<UnitBox> rowUnitBoxes))
+                {
+                    AddUnitBoxes(completedLineUnitBoxes, rowUnitBoxes);
+                }
+            }
+
+            for (int x = 0; x < xValue; x++)
+            {
+                if (TryGetCompletedColumnUnitBoxes(x, out List<UnitBox> columnUnitBoxes))
+                {
+                    AddUnitBoxes(completedLineUnitBoxes, columnUnitBoxes);
+                }
+            }
+
+            return completedLineUnitBoxes;
+        }
+
+        private bool TryGetCompletedRowUnitBoxes(int rowIndex, out List<UnitBox> rowUnitBoxes)
+        {
+            rowUnitBoxes = new List<UnitBox>();
+
+            for (int x = 0; x < xValue; x++)
+            {
+                if (!TryGetTile(new Vector2Int(x, rowIndex), out GridTile gridTile) ||
+                    gridTile.UnitBox == null ||
+                    !gridTile.UnitBox.IsFull)
+                {
+                    rowUnitBoxes.Clear();
+                    return false;
+                }
+
+                rowUnitBoxes.Add(gridTile.UnitBox);
+            }
+
+            return rowUnitBoxes.Count > 0;
+        }
+
+        private bool TryGetCompletedColumnUnitBoxes(int columnIndex, out List<UnitBox> columnUnitBoxes)
+        {
+            columnUnitBoxes = new List<UnitBox>();
+
+            for (int y = 0; y < yValue; y++)
+            {
+                if (!TryGetTile(new Vector2Int(columnIndex, y), out GridTile gridTile) ||
+                    gridTile.UnitBox == null ||
+                    !gridTile.UnitBox.IsFull)
+                {
+                    columnUnitBoxes.Clear();
+                    return false;
+                }
+
+                columnUnitBoxes.Add(gridTile.UnitBox);
+            }
+
+            return columnUnitBoxes.Count > 0;
+        }
+
+        private static void AddUnitBoxes(HashSet<UnitBox> targetSet, List<UnitBox> sourceList)
+        {
+            for (int i = 0; i < sourceList.Count; i++)
+            {
+                if (sourceList[i] != null)
+                {
+                    targetSet.Add(sourceList[i]);
+                }
+            }
+        }
+
+        private bool TryGetTile(Vector2Int gridPosition, out GridTile gridTile)
+        {
+            return _tileDict.TryGetValue(gridPosition, out gridTile);
         }
 
         #region EmptyBox Placement Validation
@@ -158,10 +269,14 @@
                 Vector2Int targetPos = origin + offset;
 
                 if (!_tileDict.TryGetValue(targetPos, out GridTile targetTile))
+                {
                     return false;
+                }
 
                 if (targetTile.UnitBox != null)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -169,4 +284,3 @@
         #endregion
     }
 }
-

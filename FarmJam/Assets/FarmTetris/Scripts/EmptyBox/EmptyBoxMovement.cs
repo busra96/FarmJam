@@ -89,10 +89,10 @@
 
             isActive = false;
 
-            if (isMouseDown && clickTimer > 0)
-            {
-                RotateObject();
-            }
+            // if (isMouseDown && clickTimer > 0)
+            // {
+            //     RotateObject();
+            // }
 
             ResetObjectState();
         }

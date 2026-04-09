@@ -512,7 +512,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FarmTetris.EmptyBox
   EmptyBoxType: 4
   UnitBox: {fileID: 4195061710348585183}
+  UnitBoxes: []
   Collider: {fileID: 4660707905295455098}
+  _unitBoxParent: {fileID: 0}
+  _unitSpacing: 2
   GridControlColliders:
   - {fileID: 2739651982230953988}
 --- !u!114 &5904492272499524802
@@ -739,6 +742,15 @@ MonoBehaviour:
   - {fileID: 8146811988707829836}
   UnitBoxColorTypeAndMat: {fileID: 4222011840490810105}
   UnitBoxAudio: {fileID: 8362795406132324348}
+  directionMeshes:
+  - direction: 0
+    mesh: {fileID: 1076134980412239367}
+  - direction: 1
+    mesh: {fileID: 2948636842579052820}
+  - direction: 2
+    mesh: {fileID: 1617960775926111590}
+  - direction: 3
+    mesh: {fileID: 8829219678109817514}
 --- !u!114 &4222011840490810105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -817,6 +829,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8105383190737678713, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.18
+      objectReference: {fileID: 0}
+    - target: {fileID: -7341128892350516168, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_Name
+      value: SM_Box1Unit_Right
+      objectReference: {fileID: 0}
+    - target: {fileID: -7341128892350516168, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6310612455526974134, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.18
+      objectReference: {fileID: 0}
+    - target: {fileID: -6310612455526974134, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
       propertyPath: m_Name
       value: SM_Box1Unit (1)
@@ -829,6 +861,22 @@ PrefabInstance:
       propertyPath: m_TagString
       value: EmptyBox
       objectReference: {fileID: 0}
+    - target: {fileID: 5220528744053417862, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7959991113264070805, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8569369801529471988, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_Name
+      value: SM_Box1Unit_Left
+      objectReference: {fileID: 0}
+    - target: {fileID: 8569369801529471988, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -840,6 +888,16 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 691785748838040040}
   m_SourcePrefab: {fileID: 100100000, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+--- !u!1 &1076134980412239367 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7959991113264070805, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+  m_PrefabInstance: {fileID: 6960492093458935442}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1617960775926111590 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8569369801529471988, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+  m_PrefabInstance: {fileID: 6960492093458935442}
+  m_PrefabAsset: {fileID: 0}
 --- !u!23 &2235227485822183510 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -27658075543042364, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
@@ -848,6 +906,11 @@ MeshRenderer:
 --- !u!23 &2242631657471676764 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 9189541378549219278, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+  m_PrefabInstance: {fileID: 6960492093458935442}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2948636842579052820 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5220528744053417862, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
   m_PrefabInstance: {fileID: 6960492093458935442}
   m_PrefabAsset: {fileID: 0}
 --- !u!23 &4003366462592122865 stripped
@@ -894,5 +957,10 @@ BoxCollider:
 --- !u!23 &7974171184063218992 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -8200684527208207454, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
+  m_PrefabInstance: {fileID: 6960492093458935442}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8829219678109817514 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7341128892350516168, guid: 7befe8538a34a6e4383a6a2a04265c1c, type: 3}
   m_PrefabInstance: {fileID: 6960492093458935442}
   m_PrefabAsset: {fileID: 0}

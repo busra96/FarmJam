@@ -11,7 +11,18 @@
 
         public EmptyBox ReturnEmptyBox(EmptyBoxType EmptyBoxType)
         {
-            return EmptyBoxContainerList.Find(parameter => parameter.EmptyBoxType == EmptyBoxType)?.EmptyBox;
+            if (EmptyBoxContainerList == null || EmptyBoxContainerList.Count == 0)
+            {
+                return null;
+            }
+
+            EmptyBox matchedEmptyBox = EmptyBoxContainerList.Find(parameter => parameter.EmptyBoxType == EmptyBoxType)?.EmptyBox;
+            if (matchedEmptyBox != null)
+            {
+                return matchedEmptyBox;
+            }
+
+            return EmptyBoxContainerList[0].EmptyBox;
         }
     }
 

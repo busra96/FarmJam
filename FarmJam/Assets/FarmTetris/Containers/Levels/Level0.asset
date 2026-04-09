@@ -14,23 +14,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FarmTetris.FarmTetrisLevelSpawnData
   EmptyBoxTypes:
   - ColorType: 1
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 5
   - ColorType: 2
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 6
   - ColorType: 3
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 2
   - ColorType: 4
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 2
   - ColorType: 0
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 4
   - ColorType: 3
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 4
   - ColorType: 4
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 3
   - ColorType: 2
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 7
   - ColorType: 1
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 8
   - ColorType: 0
-    EmptyBox: {fileID: 2955945769337688507, guid: e8f63fdac9e61fc4cace80189b72045e, type: 3}
+    EmptyBoxType: 5
+  - ColorType: 0
+    EmptyBoxType: 5
+  - ColorType: 0
+    EmptyBoxType: 5
+  - ColorType: 1
+    EmptyBoxType: 3
+  - ColorType: 4
+    EmptyBoxType: 8
+  - ColorType: 0
+    EmptyBoxType: 4
   CollectableBoxParent: {fileID: 3570554131136927327, guid: 475b24e3e682b404fb0e71f8c89ac867, type: 3}

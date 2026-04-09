@@ -61,7 +61,7 @@
           if (!_unitBoxesByColor.TryGetValue(colorType, out List<UnitBox> boxes))
              return null;
 
-          return boxes.FirstOrDefault(box => !box.IsFull);
+          return boxes.FirstOrDefault(box => box != null && !box.IsFull && box.GetEmptyBoxPoint() != null);
        } 
        
        public void ClearUnitBoxList()
