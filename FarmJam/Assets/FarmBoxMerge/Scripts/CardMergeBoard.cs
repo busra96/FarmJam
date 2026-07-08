@@ -309,7 +309,8 @@ public class CardMergeBoard : MonoBehaviour
             spawnedBoxes.Add(spawnedBox);
         }
 
-        boxParent.Initialize(boxCount, colorType, pattern.PatternType, spawnedBoxes);
+        boxParent.Initialize(boxCount, colorType, pattern.PatternType, spawnedBoxes, pattern.Cells);
+        MergeItemSpawner.Instance?.TryProcessQueue();
         return boxParent;
     }
 

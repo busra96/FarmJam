@@ -6,8 +6,12 @@ namespace FarmTetris
 
     public class UnitBox : MonoBehaviour
     {
-        private const float DESTROY_DURATION = 0.2f;
+        private const float DESTROY_DURATION = 0.1f;
         private const float INITIAL_SCALE = 1f;
+        private const float PRE_CLEAR_SHAKE_DURATION = 0.08f;
+        private const float PRE_CLEAR_SHAKE_STRENGTH = 0.08f;
+        private const float PRE_CLEAR_ROTATION_STRENGTH = 10f;
+        private const float PRE_CLEAR_PUNCH_SCALE = 0.18f;
 
         public bool IsFull;
         public GameObject UnitBoxModel;
@@ -27,6 +31,7 @@ namespace FarmTetris
         [SerializeField] private List<DirectionMeshPair> directionMeshes;
         private readonly List<UnitBoxNeighbor> _neighbors = new List<UnitBoxNeighbor>();
         private readonly Dictionary<Direction, UnitBox> _neighborLookup = new Dictionary<Direction, UnitBox>();
+        private Sequence _clearEffectSequence;
         
         public void Init(ColorType colorType)
         {
@@ -112,11 +117,45 @@ namespace FarmTetris
             DestroyAnim();
         }
 
+        public void PlayClearEffect()
+        {
+            if (onDestroyed || UnitBoxModel == null)
+            {
+                return;
+            }
+
+            Transform modelTransform = UnitBoxModel.transform;
+            _clearEffectSequence?.Kill();
+            modelTransform.DOKill();
+
+            _clearEffectSequence = DOTween.Sequence();
+            _clearEffectSequence.Append(modelTransform.DOPunchScale(Vector3.one * PRE_CLEAR_PUNCH_SCALE, PRE_CLEAR_SHAKE_DURATION, 8, 0.85f));
+            _clearEffectSequence.Join(modelTransform.DOShakePosition(
+                PRE_CLEAR_SHAKE_DURATION,
+                new Vector3(PRE_CLEAR_SHAKE_STRENGTH, PRE_CLEAR_SHAKE_STRENGTH * 0.4f, PRE_CLEAR_SHAKE_STRENGTH),
+                18,
+                90f,
+                false,
+                true));
+            _clearEffectSequence.Join(modelTransform.DOShakeRotation(
+                PRE_CLEAR_SHAKE_DURATION,
+                new Vector3(0f, 0f, PRE_CLEAR_ROTATION_STRENGTH),
+                18,
+                90f,
+                true));
+        }
+
         private void DestroyAnim()
         {
+            _clearEffectSequence?.Kill();
+            if (UnitBoxModel != null)
+            {
+                UnitBoxModel.transform.DOKill();
+            }
+
             UnitBoxAudio.PlayWinClip();
             UnitBoxModel.transform.DOScale(Vector3.zero, DESTROY_DURATION)
-                .SetEase(Ease.Linear)
+                .SetEase(Ease.InBack)
                 .OnComplete(() => Destroy(gameObject));
         }
 

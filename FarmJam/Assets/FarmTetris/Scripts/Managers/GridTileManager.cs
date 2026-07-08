@@ -1,12 +1,14 @@
 namespace FarmTetris
 {
     using System.Collections.Generic;
+    using Cysharp.Threading.Tasks;
     using UnityEngine;
     using VContainer;
 
     public class GridTileManager : MonoBehaviour
     {
         private const float TILE_SPACING = 2f;
+        private const int LINE_CLEAR_PREVIEW_DELAY_MS = 90;
 
         [Inject] private readonly GridTileFactory _gridTileFactory;
 
@@ -19,6 +21,7 @@ namespace FarmTetris
 
         public Material GreyMat;
         public Material WhiteMat;
+        private bool _isResolvingCompletedLines;
 
         private void OnEnable()
         {
@@ -145,16 +148,37 @@ namespace FarmTetris
 
         public void ResolveCompletedLines()
         {
+            if (_isResolvingCompletedLines)
+            {
+                return;
+            }
+
+            ResolveCompletedLinesAsync().Forget();
+        }
+
+        private async UniTaskVoid ResolveCompletedLinesAsync()
+        {
             HashSet<UnitBox> matchedUnitBoxes = FindCompletedLineUnitBoxes();
             if (matchedUnitBoxes.Count == 0)
             {
                 return;
             }
 
+            _isResolvingCompletedLines = true;
+
+            foreach (UnitBox matchedUnitBox in matchedUnitBoxes)
+            {
+                matchedUnitBox?.PlayClearEffect();
+            }
+
+            await UniTask.Delay(LINE_CLEAR_PREVIEW_DELAY_MS);
+
             foreach (UnitBox matchedUnitBox in matchedUnitBoxes)
             {
                 matchedUnitBox?.PopFromGrid();
             }
+
+            _isResolvingCompletedLines = false;
         }
 
         private HashSet<UnitBox> FindCompletedLineUnitBoxes()

@@ -1,0 +1,489 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[DisallowMultipleComponent]
+public class MergeItemSpawner : MonoBehaviour
+{
+    public static MergeItemSpawner Instance { get; private set; }
+
+    [Header("References")]
+    [SerializeField] private MergeItem itemPrefab;
+    [SerializeField] private Transform itemsRoot;
+    [SerializeField] private Transform queuePointRoot;
+
+    [Header("Queue Points")]
+    [SerializeField] private List<Transform> queuePoints = new List<Transform>();
+    [SerializeField] private bool createRuntimeQueuePoints = true;
+    [SerializeField] private int runtimeQueuePointCount = 20;
+    [SerializeField] private float runtimeQueuePointSpacing = 1.1f;
+
+    [Header("Spawn")]
+    [SerializeField] private bool spawnOnStart;
+    [SerializeField] private int initialSpawnCount = 8;
+
+    [Header("Animation")]
+    [SerializeField] private float queueMoveDuration = 0.1f;
+    [SerializeField] private float jumpDuration = 0.22f;
+    [SerializeField] private float jumpHeight = 0.95f;
+
+    [Header("Runtime")]
+    [SerializeField] private List<MergeItem> spawnedItems = new List<MergeItem>();
+
+    public IReadOnlyList<MergeItem> SpawnedItems => spawnedItems;
+
+    private Coroutine _processRoutine;
+
+    private void Reset()
+    {
+        ResolveReferences();
+        EnsureRoots();
+        EnsureQueuePoints();
+    }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Birden fazla MergeItemSpawner bulundu. Son bulunan instance kullanilacak.", this);
+        }
+
+        Instance = this;
+        ResolveReferences();
+        EnsureRoots();
+        EnsureQueuePoints();
+        RegisterExistingItems();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    private void Start()
+    {
+        if (spawnOnStart)
+        {
+            SpawnRandomItems(initialSpawnCount);
+        }
+
+        TryProcessQueue();
+    }
+
+    [ContextMenu("Spawn Random Item")]
+    public void SpawnRandomItem()
+    {
+        SpawnItem(GetRandomColorType());
+    }
+
+    [ContextMenu("Spawn Initial Items")]
+    public void SpawnRandomItems()
+    {
+        SpawnRandomItems(initialSpawnCount);
+    }
+
+    [ContextMenu("Clear Spawned Items")]
+    public void ClearSpawnedItems()
+    {
+        for (int i = spawnedItems.Count - 1; i >= 0; i--)
+        {
+            MergeItem item = spawnedItems[i];
+            if (item == null)
+            {
+                continue;
+            }
+
+            if (Application.isPlaying)
+            {
+                Destroy(item.gameObject);
+            }
+            else
+            {
+                DestroyImmediate(item.gameObject);
+            }
+        }
+
+        spawnedItems.Clear();
+    }
+
+    public void SpawnRandomItems(int count)
+    {
+        int itemCount = Mathf.Max(0, count);
+        for (int i = 0; i < itemCount; i++)
+        {
+            if (SpawnItem(GetRandomColorType()) == null)
+            {
+                break;
+            }
+        }
+
+        TryProcessQueue();
+    }
+
+    public MergeItem SpawnItem(ColorType colorType)
+    {
+        ResolveReferences();
+        EnsureRoots();
+        EnsureQueuePoints();
+        CleanupNullItems();
+
+        if (itemPrefab == null)
+        {
+            Debug.LogWarning("MergeItemSpawner icin item prefab referansi eksik.", this);
+            return null;
+        }
+
+        if (queuePoints.Count == 0)
+        {
+            Debug.LogWarning("MergeItemSpawner icin queue point bulunamadi.", this);
+            return null;
+        }
+
+        if (spawnedItems.Count >= queuePoints.Count)
+        {
+            Debug.LogWarning("Queue dolu. Yeni item spawnlanamadi.", this);
+            return null;
+        }
+
+        MergeItem spawnedItem = Instantiate(itemPrefab, itemsRoot != null ? itemsRoot : transform);
+        spawnedItem.name = $"{itemPrefab.name}_{spawnedItems.Count + 1:00}";
+        spawnedItem.Initialize(colorType);
+
+        Transform targetPoint = GetQueuePoint(spawnedItems.Count);
+        if (targetPoint != null)
+        {
+            spawnedItem.transform.SetPositionAndRotation(targetPoint.position, targetPoint.rotation);
+        }
+
+        spawnedItems.Add(spawnedItem);
+        TryProcessQueue();
+        return spawnedItem;
+    }
+
+    public void TryProcessQueue()
+    {
+        if (!Application.isPlaying || !isActiveAndEnabled || _processRoutine != null)
+        {
+            return;
+        }
+
+        _processRoutine = StartCoroutine(ProcessQueueRoutine());
+    }
+
+    private IEnumerator ProcessQueueRoutine()
+    {
+        yield return RepositionQueueItems();
+
+        while (true)
+        {
+            CleanupNullItems();
+            if (spawnedItems.Count == 0)
+            {
+                break;
+            }
+
+            MergeItem firstItem = spawnedItems[0];
+            if (firstItem == null)
+            {
+                spawnedItems.RemoveAt(0);
+                continue;
+            }
+
+            Box targetBox = FindMatchingBox(firstItem.ColorType);
+            if (targetBox == null || !targetBox.TryAssignItem(firstItem))
+            {
+                break;
+            }
+
+            spawnedItems.RemoveAt(0);
+            yield return AnimateItemIntoBox(firstItem, targetBox);
+            yield return RepositionQueueItems();
+        }
+
+        _processRoutine = null;
+    }
+
+    private IEnumerator AnimateItemIntoBox(MergeItem item, Box targetBox)
+    {
+        if (item == null || targetBox == null)
+        {
+            yield break;
+        }
+
+        Transform targetAnchor = targetBox.CollectableRoot;
+        if (targetAnchor == null)
+        {
+            targetBox.ClearAssignedItem(item);
+            yield break;
+        }
+
+        if (itemsRoot != null)
+        {
+            item.transform.SetParent(itemsRoot, true);
+        }
+
+        Vector3 startPosition = item.transform.position;
+        Quaternion startRotation = item.transform.rotation;
+        Vector3 targetPosition = targetAnchor.position;
+        Quaternion targetRotation = targetAnchor.rotation;
+
+        float duration = Mathf.Max(0.01f, jumpDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (item == null || targetBox == null)
+            {
+                yield break;
+            }
+
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
+            Vector3 position = Vector3.LerpUnclamped(startPosition, targetPosition, easedProgress);
+            position += Vector3.up * (4f * jumpHeight * progress * (1f - progress));
+
+            item.transform.position = position;
+            item.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, easedProgress);
+            yield return null;
+        }
+
+        if (item == null || targetBox == null)
+        {
+            yield break;
+        }
+
+        item.transform.SetParent(targetAnchor, false);
+        item.transform.localPosition = Vector3.zero;
+        item.transform.localRotation = Quaternion.identity;
+        targetBox.NotifyItemSettled();
+    }
+
+    private IEnumerator RepositionQueueItems()
+    {
+        CleanupNullItems();
+        if (spawnedItems.Count == 0 || queuePoints.Count == 0)
+        {
+            yield break;
+        }
+
+        List<MergeItem> itemsToMove = new List<MergeItem>();
+        List<Vector3> startPositions = new List<Vector3>();
+        List<Quaternion> startRotations = new List<Quaternion>();
+        List<Vector3> targetPositions = new List<Vector3>();
+        List<Quaternion> targetRotations = new List<Quaternion>();
+
+        for (int i = 0; i < spawnedItems.Count; i++)
+        {
+            MergeItem item = spawnedItems[i];
+            if (item == null)
+            {
+                continue;
+            }
+
+            Transform targetPoint = GetQueuePoint(i);
+            if (targetPoint == null)
+            {
+                continue;
+            }
+
+            if (itemsRoot != null)
+            {
+                item.transform.SetParent(itemsRoot, true);
+            }
+
+            itemsToMove.Add(item);
+            startPositions.Add(item.transform.position);
+            startRotations.Add(item.transform.rotation);
+            targetPositions.Add(targetPoint.position);
+            targetRotations.Add(targetPoint.rotation);
+        }
+
+        if (itemsToMove.Count == 0)
+        {
+            yield break;
+        }
+
+        float duration = Mathf.Max(0.01f, queueMoveDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float easedProgress = progress * progress * (3f - (2f * progress));
+
+            for (int i = 0; i < itemsToMove.Count; i++)
+            {
+                MergeItem item = itemsToMove[i];
+                if (item == null)
+                {
+                    continue;
+                }
+
+                item.transform.position = Vector3.LerpUnclamped(startPositions[i], targetPositions[i], easedProgress);
+                item.transform.rotation = Quaternion.Slerp(startRotations[i], targetRotations[i], easedProgress);
+            }
+
+            yield return null;
+        }
+
+        for (int i = 0; i < itemsToMove.Count; i++)
+        {
+            MergeItem item = itemsToMove[i];
+            if (item == null)
+            {
+                continue;
+            }
+
+            item.transform.position = targetPositions[i];
+            item.transform.rotation = targetRotations[i];
+        }
+    }
+
+    private Box FindMatchingBox(ColorType colorType)
+    {
+        Box[] availableBoxes = FindObjectsByType<Box>(FindObjectsSortMode.None);
+        for (int i = 0; i < availableBoxes.Length; i++)
+        {
+            Box candidate = availableBoxes[i];
+            if (candidate == null || !candidate.CanAcceptItem(colorType))
+            {
+                continue;
+            }
+
+            return candidate;
+        }
+
+        return null;
+    }
+
+    private void RegisterExistingItems()
+    {
+        CleanupNullItems();
+
+        if (itemsRoot == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < itemsRoot.childCount; i++)
+        {
+            Transform child = itemsRoot.GetChild(i);
+            if (!child.TryGetComponent(out MergeItem mergeItem) || spawnedItems.Contains(mergeItem))
+            {
+                continue;
+            }
+
+            spawnedItems.Add(mergeItem);
+        }
+    }
+
+    private void ResolveReferences()
+    {
+        if (itemsRoot == null)
+        {
+            Transform existingItemsRoot = transform.Find("SpawnedItems");
+            if (existingItemsRoot != null)
+            {
+                itemsRoot = existingItemsRoot;
+            }
+        }
+
+        if (queuePointRoot == null)
+        {
+            Transform existingQueueRoot = transform.Find("ItemQueuePoints");
+            if (existingQueueRoot != null)
+            {
+                queuePointRoot = existingQueueRoot;
+            }
+        }
+
+        queuePoints.RemoveAll(point => point == null);
+    }
+
+    private void EnsureRoots()
+    {
+        if (itemsRoot == null)
+        {
+            GameObject itemsRootObject = new GameObject("SpawnedItems");
+            itemsRoot = itemsRootObject.transform;
+            itemsRoot.SetParent(transform, false);
+            itemsRoot.localPosition = Vector3.zero;
+            itemsRoot.localRotation = Quaternion.identity;
+            itemsRoot.localScale = Vector3.one;
+        }
+
+        if (queuePointRoot == null)
+        {
+            GameObject queueRootObject = new GameObject("ItemQueuePoints");
+            queuePointRoot = queueRootObject.transform;
+            queuePointRoot.SetParent(transform, false);
+            queuePointRoot.localPosition = Vector3.zero;
+            queuePointRoot.localRotation = Quaternion.identity;
+            queuePointRoot.localScale = Vector3.one;
+        }
+    }
+
+    private void EnsureQueuePoints()
+    {
+        if (queuePointRoot == null)
+        {
+            return;
+        }
+
+        queuePoints.RemoveAll(point => point == null);
+
+        if (queuePoints.Count == 0)
+        {
+            for (int i = 0; i < queuePointRoot.childCount; i++)
+            {
+                queuePoints.Add(queuePointRoot.GetChild(i));
+            }
+        }
+
+        if (queuePoints.Count > 0 || !createRuntimeQueuePoints)
+        {
+            return;
+        }
+
+        int pointCount = Mathf.Max(1, runtimeQueuePointCount);
+        float halfWidth = (pointCount - 1) * runtimeQueuePointSpacing * 0.5f;
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            GameObject pointObject = new GameObject($"QueuePoint_{i + 1:00}");
+            Transform pointTransform = pointObject.transform;
+            pointTransform.SetParent(queuePointRoot, false);
+            pointTransform.localPosition = new Vector3((i * runtimeQueuePointSpacing) - halfWidth, 0f, 0f);
+            pointTransform.localRotation = Quaternion.identity;
+            pointTransform.localScale = Vector3.one;
+            queuePoints.Add(pointTransform);
+        }
+    }
+
+    private Transform GetQueuePoint(int index)
+    {
+        if (queuePoints.Count == 0)
+        {
+            return null;
+        }
+
+        int clampedIndex = Mathf.Clamp(index, 0, queuePoints.Count - 1);
+        return queuePoints[clampedIndex];
+    }
+
+    private ColorType GetRandomColorType()
+    {
+        int colorCount = System.Enum.GetValues(typeof(ColorType)).Length;
+        return (ColorType)Random.Range(0, colorCount);
+    }
+
+    private void CleanupNullItems()
+    {
+        spawnedItems.RemoveAll(item => item == null);
+    }
+}
