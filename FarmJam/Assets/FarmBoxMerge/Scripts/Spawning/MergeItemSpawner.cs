@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,9 +32,34 @@ public class MergeItemSpawner : MonoBehaviour
     [SerializeField] private List<MergeItem> spawnedItems = new List<MergeItem>();
 
     public IReadOnlyList<MergeItem> SpawnedItems => spawnedItems;
+    public int ActiveItemCount
+    {
+        get
+        {
+            CleanupActiveItems();
+            return _activeItems.Count;
+        }
+    }
+    public bool HasRemainingItems => ActiveItemCount > 0;
+    public bool IsNextQueuedItemBlocked
+    {
+        get
+        {
+            CleanupNullItems();
+            if (spawnedItems.Count == 0 || spawnedItems[0] == null)
+            {
+                return false;
+            }
+
+            return !BoxRegistry.TryFindAvailable(spawnedItems[0].ColorType, out _);
+        }
+    }
+
+    public event Action ItemCountChanged;
 
     private Coroutine _processRoutine;
     private readonly List<ColorType> _lastInitialColors = new List<ColorType>();
+    private readonly HashSet<MergeItem> _activeItems = new HashSet<MergeItem>();
 
     private void Reset()
     {
@@ -188,6 +214,7 @@ public class MergeItemSpawner : MonoBehaviour
 
         MergeItem spawnedItem = Instantiate(itemPrefab, itemsRoot != null ? itemsRoot : transform);
         spawnedItem.name = $"{itemPrefab.name}_{spawnedItems.Count + 1:00}";
+        RegisterActiveItem(spawnedItem);
         spawnedItem.Initialize(colorType);
 
         Transform targetPoint = GetQueuePoint(spawnedItems.Count);
@@ -399,12 +426,39 @@ public class MergeItemSpawner : MonoBehaviour
         for (int i = 0; i < itemsRoot.childCount; i++)
         {
             Transform child = itemsRoot.GetChild(i);
-            if (!child.TryGetComponent(out MergeItem mergeItem) || spawnedItems.Contains(mergeItem))
+            if (!child.TryGetComponent(out MergeItem mergeItem))
             {
                 continue;
             }
 
-            spawnedItems.Add(mergeItem);
+            if (!spawnedItems.Contains(mergeItem))
+            {
+                spawnedItems.Add(mergeItem);
+            }
+
+            RegisterActiveItem(mergeItem);
+        }
+    }
+
+    internal void UnregisterActiveItem(MergeItem item)
+    {
+        if (_activeItems.Remove(item))
+        {
+            ItemCountChanged?.Invoke();
+        }
+    }
+
+    private void RegisterActiveItem(MergeItem item)
+    {
+        if (item == null)
+        {
+            return;
+        }
+
+        item.AssignSpawner(this);
+        if (_activeItems.Add(item))
+        {
+            ItemCountChanged?.Invoke();
         }
     }
 
@@ -510,6 +564,11 @@ public class MergeItemSpawner : MonoBehaviour
     private void CleanupNullItems()
     {
         spawnedItems.RemoveAll(item => item == null);
+    }
+
+    private void CleanupActiveItems()
+    {
+        _activeItems.RemoveWhere(item => item == null);
     }
 
     private void StopProcessing()

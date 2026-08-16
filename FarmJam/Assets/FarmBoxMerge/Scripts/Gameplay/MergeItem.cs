@@ -8,12 +8,22 @@ public class MergeItem : MonoBehaviour
     [SerializeField] private ColorType colorType = ColorType.Green;
     [SerializeField] private List<ItemColorMeshEntry> colorMeshEntries = new List<ItemColorMeshEntry>();
 
+    private MergeItemSpawner _owner;
+
     public ColorType ColorType => colorType;
     public IReadOnlyList<ItemColorMeshEntry> ColorMeshEntries => colorMeshEntries;
 
     private void Awake()
     {
         RefreshVisuals();
+    }
+
+    private void OnDestroy()
+    {
+        if (_owner != null)
+        {
+            _owner.UnregisterActiveItem(this);
+        }
     }
 
     private void OnValidate()
@@ -24,6 +34,11 @@ public class MergeItem : MonoBehaviour
     public void Initialize(ColorType assignedColorType)
     {
         SetColorType(assignedColorType);
+    }
+
+    public void AssignSpawner(MergeItemSpawner owner)
+    {
+        _owner = owner;
     }
 
     public void SetColorType(ColorType assignedColorType)

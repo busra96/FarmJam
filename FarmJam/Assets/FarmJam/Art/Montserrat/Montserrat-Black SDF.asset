@@ -11,7 +11,7 @@ Texture2D:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
+  serializedVersion: 4
   m_Width: 2048
   m_Height: 2048
   m_CompleteImageSize: 4194304
@@ -2846,7 +2846,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient: 0.5
-    - _Bevel: 0.5
+    - _Bevel: 0.491
     - _BevelClamp: 0
     - _BevelOffset: 0
     - _BevelRoundness: 0

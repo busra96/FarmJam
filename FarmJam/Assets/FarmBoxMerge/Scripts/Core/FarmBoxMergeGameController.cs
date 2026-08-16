@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -24,6 +25,10 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [SerializeField] private Color addCardButtonColor = new Color(0.2f, 0.55f, 0.9f, 1f);
 
     private Coroutine _resetRoutine;
+
+    public bool IsResetting => _resetRoutine != null;
+    public event Action AttemptResetStarted;
+    public event Action AttemptReady;
 
     private void Awake()
     {
@@ -85,6 +90,12 @@ public class FarmBoxMergeGameController : MonoBehaviour
         StartReset(replaySameLevel: true);
     }
 
+    public void NextLevel()
+    {
+        // Level assets will replace this random-layout fallback when progression is added.
+        StartReset(replaySameLevel: false);
+    }
+
     public void AddRecommendedCard()
     {
         if (!Application.isPlaying || _resetRoutine != null)
@@ -120,6 +131,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         }
 
         actionBudget?.ResetForAttempt();
+        AttemptResetStarted?.Invoke();
         _resetRoutine = StartCoroutine(ResetRoutine(replaySameLevel));
     }
 
@@ -148,6 +160,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         SetButtonsInteractable(true);
         _resetRoutine = null;
+        AttemptReady?.Invoke();
     }
 
     private void ResolveReferences()

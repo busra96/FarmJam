@@ -67,6 +67,27 @@ public class CardMergeBoard : MonoBehaviour
         }
     }
     public bool HasCardCapacity => CardCount < FarmBoxMergeRules.MaxCardsOnBoard;
+    public bool AreAllSpawnPointsOccupied
+    {
+        get
+        {
+            EnsureSpawnPoints();
+            if (spawnPoints.Count == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < spawnPoints.Count; i++)
+            {
+                if (spawnPoints[i] == null || !IsSpawnPointOccupied(spawnPoints[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
 
     public event Action CardCountChanged;
 
