@@ -123,22 +123,46 @@ public class CardSpawner : MonoBehaviour
         RectTransform targetParent = ResolveSpawnParent();
         CardMergeBoard resolvedBoard = EnsureBoardReference();
 
-        if (cardPrefab == null || targetParent == null)
+        if (cardPrefab == null || targetParent == null || !CanSpawnCard())
         {
             return null;
         }
 
         Card spawnedCard = Instantiate(cardPrefab, targetParent);
-        spawnedCard.Initialize(resolvedBoard, counter, colorType);
+        spawnedCard.Initialize(resolvedBoard, FarmBoxMergeRules.ClampCardCounter(counter), colorType);
+        resolvedBoard?.RegisterCard(spawnedCard);
         return spawnedCard;
+    }
+
+    public bool CanSpawnCard()
+    {
+        CardMergeBoard resolvedBoard = EnsureBoardReference();
+        if (resolvedBoard != null)
+        {
+            return resolvedBoard.HasCardCapacity;
+        }
+
+        RectTransform targetParent = ResolveSpawnParent();
+        return targetParent != null
+            && targetParent.GetComponentsInChildren<Card>(true).Length < FarmBoxMergeRules.MaxCardsOnBoard;
     }
 
     public Card SpawnRandomCard()
     {
-        int minCounter = Mathf.Min(counterRange.x, counterRange.y);
-        int maxCounter = Mathf.Max(counterRange.x, counterRange.y);
+        int minCounter = FarmBoxMergeRules.ClampCardCounter(Mathf.Min(counterRange.x, counterRange.y));
+        int maxCounter = FarmBoxMergeRules.ClampCardCounter(Mathf.Max(counterRange.x, counterRange.y));
         int counter = UnityEngine.Random.Range(minCounter, maxCounter + 1);
         return SpawnCard(counter, GetRandomColorType());
+    }
+
+    public Card SpawnRecommendedCard(IReadOnlyList<MergeItem> queuedItems)
+    {
+        if (!CanSpawnCard())
+        {
+            return null;
+        }
+
+        return SpawnCard(FarmBoxMergeRules.MinCardCounter, GetRecommendedColorType(queuedItems));
     }
 
     public void ReplayLastCards()
@@ -157,7 +181,10 @@ public class CardSpawner : MonoBehaviour
         for (int i = 0; i < _lastSpawnedCards.Count; i++)
         {
             CardSpawnEntry cardData = _lastSpawnedCards[i];
-            SpawnCard(cardData.counter, cardData.colorType);
+            if (SpawnCard(cardData.counter, cardData.colorType) == null)
+            {
+                break;
+            }
         }
     }
 
@@ -167,15 +194,17 @@ public class CardSpawner : MonoBehaviour
         int count = Mathf.Max(0, randomSpawnCount);
         for (int i = 0; i < count; i++)
         {
-            int minCounter = Mathf.Min(counterRange.x, counterRange.y);
-            int maxCounter = Mathf.Max(counterRange.x, counterRange.y);
+            int minCounter = FarmBoxMergeRules.ClampCardCounter(Mathf.Min(counterRange.x, counterRange.y));
+            int maxCounter = FarmBoxMergeRules.ClampCardCounter(Mathf.Max(counterRange.x, counterRange.y));
             int counter = UnityEngine.Random.Range(minCounter, maxCounter + 1);
             ColorType colorType = GetRandomColorType();
 
-            if (SpawnCard(counter, colorType) != null)
+            if (SpawnCard(counter, colorType) == null)
             {
-                RememberCard(counter, colorType);
+                break;
             }
+
+            RememberCard(counter, colorType);
         }
     }
 
@@ -189,10 +218,12 @@ public class CardSpawner : MonoBehaviour
                 continue;
             }
 
-            if (SpawnCard(cardData.counter, cardData.colorType) != null)
+            if (SpawnCard(cardData.counter, cardData.colorType) == null)
             {
-                RememberCard(cardData.counter, cardData.colorType);
+                break;
             }
+
+            RememberCard(FarmBoxMergeRules.ClampCardCounter(cardData.counter), cardData.colorType);
         }
     }
 
@@ -308,6 +339,67 @@ public class CardSpawner : MonoBehaviour
 
         int randomIndex = UnityEngine.Random.Range(0, availableColors.Count);
         return availableColors[randomIndex].colorType;
+    }
+
+    private ColorType GetRecommendedColorType(IReadOnlyList<MergeItem> queuedItems)
+    {
+        CardMergeBoard resolvedBoard = EnsureBoardReference();
+        Dictionary<ColorType, int> remainingCapacityByColor = new Dictionary<ColorType, int>();
+        List<ColorType> queueOrder = new List<ColorType>();
+
+        if (queuedItems != null)
+        {
+            for (int i = 0; i < queuedItems.Count; i++)
+            {
+                MergeItem item = queuedItems[i];
+                if (item == null)
+                {
+                    continue;
+                }
+
+                ColorType colorType = item.ColorType;
+                if (!remainingCapacityByColor.TryGetValue(colorType, out int remainingCapacity))
+                {
+                    int cardCapacity = resolvedBoard != null ? resolvedBoard.GetCardCapacity(colorType) : 0;
+                    remainingCapacity = cardCapacity + BoxRegistry.CountAvailable(colorType);
+                }
+
+                if (!queueOrder.Contains(colorType))
+                {
+                    queueOrder.Add(colorType);
+                }
+
+                if (remainingCapacity <= 0)
+                {
+                    return colorType;
+                }
+
+                remainingCapacityByColor[colorType] = remainingCapacity - 1;
+            }
+        }
+
+        for (int i = 0; i < queueOrder.Count; i++)
+        {
+            if (resolvedBoard != null && resolvedBoard.HasLevelOneCard(queueOrder[i]))
+            {
+                return queueOrder[i];
+            }
+        }
+
+        if (resolvedBoard != null)
+        {
+            SyncPaletteWithBoard();
+            for (int i = 0; i < availableColors.Count; i++)
+            {
+                ColorType colorType = availableColors[i].colorType;
+                if (resolvedBoard.HasLevelOneCard(colorType))
+                {
+                    return colorType;
+                }
+            }
+        }
+
+        return queueOrder.Count > 0 ? queueOrder[0] : GetRandomColorType();
     }
 
 }

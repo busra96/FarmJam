@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class CardMergeBoard : MonoBehaviour
 {
     private readonly List<RaycastResult> _uiRaycastResults = new List<RaycastResult>();
+    private readonly HashSet<Card> _registeredCards = new HashSet<Card>();
 
     [Serializable]
     public class ColorPaletteEntry
@@ -50,6 +51,17 @@ public class CardMergeBoard : MonoBehaviour
     public Camera EventCamera => ResolveCanvasEventCamera();
     public IReadOnlyList<ColorPaletteEntry> ColorPalette => colorPalette;
     public bool HasColorPalette => colorPalette != null && colorPalette.Count > 0;
+    public int CardCount
+    {
+        get
+        {
+            _registeredCards.RemoveWhere(card => card == null);
+            return _registeredCards.Count;
+        }
+    }
+    public bool HasCardCapacity => CardCount < FarmBoxMergeRules.MaxCardsOnBoard;
+
+    public event Action CardCountChanged;
 
     private void Reset()
     {
@@ -238,7 +250,50 @@ public class CardMergeBoard : MonoBehaviour
         }
 
         card.AssignBoard(this);
-        card.SyncDataFromView();
+        if (_registeredCards.Add(card))
+        {
+            card.SyncDataFromView();
+            CardCountChanged?.Invoke();
+        }
+    }
+
+    public void UnregisterCard(Card card)
+    {
+        if (_registeredCards.Remove(card))
+        {
+            CardCountChanged?.Invoke();
+        }
+    }
+
+    public int GetCardCapacity(ColorType colorType)
+    {
+        int capacity = 0;
+        _registeredCards.RemoveWhere(card => card == null);
+
+        foreach (Card card in _registeredCards)
+        {
+            if (card.CardColorType == colorType)
+            {
+                capacity += card.CounterValue;
+            }
+        }
+
+        return capacity;
+    }
+
+    public bool HasLevelOneCard(ColorType colorType)
+    {
+        _registeredCards.RemoveWhere(card => card == null);
+
+        foreach (Card card in _registeredCards)
+        {
+            if (card.CardColorType == colorType && card.CounterValue == FarmBoxMergeRules.MinCardCounter)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void ClearSpawnedBoxGroups()
@@ -338,7 +393,8 @@ public class CardMergeBoard : MonoBehaviour
             return null;
         }
 
-        GameObject groupObject = new GameObject($"BoxParent_{colorType}_{boxCount}", typeof(MergeBoxParent));
+        int clampedBoxCount = FarmBoxMergeRules.ClampCardCounter(boxCount);
+        GameObject groupObject = new GameObject($"BoxParent_{colorType}_{clampedBoxCount}", typeof(MergeBoxParent));
         Transform groupTransform = groupObject.transform;
         groupTransform.SetParent(targetSpawnPoint, false);
         groupTransform.localPosition = Vector3.up * spawnHeightOffset;
@@ -346,7 +402,7 @@ public class CardMergeBoard : MonoBehaviour
         groupTransform.localScale = Vector3.one;
 
         MergeBoxParent boxParent = groupObject.GetComponent<MergeBoxParent>();
-        BoxPatternDefinition pattern = ResolvePattern(boxCount);
+        BoxPatternDefinition pattern = ResolvePattern(clampedBoxCount);
         Vector3[] localPositions = GetCenteredLocalPositions(pattern.Cells);
         List<Box> spawnedBoxes = new List<Box>(localPositions.Length);
 
@@ -358,7 +414,7 @@ public class CardMergeBoard : MonoBehaviour
             spawnedBoxes.Add(spawnedBox);
         }
 
-        boxParent.Initialize(boxCount, colorType, pattern.PatternType, spawnedBoxes, pattern.Cells);
+        boxParent.Initialize(clampedBoxCount, colorType, pattern.PatternType, spawnedBoxes, pattern.Cells);
         MergeItemSpawner.Instance?.TryProcessQueue();
         return boxParent;
     }

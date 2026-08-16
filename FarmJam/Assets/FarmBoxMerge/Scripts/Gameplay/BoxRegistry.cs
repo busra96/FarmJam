@@ -22,7 +22,7 @@ public static class BoxRegistry
 
     public static bool TryFindAvailable(ColorType colorType, out Box matchingBox)
     {
-        ActiveBoxes.RemoveWhere(box => box == null);
+        CleanupDestroyedBoxes();
 
         foreach (Box box in ActiveBoxes)
         {
@@ -35,5 +35,26 @@ public static class BoxRegistry
 
         matchingBox = null;
         return false;
+    }
+
+    public static int CountAvailable(ColorType colorType)
+    {
+        CleanupDestroyedBoxes();
+
+        int count = 0;
+        foreach (Box box in ActiveBoxes)
+        {
+            if (box.CanAcceptItem(colorType))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static void CleanupDestroyedBoxes()
+    {
+        ActiveBoxes.RemoveWhere(box => box == null);
     }
 }

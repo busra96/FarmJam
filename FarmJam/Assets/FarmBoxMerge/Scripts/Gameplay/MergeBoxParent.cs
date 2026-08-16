@@ -40,7 +40,7 @@ public class MergeBoxParent : MonoBehaviour
 
     public void Initialize(int newCounterValue, ColorType newColorType, MergeBoxPatternType newPatternType, IList<Box> spawnedBoxes, IList<Vector2Int> boxCells)
     {
-        counterValue = Mathf.Max(1, newCounterValue);
+        counterValue = FarmBoxMergeRules.ClampCardCounter(newCounterValue);
         colorType = newColorType;
         patternType = newPatternType;
         boxes.Clear();

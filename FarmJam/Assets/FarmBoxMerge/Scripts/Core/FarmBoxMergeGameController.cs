@@ -29,7 +29,14 @@ public class FarmBoxMergeGameController : MonoBehaviour
         ResolveReferences();
         ConfigureButton(refreshButton, RefreshGame, refreshLabel, buttonColor, "refresh");
         ConfigureButton(retryButton, RetryLevel, retryLabel, retryButtonColor, "retry");
-        ConfigureButton(addCardButton, AddRandomCard, addCardLabel, addCardButtonColor, "add card");
+        ConfigureButton(addCardButton, AddRecommendedCard, addCardLabel, addCardButtonColor, "add card");
+
+        if (cardMergeBoard != null)
+        {
+            cardMergeBoard.CardCountChanged += RefreshAddCardButtonState;
+        }
+
+        RefreshAddCardButtonState();
     }
 
     private void OnDestroy()
@@ -46,7 +53,12 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         if (addCardButton != null)
         {
-            addCardButton.onClick.RemoveListener(AddRandomCard);
+            addCardButton.onClick.RemoveListener(AddRecommendedCard);
+        }
+
+        if (cardMergeBoard != null)
+        {
+            cardMergeBoard.CardCountChanged -= RefreshAddCardButtonState;
         }
     }
 
@@ -62,15 +74,21 @@ public class FarmBoxMergeGameController : MonoBehaviour
         StartReset(replaySameLevel: true);
     }
 
-    public void AddRandomCard()
+    public void AddRecommendedCard()
     {
         if (!Application.isPlaying || _resetRoutine != null)
         {
             return;
         }
 
-        Card spawnedCard = cardSpawner?.SpawnRandomCard();
+        Card spawnedCard = cardSpawner?.SpawnRecommendedCard(itemSpawner?.SpawnedItems);
         spawnedCard?.PlayMergePop();
+        RefreshAddCardButtonState();
+    }
+
+    public void AddRandomCard()
+    {
+        AddRecommendedCard();
     }
 
     private void StartReset(bool replaySameLevel)
@@ -181,7 +199,15 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         if (addCardButton != null)
         {
-            addCardButton.interactable = interactable;
+            addCardButton.interactable = interactable && cardSpawner != null && cardSpawner.CanSpawnCard();
+        }
+    }
+
+    private void RefreshAddCardButtonState()
+    {
+        if (addCardButton != null)
+        {
+            addCardButton.interactable = _resetRoutine == null && cardSpawner != null && cardSpawner.CanSpawnCard();
         }
     }
 }

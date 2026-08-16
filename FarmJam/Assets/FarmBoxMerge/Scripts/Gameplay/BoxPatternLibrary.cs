@@ -14,9 +14,15 @@ public readonly struct BoxPatternDefinition
 
 public static class BoxPatternLibrary
 {
+    private static readonly BoxPatternDefinition ThreeBoxPattern =
+        new BoxPatternDefinition(MergeBoxPatternType.L, new[]
+        {
+            new Vector2Int(0, 0), new Vector2Int(1, 0),
+            new Vector2Int(0, 1)
+        });
+
     private static readonly BoxPatternDefinition[] FourBoxPatterns =
     {
-        CreateLine(4),
         new BoxPatternDefinition(MergeBoxPatternType.Square, new[]
         {
             new Vector2Int(0, 0), new Vector2Int(1, 0),
@@ -29,28 +35,28 @@ public static class BoxPatternLibrary
         }),
         new BoxPatternDefinition(MergeBoxPatternType.T, new[]
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0),
-            new Vector2Int(2, 0), new Vector2Int(1, 1)
+            new Vector2Int(0, 0), new Vector2Int(0, 1),
+            new Vector2Int(0, 2), new Vector2Int(1, 1)
         }),
         new BoxPatternDefinition(MergeBoxPatternType.Z, new[]
         {
-            new Vector2Int(0, 0), new Vector2Int(1, 0),
-            new Vector2Int(1, 1), new Vector2Int(2, 1)
+            new Vector2Int(0, 0), new Vector2Int(0, 1),
+            new Vector2Int(1, 1), new Vector2Int(1, 2)
         })
     };
 
     public static BoxPatternDefinition Resolve(int boxCount, bool randomizeFourBoxPatterns)
     {
-        int count = Mathf.Max(1, boxCount);
+        int count = FarmBoxMergeRules.ClampCardCounter(boxCount);
 
         return count switch
         {
             1 => new BoxPatternDefinition(MergeBoxPatternType.Single, new[] { Vector2Int.zero }),
             2 => CreateLine(2),
-            3 => CreateLine(3),
+            3 => ThreeBoxPattern,
             4 when randomizeFourBoxPatterns => FourBoxPatterns[Random.Range(0, FourBoxPatterns.Length)],
             4 => FourBoxPatterns[0],
-            _ => CreateLine(count)
+            _ => FourBoxPatterns[0]
         };
     }
 

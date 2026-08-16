@@ -124,6 +124,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     private void OnDestroy()
     {
+        _board?.UnregisterCard(this);
         StopScaleEffectRoutine();
         DestroyPlaceholder();
     }
@@ -143,7 +144,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     public void Initialize(CardMergeBoard board, int counterValue, ColorType cardColorType)
     {
         AssignBoard(board);
-        _counterValue = Mathf.Max(1, counterValue);
+        _counterValue = FarmBoxMergeRules.ClampCardCounter(counterValue);
         colorType = cardColorType;
         _hasRuntimeData = true;
         RefreshVisuals();
@@ -160,7 +161,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
         if (CounterTxt != null && int.TryParse(CounterTxt.text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedCounter))
         {
-            _counterValue = Mathf.Max(1, parsedCounter);
+            _counterValue = FarmBoxMergeRules.ClampCardCounter(parsedCounter);
         }
 
         if (BackgroundColorImg != null)
@@ -179,7 +180,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     public void SetCounter(int newCounterValue)
     {
-        _counterValue = Mathf.Max(1, newCounterValue);
+        _counterValue = FarmBoxMergeRules.ClampCardCounter(newCounterValue);
         _hasRuntimeData = true;
         RefreshVisuals();
     }
@@ -213,7 +214,9 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
             return false;
         }
 
-        return otherCard.CounterValue == CounterValue && otherCard.CardColorType == CardColorType;
+        return FarmBoxMergeRules.CanIncreaseCardCounter(CounterValue)
+            && otherCard.CounterValue == CounterValue
+            && otherCard.CardColorType == CardColorType;
     }
 
     public void PrepareForDrag(RectTransform dragLayer, PointerEventData eventData)
