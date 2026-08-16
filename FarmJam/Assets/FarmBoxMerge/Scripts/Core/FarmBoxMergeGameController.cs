@@ -10,6 +10,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [SerializeField] private CardSpawner cardSpawner;
     [SerializeField] private CardMergeBoard cardMergeBoard;
     [SerializeField] private MergeItemSpawner itemSpawner;
+    [SerializeField] private FarmBoxMergeActionBudget actionBudget;
 
     [Header("Reset UI")]
     [SerializeField] private Button refreshButton;
@@ -36,6 +37,11 @@ public class FarmBoxMergeGameController : MonoBehaviour
             cardMergeBoard.CardCountChanged += RefreshAddCardButtonState;
         }
 
+        if (actionBudget != null)
+        {
+            actionBudget.Changed += RefreshAddCardButtonState;
+        }
+
         RefreshAddCardButtonState();
     }
 
@@ -60,6 +66,11 @@ public class FarmBoxMergeGameController : MonoBehaviour
         {
             cardMergeBoard.CardCountChanged -= RefreshAddCardButtonState;
         }
+
+        if (actionBudget != null)
+        {
+            actionBudget.Changed -= RefreshAddCardButtonState;
+        }
     }
 
     [ContextMenu("Refresh Game")]
@@ -81,7 +92,17 @@ public class FarmBoxMergeGameController : MonoBehaviour
             return;
         }
 
+        if (actionBudget == null || !actionBudget.TryConsumeAddCardUse())
+        {
+            return;
+        }
+
         Card spawnedCard = cardSpawner?.SpawnRecommendedCard(itemSpawner?.SpawnedItems);
+        if (spawnedCard == null)
+        {
+            actionBudget.GrantAddCardUses();
+        }
+
         spawnedCard?.PlayMergePop();
         RefreshAddCardButtonState();
     }
@@ -98,6 +119,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
             return;
         }
 
+        actionBudget?.ResetForAttempt();
         _resetRoutine = StartCoroutine(ResetRoutine(replaySameLevel));
     }
 
@@ -133,6 +155,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         cardSpawner ??= FarmBoxMergeObjectUtility.FindSceneComponent<CardSpawner>();
         cardMergeBoard ??= FarmBoxMergeObjectUtility.FindSceneComponent<CardMergeBoard>();
         itemSpawner ??= FarmBoxMergeObjectUtility.FindSceneComponent<MergeItemSpawner>();
+        actionBudget ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeActionBudget>();
 
         if (refreshButton == null)
         {
@@ -199,15 +222,42 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         if (addCardButton != null)
         {
-            addCardButton.interactable = interactable && cardSpawner != null && cardSpawner.CanSpawnCard();
+            addCardButton.interactable = interactable
+                && actionBudget != null
+                && actionBudget.CanAddCard
+                && cardSpawner != null
+                && cardSpawner.CanSpawnCard();
         }
+
+        RefreshAddCardButtonLabel();
     }
 
     private void RefreshAddCardButtonState()
     {
         if (addCardButton != null)
         {
-            addCardButton.interactable = _resetRoutine == null && cardSpawner != null && cardSpawner.CanSpawnCard();
+            addCardButton.interactable = _resetRoutine == null
+                && actionBudget != null
+                && actionBudget.CanAddCard
+                && cardSpawner != null
+                && cardSpawner.CanSpawnCard();
+        }
+
+        RefreshAddCardButtonLabel();
+    }
+
+    private void RefreshAddCardButtonLabel()
+    {
+        if (addCardButton == null)
+        {
+            return;
+        }
+
+        TextMeshProUGUI label = addCardButton.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (label != null)
+        {
+            int remainingUses = actionBudget != null ? actionBudget.RemainingAddCardUses : 0;
+            label.text = $"{addCardLabel} ({remainingUses})";
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -23,6 +24,7 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private RectTransform dragLayer;
     [SerializeField] private RectTransform spawnDropLayer;
     [SerializeField] private RectTransform trashDropLayer;
+    [SerializeField] private FarmBoxMergeActionBudget actionBudget;
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private bool createRuntimeDragLayer = true;
     [SerializeField] private bool createRuntimeSpawnDropLayer = true;
@@ -46,6 +48,11 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private bool createRuntimeSpawnPoints = true;
     [SerializeField] private int runtimeSpawnPointCount = 3;
     [SerializeField] private float runtimeSpawnPointSpacing = 3.4f;
+
+    [Header("Trash Feedback")]
+    [SerializeField] private string trashLabel = "TRASH";
+    [SerializeField] private Color trashAvailableColor = new Color(0.78f, 0.20f, 0.20f, 0.88f);
+    [SerializeField] private Color trashUnavailableColor = new Color(0.30f, 0.30f, 0.30f, 0.65f);
 
     public RectTransform CardContainer => cardContainer != null ? cardContainer : cardContainer = (RectTransform)transform;
     public Camera EventCamera => ResolveCanvasEventCamera();
@@ -77,6 +84,21 @@ public class CardMergeBoard : MonoBehaviour
         EnsureSpawnDropLayer();
         EnsureSpawnPoints();
         RegisterExistingCards();
+
+        if (actionBudget != null)
+        {
+            actionBudget.Changed += RefreshTrashState;
+        }
+
+        RefreshTrashState();
+    }
+
+    private void OnDestroy()
+    {
+        if (actionBudget != null)
+        {
+            actionBudget.Changed -= RefreshTrashState;
+        }
     }
 
     private void OnValidate()
@@ -380,6 +402,11 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
+        if (actionBudget == null || !actionBudget.TryConsumeTrashUse())
+        {
+            return false;
+        }
+
         card.DiscardInto(trashDropLayer);
         return true;
     }
@@ -457,6 +484,8 @@ public class CardMergeBoard : MonoBehaviour
         {
             trashDropLayer = rootCanvas.transform.Find("TrashDropZone") as RectTransform;
         }
+
+        actionBudget ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeActionBudget>();
 
         if (spawnSurface == null)
         {
@@ -652,6 +681,28 @@ public class CardMergeBoard : MonoBehaviour
         Image image = spawnDropLayer.gameObject.AddComponent<Image>();
         image.color = new Color(1f, 1f, 1f, 0.001f);
         image.raycastTarget = true;
+    }
+
+    private void RefreshTrashState()
+    {
+        if (trashDropLayer == null)
+        {
+            return;
+        }
+
+        bool canUseTrash = actionBudget != null && actionBudget.CanUseTrash;
+        if (trashDropLayer.TryGetComponent(out Image image))
+        {
+            image.color = canUseTrash ? trashAvailableColor : trashUnavailableColor;
+            image.raycastTarget = canUseTrash;
+        }
+
+        TextMeshProUGUI label = trashDropLayer.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (label != null)
+        {
+            int remainingUses = actionBudget != null ? actionBudget.RemainingTrashUses : 0;
+            label.text = $"{trashLabel} ({remainingUses})";
+        }
     }
 
     private bool TryGetAvailableSpawnPoint(out Transform availableSpawnPoint)

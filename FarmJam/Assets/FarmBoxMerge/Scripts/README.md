@@ -15,3 +15,5 @@ Runtime references stay serialized in the scene. Components may resolve a missin
 Card counters are limited to `1-4`. A level-four card cannot merge again. Three-box groups use a compact L triomino, while four-box groups use randomized square/L/T/Z patterns whose width never exceeds two boxes.
 
 The card board holds at most 12 cards. `ADD CARD` always creates a level-one card and chooses its color by comparing queued item demand with the capacity already available in cards and world boxes. Queue order breaks ties; when demand is already covered, it prefers a color that can immediately merge with another level-one card.
+
+`ADD CARD` and `TRASH` each have three uses per attempt. Their remaining uses are shown in the UI and reset on refresh/retry. `FarmBoxMergeActionBudget.GrantAddCardUses` and `GrantTrashUses` are the integration points for a future rewarded-ad completion callback; no ad SDK is currently installed in the project.
