@@ -24,6 +24,8 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     [SerializeField] private float rotationSharpness = 18f;
     [SerializeField] private float returnDuration = 0.18f;
     [SerializeField] private float mergeDuration = 0.12f;
+    [SerializeField] private float discardDuration = 0.16f;
+    [SerializeField] private float discardTargetScale = 0.15f;
     [SerializeField] private float dragWobbleAngle = 4.5f;
     [SerializeField] private float dragWobbleSpeed = 10f;
     [SerializeField] private float dragTiltByMovement = 0.12f;
@@ -289,6 +291,22 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         _targetRotationOffset = 0f;
         StopMotionRoutine();
         _motionRoutine = StartCoroutine(AnimateIntoTarget(targetCard));
+    }
+
+    public void DiscardInto(RectTransform trashTarget)
+    {
+        if (trashTarget == null)
+        {
+            ReturnToOriginalSlot();
+            return;
+        }
+
+        _mergeCompleted = true;
+        _isDragging = false;
+        _targetScaleMultiplier = 1f;
+        _targetRotationOffset = 12f;
+        StopMotionRoutine();
+        _motionRoutine = StartCoroutine(AnimateDiscard(trashTarget));
     }
 
     public void PlayMergePop()
@@ -617,6 +635,43 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         targetCard.PlayMergePop();
         DestroyPlaceholder();
 
+        if (_originalParent is RectTransform parentRect)
+        {
+            LayoutRebuilder.MarkLayoutForRebuild(parentRect);
+        }
+
+        Destroy(gameObject);
+    }
+
+    private IEnumerator AnimateDiscard(RectTransform trashTarget)
+    {
+        CanvasGroup.blocksRaycasts = false;
+        RectTransform dragParent = RectTransform.parent as RectTransform;
+
+        if (dragParent == null || trashTarget == null)
+        {
+            DestroyPlaceholder();
+            Destroy(gameObject);
+            yield break;
+        }
+
+        Vector2 startPosition = RectTransform.anchoredPosition;
+        float elapsed = 0f;
+        float duration = Mathf.Max(0.01f, discardDuration);
+
+        while (elapsed < duration && trashTarget != null)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration);
+            float easedProgress = FarmBoxMergeMath.EaseOutCubic(progress);
+            Vector2 targetPosition = GetAnchoredPositionForTarget(dragParent, trashTarget);
+
+            RectTransform.anchoredPosition = Vector2.LerpUnclamped(startPosition, targetPosition, easedProgress);
+            _scaleEffectMultiplier = Mathf.LerpUnclamped(1f, discardTargetScale, easedProgress);
+            yield return null;
+        }
+
+        DestroyPlaceholder();
         if (_originalParent is RectTransform parentRect)
         {
             LayoutRebuilder.MarkLayoutForRebuild(parentRect);

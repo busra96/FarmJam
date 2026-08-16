@@ -21,6 +21,7 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private RectTransform cardContainer;
     [SerializeField] private RectTransform dragLayer;
     [SerializeField] private RectTransform spawnDropLayer;
+    [SerializeField] private RectTransform trashDropLayer;
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private bool createRuntimeDragLayer = true;
     [SerializeField] private bool createRuntimeSpawnDropLayer = true;
@@ -202,7 +203,7 @@ public class CardMergeBoard : MonoBehaviour
             return;
         }
 
-        if (TrySpawnBoxesFromCard(card, eventData))
+        if (TryDiscardCard(card, eventData) || TrySpawnBoxesFromCard(card, eventData))
         {
             return;
         }
@@ -317,6 +318,17 @@ public class CardMergeBoard : MonoBehaviour
         return true;
     }
 
+    private bool TryDiscardCard(Card card, PointerEventData eventData)
+    {
+        if (card == null || trashDropLayer == null || !IsPointerInsideUiLayer(trashDropLayer, eventData.position))
+        {
+            return false;
+        }
+
+        card.DiscardInto(trashDropLayer);
+        return true;
+    }
+
     private MergeBoxParent SpawnBoxGroup(int boxCount, ColorType colorType, Transform targetSpawnPoint)
     {
         EnsureSpawnPoints();
@@ -383,6 +395,11 @@ public class CardMergeBoard : MonoBehaviour
         if (rootCanvas == null)
         {
             rootCanvas = GetComponentInParent<Canvas>();
+        }
+
+        if (trashDropLayer == null && rootCanvas != null)
+        {
+            trashDropLayer = rootCanvas.transform.Find("TrashDropZone") as RectTransform;
         }
 
         if (spawnSurface == null)
@@ -528,7 +545,12 @@ public class CardMergeBoard : MonoBehaviour
 
     private bool IsPointerInsideSpawnDropLayer(Vector2 screenPosition)
     {
-        if (spawnDropLayer == null)
+        return IsPointerInsideUiLayer(spawnDropLayer, screenPosition);
+    }
+
+    private bool IsPointerInsideUiLayer(RectTransform targetLayer, Vector2 screenPosition)
+    {
+        if (targetLayer == null)
         {
             return false;
         }
@@ -546,7 +568,7 @@ public class CardMergeBoard : MonoBehaviour
             for (int i = 0; i < _uiRaycastResults.Count; i++)
             {
                 Transform hitTransform = _uiRaycastResults[i].gameObject.transform;
-                if (hitTransform == spawnDropLayer || hitTransform.IsChildOf(spawnDropLayer))
+                if (hitTransform == targetLayer || hitTransform.IsChildOf(targetLayer))
                 {
                     return true;
                 }
@@ -555,7 +577,7 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
-        return RectTransformUtility.RectangleContainsScreenPoint(spawnDropLayer, screenPosition, EventCamera);
+        return RectTransformUtility.RectangleContainsScreenPoint(targetLayer, screenPosition, EventCamera);
     }
 
     private void EnsureSpawnDropLayerGraphic()

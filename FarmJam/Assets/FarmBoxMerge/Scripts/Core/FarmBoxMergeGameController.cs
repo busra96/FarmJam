@@ -14,10 +14,13 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [Header("Reset UI")]
     [SerializeField] private Button refreshButton;
     [SerializeField] private Button retryButton;
+    [SerializeField] private Button addCardButton;
     [SerializeField] private string refreshLabel = "REFRESH";
     [SerializeField] private string retryLabel = "RETRY";
+    [SerializeField] private string addCardLabel = "ADD CARD";
     [SerializeField] private Color buttonColor = new Color(0.2f, 0.67f, 0.38f, 1f);
     [SerializeField] private Color retryButtonColor = new Color(0.95f, 0.55f, 0.18f, 1f);
+    [SerializeField] private Color addCardButtonColor = new Color(0.2f, 0.55f, 0.9f, 1f);
 
     private Coroutine _resetRoutine;
 
@@ -26,6 +29,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         ResolveReferences();
         ConfigureButton(refreshButton, RefreshGame, refreshLabel, buttonColor, "refresh");
         ConfigureButton(retryButton, RetryLevel, retryLabel, retryButtonColor, "retry");
+        ConfigureButton(addCardButton, AddRandomCard, addCardLabel, addCardButtonColor, "add card");
     }
 
     private void OnDestroy()
@@ -39,6 +43,11 @@ public class FarmBoxMergeGameController : MonoBehaviour
         {
             retryButton.onClick.RemoveListener(RetryLevel);
         }
+
+        if (addCardButton != null)
+        {
+            addCardButton.onClick.RemoveListener(AddRandomCard);
+        }
     }
 
     [ContextMenu("Refresh Game")]
@@ -51,6 +60,17 @@ public class FarmBoxMergeGameController : MonoBehaviour
     public void RetryLevel()
     {
         StartReset(replaySameLevel: true);
+    }
+
+    public void AddRandomCard()
+    {
+        if (!Application.isPlaying || _resetRoutine != null)
+        {
+            return;
+        }
+
+        Card spawnedCard = cardSpawner?.SpawnRandomCard();
+        spawnedCard?.PlayMergePop();
     }
 
     private void StartReset(bool replaySameLevel)
@@ -113,6 +133,15 @@ public class FarmBoxMergeGameController : MonoBehaviour
                 retryButton = buttonTransform.GetComponent<Button>();
             }
         }
+
+        if (addCardButton == null)
+        {
+            Transform buttonTransform = transform.Find("AddCardButton");
+            if (buttonTransform != null)
+            {
+                addCardButton = buttonTransform.GetComponent<Button>();
+            }
+        }
     }
 
     private void ConfigureButton(Button button, UnityEngine.Events.UnityAction action, string labelText, Color color, string buttonName)
@@ -148,6 +177,11 @@ public class FarmBoxMergeGameController : MonoBehaviour
         if (retryButton != null)
         {
             retryButton.interactable = interactable;
+        }
+
+        if (addCardButton != null)
+        {
+            addCardButton.interactable = interactable;
         }
     }
 }
