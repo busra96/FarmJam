@@ -33,6 +33,7 @@ public class MergeItemSpawner : MonoBehaviour
     public IReadOnlyList<MergeItem> SpawnedItems => spawnedItems;
 
     private Coroutine _processRoutine;
+    private readonly List<ColorType> _lastInitialColors = new List<ColorType>();
 
     private void Reset()
     {
@@ -65,11 +66,7 @@ public class MergeItemSpawner : MonoBehaviour
 
     private void Start()
     {
-        if (spawnOnStart)
-        {
-            SpawnRandomItems(initialSpawnCount);
-        }
-
+        SpawnInitialItems();
         TryProcessQueue();
     }
 
@@ -85,25 +82,66 @@ public class MergeItemSpawner : MonoBehaviour
         SpawnRandomItems(initialSpawnCount);
     }
 
+    public void SpawnInitialItems()
+    {
+        _lastInitialColors.Clear();
+        if (!spawnOnStart)
+        {
+            return;
+        }
+
+        int count = Mathf.Max(0, initialSpawnCount);
+        for (int i = 0; i < count; i++)
+        {
+            ColorType colorType = GetRandomColorType();
+            if (SpawnItem(colorType) == null)
+            {
+                break;
+            }
+
+            _lastInitialColors.Add(colorType);
+        }
+
+        TryProcessQueue();
+    }
+
+    public void ReplayInitialItems()
+    {
+        if (_lastInitialColors.Count == 0)
+        {
+            SpawnInitialItems();
+            return;
+        }
+
+        for (int i = 0; i < _lastInitialColors.Count; i++)
+        {
+            if (SpawnItem(_lastInitialColors[i]) == null)
+            {
+                break;
+            }
+        }
+
+        TryProcessQueue();
+    }
+
     [ContextMenu("Clear Spawned Items")]
     public void ClearSpawnedItems()
     {
-        for (int i = spawnedItems.Count - 1; i >= 0; i--)
+        StopProcessing();
+
+        MergeItem[] itemsToDestroy = itemsRoot != null
+            ? itemsRoot.GetComponentsInChildren<MergeItem>(true)
+            : spawnedItems.ToArray();
+
+        for (int i = itemsToDestroy.Length - 1; i >= 0; i--)
         {
-            MergeItem item = spawnedItems[i];
+            MergeItem item = itemsToDestroy[i];
             if (item == null)
             {
                 continue;
             }
 
-            if (Application.isPlaying)
-            {
-                Destroy(item.gameObject);
-            }
-            else
-            {
-                DestroyImmediate(item.gameObject);
-            }
+            FarmBoxMergeObjectUtility.Destroy(item.gameObject);
         }
 
         spawnedItems.Clear();
@@ -242,7 +280,7 @@ public class MergeItemSpawner : MonoBehaviour
 
             elapsed += Time.deltaTime;
             float progress = Mathf.Clamp01(elapsed / duration);
-            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
+            float easedProgress = FarmBoxMergeMath.EaseOutCubic(progress);
             Vector3 position = Vector3.LerpUnclamped(startPosition, targetPosition, easedProgress);
             position += Vector3.up * (4f * jumpHeight * progress * (1f - progress));
 
@@ -314,7 +352,7 @@ public class MergeItemSpawner : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float progress = Mathf.Clamp01(elapsed / duration);
-            float easedProgress = progress * progress * (3f - (2f * progress));
+            float easedProgress = FarmBoxMergeMath.SmoothStep(progress);
 
             for (int i = 0; i < itemsToMove.Count; i++)
             {
@@ -346,19 +384,7 @@ public class MergeItemSpawner : MonoBehaviour
 
     private Box FindMatchingBox(ColorType colorType)
     {
-        Box[] availableBoxes = FindObjectsByType<Box>(FindObjectsSortMode.None);
-        for (int i = 0; i < availableBoxes.Length; i++)
-        {
-            Box candidate = availableBoxes[i];
-            if (candidate == null || !candidate.CanAcceptItem(colorType))
-            {
-                continue;
-            }
-
-            return candidate;
-        }
-
-        return null;
+        return BoxRegistry.TryFindAvailable(colorType, out Box matchingBox) ? matchingBox : null;
     }
 
     private void RegisterExistingItems()
@@ -478,12 +504,22 @@ public class MergeItemSpawner : MonoBehaviour
 
     private ColorType GetRandomColorType()
     {
-        int colorCount = System.Enum.GetValues(typeof(ColorType)).Length;
-        return (ColorType)Random.Range(0, colorCount);
+        return FarmBoxMergeRandom.ColorType();
     }
 
     private void CleanupNullItems()
     {
         spawnedItems.RemoveAll(item => item == null);
+    }
+
+    private void StopProcessing()
+    {
+        if (_processRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_processRoutine);
+        _processRoutine = null;
     }
 }

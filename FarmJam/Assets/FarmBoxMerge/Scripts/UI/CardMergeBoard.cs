@@ -17,18 +17,6 @@ public class CardMergeBoard : MonoBehaviour
         public Color color = Color.white;
     }
 
-    private readonly struct BoxPatternDefinition
-    {
-        public BoxPatternDefinition(MergeBoxPatternType patternType, Vector2Int[] cells)
-        {
-            PatternType = patternType;
-            Cells = cells;
-        }
-
-        public MergeBoxPatternType PatternType { get; }
-        public Vector2Int[] Cells { get; }
-    }
-
     [Header("UI")]
     [SerializeField] private RectTransform cardContainer;
     [SerializeField] private RectTransform dragLayer;
@@ -160,7 +148,7 @@ public class CardMergeBoard : MonoBehaviour
                 continue;
             }
 
-            float distance = GetColorDistance(color, entry.color);
+            float distance = FarmBoxMergeMath.SqrColorDistance(color, entry.color);
             if (distance < bestDistance)
             {
                 bestDistance = distance;
@@ -168,7 +156,7 @@ public class CardMergeBoard : MonoBehaviour
             }
         }
 
-        if (bestDistance > colorDetectionTolerance)
+        if (bestDistance > colorDetectionTolerance * colorDetectionTolerance)
         {
             return false;
         }
@@ -252,6 +240,55 @@ public class CardMergeBoard : MonoBehaviour
         card.SyncDataFromView();
     }
 
+    public void ClearSpawnedBoxGroups()
+    {
+        EnsureSpawnSlotRoot();
+        if (spawnSlotRoot == null)
+        {
+            return;
+        }
+
+        for (int i = spawnSlotRoot.childCount - 1; i >= 0; i--)
+        {
+            Transform spawnPoint = spawnSlotRoot.GetChild(i);
+            for (int childIndex = spawnPoint.childCount - 1; childIndex >= 0; childIndex--)
+            {
+                GameObject child = spawnPoint.GetChild(childIndex).gameObject;
+                if (child.TryGetComponent(out MergeBoxParent _))
+                {
+                    FarmBoxMergeObjectUtility.Destroy(child);
+                }
+            }
+        }
+    }
+
+    public void ClearCards()
+    {
+        DestroyCardsIn(cardContainer);
+
+        if (dragLayer != null && dragLayer != cardContainer)
+        {
+            DestroyCardsIn(dragLayer);
+        }
+    }
+
+    private static void DestroyCardsIn(Transform container)
+    {
+        if (container == null)
+        {
+            return;
+        }
+
+        for (int i = container.childCount - 1; i >= 0; i--)
+        {
+            GameObject child = container.GetChild(i).gameObject;
+            if (child.TryGetComponent(out Card _))
+            {
+                FarmBoxMergeObjectUtility.Destroy(child);
+            }
+        }
+    }
+
     private bool TrySpawnBoxesFromCard(Card card, PointerEventData eventData)
     {
         if (!spawnBoxesOnCenterDrop || card == null || boxPrefab == null)
@@ -316,108 +353,12 @@ public class CardMergeBoard : MonoBehaviour
 
     private BoxPatternDefinition ResolvePattern(int boxCount)
     {
-        int clampedCount = Mathf.Max(1, boxCount);
-
-        if (clampedCount == 1)
-        {
-            return new BoxPatternDefinition(MergeBoxPatternType.Single, new[] { Vector2Int.zero });
-        }
-
-        if (clampedCount == 2)
-        {
-            return CreateLinePattern(clampedCount);
-        }
-
-        if (clampedCount == 3)
-        {
-            return new BoxPatternDefinition(MergeBoxPatternType.Line, new[]
-            {
-                new Vector2Int(0, 0),
-                new Vector2Int(1, 0),
-                new Vector2Int(2, 0)
-            });
-        }
-
-        if (clampedCount == 4)
-        {
-            BoxPatternDefinition[] availablePatterns =
-            {
-                CreateLinePattern(4),
-                new BoxPatternDefinition(MergeBoxPatternType.Square, new[]
-                {
-                    new Vector2Int(0, 0),
-                    new Vector2Int(1, 0),
-                    new Vector2Int(0, 1),
-                    new Vector2Int(1, 1)
-                }),
-                new BoxPatternDefinition(MergeBoxPatternType.L, new[]
-                {
-                    new Vector2Int(0, 0),
-                    new Vector2Int(0, 1),
-                    new Vector2Int(0, 2),
-                    new Vector2Int(1, 0)
-                }),
-                new BoxPatternDefinition(MergeBoxPatternType.T, new[]
-                {
-                    new Vector2Int(0, 0),
-                    new Vector2Int(1, 0),
-                    new Vector2Int(2, 0),
-                    new Vector2Int(1, 1)
-                }),
-                new BoxPatternDefinition(MergeBoxPatternType.Z, new[]
-                {
-                    new Vector2Int(0, 0),
-                    new Vector2Int(1, 0),
-                    new Vector2Int(1, 1),
-                    new Vector2Int(2, 1)
-                })
-            };
-
-            return randomizeFourBlockPatterns
-                ? availablePatterns[UnityEngine.Random.Range(0, availablePatterns.Length)]
-                : availablePatterns[0];
-        }
-
-        return CreateLinePattern(clampedCount);
-    }
-
-    private BoxPatternDefinition CreateLinePattern(int boxCount)
-    {
-        Vector2Int[] lineCells = new Vector2Int[boxCount];
-        for (int i = 0; i < boxCount; i++)
-        {
-            lineCells[i] = new Vector2Int(i, 0);
-        }
-
-        return new BoxPatternDefinition(MergeBoxPatternType.Line, lineCells);
+        return BoxPatternLibrary.Resolve(boxCount, randomizeFourBlockPatterns);
     }
 
     private Vector3[] GetCenteredLocalPositions(Vector2Int[] cells)
     {
-        int minX = cells[0].x;
-        int maxX = cells[0].x;
-        int minY = cells[0].y;
-        int maxY = cells[0].y;
-
-        for (int i = 1; i < cells.Length; i++)
-        {
-            Vector2Int cell = cells[i];
-            minX = Mathf.Min(minX, cell.x);
-            maxX = Mathf.Max(maxX, cell.x);
-            minY = Mathf.Min(minY, cell.y);
-            maxY = Mathf.Max(maxY, cell.y);
-        }
-
-        Vector2 center = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
-        Vector3[] localPositions = new Vector3[cells.Length];
-
-        for (int i = 0; i < cells.Length; i++)
-        {
-            Vector2 centeredCell = new Vector2(cells[i].x, cells[i].y) - center;
-            localPositions[i] = new Vector3(centeredCell.x * boxSpacing, 0f, centeredCell.y * boxSpacing);
-        }
-
-        return localPositions;
+        return BoxPatternLibrary.GetCenteredPositions(cells, boxSpacing);
     }
 
     private void RegisterExistingCards()
@@ -808,12 +749,4 @@ public class CardMergeBoard : MonoBehaviour
         return Camera.main;
     }
 
-    private float GetColorDistance(Color first, Color second)
-    {
-        float red = first.r - second.r;
-        float green = first.g - second.g;
-        float blue = first.b - second.b;
-        float alpha = first.a - second.a;
-        return Mathf.Sqrt((red * red) + (green * green) + (blue * blue) + (alpha * alpha));
-    }
 }

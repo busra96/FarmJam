@@ -31,6 +31,8 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private List<CardMergeBoard.ColorPaletteEntry> availableColors = new List<CardMergeBoard.ColorPaletteEntry>();
     [SerializeField] private List<CardSpawnEntry> manualCards = new List<CardSpawnEntry>();
 
+    private readonly List<CardSpawnEntry> _lastSpawnedCards = new List<CardSpawnEntry>();
+
     private void Reset()
     {
         AutoAssignReferences();
@@ -94,6 +96,12 @@ public class CardSpawner : MonoBehaviour
     [ContextMenu("Clear Spawned Cards")]
     public void ClearCards()
     {
+        if (board != null)
+        {
+            board.ClearCards();
+            return;
+        }
+
         RectTransform targetParent = ResolveSpawnParent();
         if (targetParent == null)
         {
@@ -105,7 +113,7 @@ public class CardSpawner : MonoBehaviour
             Transform child = targetParent.GetChild(i);
             if (child.TryGetComponent(out Card _))
             {
-                DestroyCardObject(child.gameObject);
+                FarmBoxMergeObjectUtility.Destroy(child.gameObject);
             }
         }
     }
@@ -133,17 +141,47 @@ public class CardSpawner : MonoBehaviour
         return SpawnCard(counter, GetRandomColorType());
     }
 
+    public void ReplayLastCards()
+    {
+        if (_lastSpawnedCards.Count == 0)
+        {
+            SpawnConfiguredCards();
+            return;
+        }
+
+        if (clearBeforeSpawn)
+        {
+            ClearCards();
+        }
+
+        for (int i = 0; i < _lastSpawnedCards.Count; i++)
+        {
+            CardSpawnEntry cardData = _lastSpawnedCards[i];
+            SpawnCard(cardData.counter, cardData.colorType);
+        }
+    }
+
     private void SpawnRandomCards()
     {
+        _lastSpawnedCards.Clear();
         int count = Mathf.Max(0, randomSpawnCount);
         for (int i = 0; i < count; i++)
         {
-            SpawnRandomCard();
+            int minCounter = Mathf.Min(counterRange.x, counterRange.y);
+            int maxCounter = Mathf.Max(counterRange.x, counterRange.y);
+            int counter = UnityEngine.Random.Range(minCounter, maxCounter + 1);
+            ColorType colorType = GetRandomColorType();
+
+            if (SpawnCard(counter, colorType) != null)
+            {
+                RememberCard(counter, colorType);
+            }
         }
     }
 
     private void SpawnManualCards()
     {
+        _lastSpawnedCards.Clear();
         foreach (CardSpawnEntry cardData in manualCards)
         {
             if (cardData == null)
@@ -151,8 +189,20 @@ public class CardSpawner : MonoBehaviour
                 continue;
             }
 
-            SpawnCard(cardData.counter, cardData.colorType);
+            if (SpawnCard(cardData.counter, cardData.colorType) != null)
+            {
+                RememberCard(cardData.counter, cardData.colorType);
+            }
         }
+    }
+
+    private void RememberCard(int counter, ColorType colorType)
+    {
+        _lastSpawnedCards.Add(new CardSpawnEntry
+        {
+            counter = counter,
+            colorType = colorType
+        });
     }
 
     private void AutoAssignReferences()
@@ -203,7 +253,7 @@ public class CardSpawner : MonoBehaviour
         board = targetObject.GetComponent<CardMergeBoard>();
         if (board == null)
         {
-            board = targetObject.AddComponent<CardMergeBoard>();
+            board = GetComponentInParent<CardMergeBoard>();
         }
 
         return board;
@@ -251,18 +301,13 @@ public class CardSpawner : MonoBehaviour
             SyncPaletteWithBoard();
         }
 
+        if (availableColors.Count == 0)
+        {
+            return FarmBoxMergeRandom.ColorType();
+        }
+
         int randomIndex = UnityEngine.Random.Range(0, availableColors.Count);
         return availableColors[randomIndex].colorType;
     }
 
-    private void DestroyCardObject(GameObject cardObject)
-    {
-        if (Application.isPlaying)
-        {
-            Destroy(cardObject);
-            return;
-        }
-
-        DestroyImmediate(cardObject);
-    }
 }

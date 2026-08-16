@@ -25,6 +25,16 @@ public class Box : MonoBehaviour
     public List<MeshRenderer> MeshRenderers = new List<MeshRenderer>();
     public List<BoxColorEntry> BoxColorEntryList = new List<BoxColorEntry>();
 
+    private void OnEnable()
+    {
+        BoxRegistry.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        BoxRegistry.Unregister(this);
+    }
+
     private void Reset()
     {
         EnsureCollectableRoot();

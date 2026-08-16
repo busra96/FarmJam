@@ -13,6 +13,14 @@ public enum MergeBoxPatternType
 
 public class MergeBoxParent : MonoBehaviour
 {
+    private static readonly Vector2Int[] NeighborDirections =
+    {
+        Vector2Int.left,
+        Vector2Int.right,
+        Vector2Int.up,
+        Vector2Int.down
+    };
+
     [SerializeField] private int counterValue;
     [SerializeField] private ColorType colorType;
     [SerializeField] private MergeBoxPatternType patternType;
@@ -85,6 +93,15 @@ public class MergeBoxParent : MonoBehaviour
 
     private void BuildNeighbors()
     {
+        Dictionary<Vector2Int, Box> boxesByCell = new Dictionary<Vector2Int, Box>(boxes.Count);
+        for (int i = 0; i < boxes.Count; i++)
+        {
+            if (boxes[i] != null)
+            {
+                boxesByCell[boxes[i].GridCell] = boxes[i];
+            }
+        }
+
         for (int i = 0; i < boxes.Count; i++)
         {
             Box sourceBox = boxes[i];
@@ -93,25 +110,13 @@ public class MergeBoxParent : MonoBehaviour
                 continue;
             }
 
-            List<Box> directNeighbors = new List<Box>();
-
-            for (int j = 0; j < boxes.Count; j++)
+            List<Box> directNeighbors = new List<Box>(NeighborDirections.Length);
+            for (int directionIndex = 0; directionIndex < NeighborDirections.Length; directionIndex++)
             {
-                if (i == j)
+                Vector2Int neighborCell = sourceBox.GridCell + NeighborDirections[directionIndex];
+                if (boxesByCell.TryGetValue(neighborCell, out Box neighbor))
                 {
-                    continue;
-                }
-
-                Box candidate = boxes[j];
-                if (candidate == null)
-                {
-                    continue;
-                }
-
-                int cellDistance = Mathf.Abs(sourceBox.GridCell.x - candidate.GridCell.x) + Mathf.Abs(sourceBox.GridCell.y - candidate.GridCell.y);
-                if (cellDistance == 1)
-                {
-                    directNeighbors.Add(candidate);
+                    directNeighbors.Add(neighbor);
                 }
             }
 
@@ -211,13 +216,13 @@ public class MergeBoxParent : MonoBehaviour
                 if (progress < 0.35f)
                 {
                     float popProgress = progress / 0.35f;
-                    float easedPop = 1f - Mathf.Pow(1f - popProgress, 3f);
+                    float easedPop = FarmBoxMergeMath.EaseOutCubic(popProgress);
                     scaleMultiplier = Mathf.LerpUnclamped(1f, collapsePopScale, easedPop);
                 }
                 else
                 {
                     float collapseProgress = (progress - 0.35f) / 0.65f;
-                    float easedCollapse = collapseProgress * collapseProgress * (3f - (2f * collapseProgress));
+                    float easedCollapse = FarmBoxMergeMath.SmoothStep(collapseProgress);
                     scaleMultiplier = Mathf.LerpUnclamped(collapsePopScale, 0f, easedCollapse);
                 }
 

@@ -408,10 +408,6 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         if (gridLayoutGroup != null)
         {
             _board = gridLayoutGroup.GetComponent<CardMergeBoard>();
-            if (_board == null)
-            {
-                _board = gridLayoutGroup.gameObject.AddComponent<CardMergeBoard>();
-            }
         }
     }
 
@@ -451,7 +447,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     private void SmoothScale()
     {
-        float interpolation = 1f - Mathf.Exp(-scaleSharpness * Time.unscaledDeltaTime);
+        float interpolation = FarmBoxMergeMath.DampFactor(scaleSharpness, Time.unscaledDeltaTime);
         RectTransform.localScale = Vector3.Lerp(RectTransform.localScale, _baseScale * (_targetScaleMultiplier * _scaleEffectMultiplier), interpolation);
     }
 
@@ -463,7 +459,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
             return;
         }
 
-        float interpolation = 1f - Mathf.Exp(-dragFollowSharpness * Time.unscaledDeltaTime);
+        float interpolation = FarmBoxMergeMath.DampFactor(dragFollowSharpness, Time.unscaledDeltaTime);
         Vector2 nextPosition = Vector2.Lerp(RectTransform.anchoredPosition, _dragTargetPosition, interpolation);
         Vector2 frameDelta = nextPosition - _lastVisualDragPosition;
         _lastVisualDragPosition = nextPosition;
@@ -476,7 +472,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     private void SmoothRotation()
     {
-        float interpolation = 1f - Mathf.Exp(-rotationSharpness * Time.unscaledDeltaTime);
+        float interpolation = FarmBoxMergeMath.DampFactor(rotationSharpness, Time.unscaledDeltaTime);
         float currentZ = NormalizeAngle(RectTransform.localEulerAngles.z);
         float targetZ = _baseRotationZ + _targetRotationOffset;
         float nextZ = Mathf.LerpAngle(currentZ, targetZ, interpolation);
@@ -579,7 +575,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
             elapsed += Time.unscaledDeltaTime;
             Vector2 targetPosition = GetAnchoredPositionForTarget(dragParent, _placeholderRect);
             float progress = Mathf.Clamp01(elapsed / returnDuration);
-            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
+            float easedProgress = FarmBoxMergeMath.EaseOutCubic(progress);
             RectTransform.anchoredPosition = Vector2.LerpUnclamped(startPosition, targetPosition, easedProgress);
             yield return null;
         }
@@ -606,7 +602,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
             elapsed += Time.unscaledDeltaTime;
             Vector2 targetPosition = GetAnchoredPositionForTarget(dragParent, targetCard.RectTransform);
             float progress = Mathf.Clamp01(elapsed / mergeDuration);
-            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
+            float easedProgress = FarmBoxMergeMath.EaseOutCubic(progress);
             RectTransform.anchoredPosition = Vector2.LerpUnclamped(startPosition, targetPosition, easedProgress);
             yield return null;
         }
@@ -679,7 +675,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         {
             elapsed += Time.unscaledDeltaTime;
             float progress = Mathf.Clamp01(elapsed / halfDuration);
-            float easedProgress = 1f - Mathf.Pow(1f - progress, 3f);
+            float easedProgress = FarmBoxMergeMath.EaseOutCubic(progress);
             _scaleEffectMultiplier = Mathf.LerpUnclamped(1f, mergePopScale, easedProgress);
             yield return null;
         }
@@ -689,7 +685,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         {
             elapsed += Time.unscaledDeltaTime;
             float progress = Mathf.Clamp01(elapsed / halfDuration);
-            float easedProgress = progress * progress * (3f - 2f * progress);
+            float easedProgress = FarmBoxMergeMath.SmoothStep(progress);
             _scaleEffectMultiplier = Mathf.LerpUnclamped(mergePopScale, 1f, easedProgress);
             yield return null;
         }
