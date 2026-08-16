@@ -12,6 +12,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [SerializeField] private CardMergeBoard cardMergeBoard;
     [SerializeField] private MergeItemSpawner itemSpawner;
     [SerializeField] private FarmBoxMergeActionBudget actionBudget;
+    [SerializeField] private FarmBoxMergeLevelRuntime levelRuntime;
 
     [Header("Reset UI")]
     [SerializeField] private Button refreshButton;
@@ -48,6 +49,15 @@ public class FarmBoxMergeGameController : MonoBehaviour
         }
 
         RefreshAddCardButtonState();
+    }
+
+    private void Start()
+    {
+        if (levelRuntime != null && levelRuntime.HasLevels)
+        {
+            levelRuntime.SpawnCurrentLevel();
+            AttemptReady?.Invoke();
+        }
     }
 
     private void OnDestroy()
@@ -92,7 +102,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     public void NextLevel()
     {
-        // Level assets will replace this random-layout fallback when progression is added.
+        levelRuntime?.MoveNext();
         StartReset(replaySameLevel: false);
     }
 
@@ -147,7 +157,11 @@ public class FarmBoxMergeGameController : MonoBehaviour
         // runtime objects from sharing layout/registry state during a refresh.
         yield return null;
 
-        if (replaySameLevel)
+        if (levelRuntime != null && levelRuntime.HasLevels)
+        {
+            levelRuntime.SpawnCurrentLevel();
+        }
+        else if (replaySameLevel)
         {
             cardSpawner?.ReplayLastCards();
             itemSpawner?.ReplayInitialItems();
@@ -169,6 +183,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         cardMergeBoard ??= FarmBoxMergeObjectUtility.FindSceneComponent<CardMergeBoard>();
         itemSpawner ??= FarmBoxMergeObjectUtility.FindSceneComponent<MergeItemSpawner>();
         actionBudget ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeActionBudget>();
+        levelRuntime ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeLevelRuntime>();
 
         if (refreshButton == null)
         {

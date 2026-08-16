@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff514382a5554d1bb906de3673decd3a, type: 3}
+  m_Name: Level_001
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
+  levelId: 62bc37c279ef4e17b6b06283e9d80ac3
+  levelName: Level1
+  designerNotes: Bu leveli. Level Editor penceresinden duzenlenebilir
+  itemSequence:
+  - colorType: 0
+    count: 2
+  - colorType: 1
+    count: 2
+  - colorType: 2
+    count: 2
+  - colorType: 3
+    count: 1
+  - colorType: 4
+    count: 1
+  startingCards:
+  - colorType: 0
+    counter: 1
+  - colorType: 0
+    counter: 1
+  - colorType: 1
+    counter: 1
+  - colorType: 1
+    counter: 1
+  - colorType: 2
+    counter: 1
+  - colorType: 2
+    counter: 1
+  - colorType: 3
+    counter: 1
+  - colorType: 4
+    counter: 1

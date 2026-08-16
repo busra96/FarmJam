@@ -40,7 +40,8 @@ public class MergeItemSpawner : MonoBehaviour
             return _activeItems.Count;
         }
     }
-    public bool HasRemainingItems => ActiveItemCount > 0;
+    public int RemainingItemCount => ActiveItemCount + _pendingColors.Count;
+    public bool HasRemainingItems => RemainingItemCount > 0;
     public bool IsNextQueuedItemBlocked
     {
         get
@@ -60,6 +61,7 @@ public class MergeItemSpawner : MonoBehaviour
     private Coroutine _processRoutine;
     private readonly List<ColorType> _lastInitialColors = new List<ColorType>();
     private readonly HashSet<MergeItem> _activeItems = new HashSet<MergeItem>();
+    private readonly Queue<ColorType> _pendingColors = new Queue<ColorType>();
 
     private void Reset()
     {
@@ -92,7 +94,45 @@ public class MergeItemSpawner : MonoBehaviour
 
     private void Start()
     {
-        SpawnInitialItems();
+        if (spawnOnStart)
+        {
+            SpawnInitialItems();
+        }
+
+        TryProcessQueue();
+    }
+
+    public void SetSpawnOnStart(bool shouldSpawnOnStart)
+    {
+        spawnOnStart = shouldSpawnOnStart;
+    }
+
+    public void SpawnLevelItems(IReadOnlyList<FarmBoxMergeItemRun> itemSequence)
+    {
+        _lastInitialColors.Clear();
+        _pendingColors.Clear();
+
+        if (itemSequence != null)
+        {
+            for (int i = 0; i < itemSequence.Count; i++)
+            {
+                FarmBoxMergeItemRun itemRun = itemSequence[i];
+                if (itemRun == null)
+                {
+                    continue;
+                }
+
+                int count = Mathf.Max(1, itemRun.count);
+                for (int j = 0; j < count; j++)
+                {
+                    _lastInitialColors.Add(itemRun.colorType);
+                    _pendingColors.Enqueue(itemRun.colorType);
+                }
+            }
+        }
+
+        FillVisibleQueue();
+        ItemCountChanged?.Invoke();
         TryProcessQueue();
     }
 
@@ -111,6 +151,7 @@ public class MergeItemSpawner : MonoBehaviour
     public void SpawnInitialItems()
     {
         _lastInitialColors.Clear();
+        _pendingColors.Clear();
         if (!spawnOnStart)
         {
             return;
@@ -120,14 +161,11 @@ public class MergeItemSpawner : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             ColorType colorType = GetRandomColorType();
-            if (SpawnItem(colorType) == null)
-            {
-                break;
-            }
-
             _lastInitialColors.Add(colorType);
+            _pendingColors.Enqueue(colorType);
         }
 
+        FillVisibleQueue();
         TryProcessQueue();
     }
 
@@ -139,14 +177,13 @@ public class MergeItemSpawner : MonoBehaviour
             return;
         }
 
+        _pendingColors.Clear();
         for (int i = 0; i < _lastInitialColors.Count; i++)
         {
-            if (SpawnItem(_lastInitialColors[i]) == null)
-            {
-                break;
-            }
+            _pendingColors.Enqueue(_lastInitialColors[i]);
         }
 
+        FillVisibleQueue();
         TryProcessQueue();
     }
 
@@ -171,6 +208,9 @@ public class MergeItemSpawner : MonoBehaviour
         }
 
         spawnedItems.Clear();
+        _activeItems.Clear();
+        _pendingColors.Clear();
+        ItemCountChanged?.Invoke();
     }
 
     public void SpawnRandomItems(int count)
@@ -178,16 +218,30 @@ public class MergeItemSpawner : MonoBehaviour
         int itemCount = Mathf.Max(0, count);
         for (int i = 0; i < itemCount; i++)
         {
-            if (SpawnItem(GetRandomColorType()) == null)
-            {
-                break;
-            }
+            _pendingColors.Enqueue(GetRandomColorType());
         }
 
+        FillVisibleQueue();
+        ItemCountChanged?.Invoke();
         TryProcessQueue();
     }
 
     public MergeItem SpawnItem(ColorType colorType)
+    {
+        if (_pendingColors.Count > 0 || !CanSpawnVisibleItem())
+        {
+            _pendingColors.Enqueue(colorType);
+            ItemCountChanged?.Invoke();
+            TryProcessQueue();
+            return null;
+        }
+
+        MergeItem spawnedItem = SpawnVisibleItem(colorType);
+        TryProcessQueue();
+        return spawnedItem;
+    }
+
+    private MergeItem SpawnVisibleItem(ColorType colorType)
     {
         ResolveReferences();
         EnsureRoots();
@@ -224,7 +278,6 @@ public class MergeItemSpawner : MonoBehaviour
         }
 
         spawnedItems.Add(spawnedItem);
-        TryProcessQueue();
         return spawnedItem;
     }
 
@@ -254,6 +307,7 @@ public class MergeItemSpawner : MonoBehaviour
             if (firstItem == null)
             {
                 spawnedItems.RemoveAt(0);
+                FillVisibleQueue();
                 continue;
             }
 
@@ -264,6 +318,7 @@ public class MergeItemSpawner : MonoBehaviour
             }
 
             spawnedItems.RemoveAt(0);
+            FillVisibleQueue();
             yield return AnimateItemIntoBox(firstItem, targetBox);
             yield return RepositionQueueItems();
         }
@@ -559,6 +614,23 @@ public class MergeItemSpawner : MonoBehaviour
     private ColorType GetRandomColorType()
     {
         return FarmBoxMergeRandom.ColorType();
+    }
+
+    private bool CanSpawnVisibleItem()
+    {
+        ResolveReferences();
+        EnsureRoots();
+        EnsureQueuePoints();
+        CleanupNullItems();
+        return itemPrefab != null && queuePoints.Count > 0 && spawnedItems.Count < queuePoints.Count;
+    }
+
+    private void FillVisibleQueue()
+    {
+        while (_pendingColors.Count > 0 && CanSpawnVisibleItem())
+        {
+            SpawnVisibleItem(_pendingColors.Dequeue());
+        }
     }
 
     private void CleanupNullItems()

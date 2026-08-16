@@ -58,6 +58,38 @@ public class CardSpawner : MonoBehaviour
         }
     }
 
+    public void SetSpawnOnStart(bool shouldSpawnOnStart)
+    {
+        spawnOnStart = shouldSpawnOnStart;
+    }
+
+    public void SpawnLevelCards(IReadOnlyList<FarmBoxMergeStartingCard> startingCards)
+    {
+        _lastSpawnedCards.Clear();
+        if (startingCards == null)
+        {
+            return;
+        }
+
+        int cardCount = Mathf.Min(startingCards.Count, FarmBoxMergeRules.MaxCardsOnBoard);
+        for (int i = 0; i < cardCount; i++)
+        {
+            FarmBoxMergeStartingCard cardData = startingCards[i];
+            if (cardData == null)
+            {
+                continue;
+            }
+
+            int counter = FarmBoxMergeRules.ClampCardCounter(cardData.counter);
+            if (SpawnCard(counter, cardData.colorType) == null)
+            {
+                break;
+            }
+
+            RememberCard(counter, cardData.colorType);
+        }
+    }
+
     [ContextMenu("Spawn Configured Cards")]
     public void SpawnConfiguredCards()
     {

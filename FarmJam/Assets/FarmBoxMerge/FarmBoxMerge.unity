@@ -1025,6 +1025,7 @@ GameObject:
   - component: {fileID: 791694495}
   - component: {fileID: 791694496}
   - component: {fileID: 791694497}
+  - component: {fileID: 791694498}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1138,6 +1139,7 @@ MonoBehaviour:
   cardMergeBoard: {fileID: 1402966117}
   itemSpawner: {fileID: 978142774}
   actionBudget: {fileID: 791694496}
+  levelRuntime: {fileID: 791694498}
   refreshButton: {fileID: 639568107}
   retryButton: {fileID: 2045491989}
   addCardButton: {fileID: 1887279817}
@@ -1181,8 +1183,27 @@ MonoBehaviour:
   failPanel: {fileID: 1967188599}
   nextLevelButton: {fileID: 161344719}
   retryLevelButton: {fileID: 1467242413}
-  winDelay: 1
+  winDelay: 3
   failDelay: 5
+--- !u!114 &791694498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791694490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3bbffdfa41b49bdb0f01f694095c335, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelRuntime
+  catalog: {fileID: 11400000, guid: 0e0658d16d1d4e23bef8c0bc8d9b80a9, type: 2}
+  startLevelIndex: 0
+  loopAfterLastLevel: 1
+  useSavedProgress: 0
+  progressKey: FarmBoxMerge.CurrentLevel
+  cardSpawner: {fileID: 1402966116}
+  itemSpawner: {fileID: 978142774}
 --- !u!1 &794068447
 GameObject:
   m_ObjectHideFlags: 0
