@@ -15,6 +15,7 @@ public class MergeItemSpawner : MonoBehaviour
 
     [Header("Queue Points")]
     [SerializeField] private List<Transform> queuePoints = new List<Transform>();
+    [SerializeField, Min(1)] private int maxVisibleItems = 6;
     [SerializeField] private bool createRuntimeQueuePoints = true;
     [SerializeField] private int runtimeQueuePointCount = 20;
     [SerializeField] private float runtimeQueuePointSpacing = 1.1f;
@@ -32,6 +33,7 @@ public class MergeItemSpawner : MonoBehaviour
     [SerializeField] private List<MergeItem> spawnedItems = new List<MergeItem>();
 
     public IReadOnlyList<MergeItem> SpawnedItems => spawnedItems;
+    public int VisibleQueueCapacity => Mathf.Min(queuePoints.Count, Mathf.Max(1, maxVisibleItems));
     public int ActiveItemCount
     {
         get
@@ -260,7 +262,7 @@ public class MergeItemSpawner : MonoBehaviour
             return null;
         }
 
-        if (spawnedItems.Count >= queuePoints.Count)
+        if (spawnedItems.Count >= VisibleQueueCapacity)
         {
             Debug.LogWarning("Queue dolu. Yeni item spawnlanamadi.", this);
             return null;
@@ -622,7 +624,7 @@ public class MergeItemSpawner : MonoBehaviour
         EnsureRoots();
         EnsureQueuePoints();
         CleanupNullItems();
-        return itemPrefab != null && queuePoints.Count > 0 && spawnedItems.Count < queuePoints.Count;
+        return itemPrefab != null && VisibleQueueCapacity > 0 && spawnedItems.Count < VisibleQueueCapacity;
     }
 
     private void FillVisibleQueue()

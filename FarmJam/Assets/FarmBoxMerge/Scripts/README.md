@@ -31,3 +31,7 @@ The card board holds at most 12 cards. `ADD CARD` always creates a level-one car
 `ADD CARD` and `TRASH` each have three uses per attempt. Their remaining uses are shown in the UI and reset on refresh/retry. `FarmBoxMergeActionBudget.GrantAddCardUses` and `GrantTrashUses` are the integration points for a future rewarded-ad completion callback; no ad SDK is currently installed in the project.
 
 `FarmBoxMergeOutcomeController` confirms a win for three seconds and a fail for five seconds before showing UI; both delays are independently configurable. It shows `WinPanel` when every queued, pending or assigned item is gone. A fail countdown starts while items remain and every world box slot is occupied if either all 12 card slots are occupied or the next queued item's color has no available matching box. A card-count, item-count or action-budget change cancels the pending fail timer. `NextLevelButton` advances through the catalog; `RetryLevelButton` reloads the current catalog entry.
+
+## Visual setup
+
+`Tools > FarmBoxMerge > Apply Mobile Visual Polish` reapplies the responsive portrait UI, camera, lighting, farm backdrop, market-table platform and card-prefab styling. `Tools > FarmBoxMerge > Apply Platform Polish` refreshes only the item platform. Both operations are idempotent, so they can be run again after scene hierarchy changes. The item queue shows at most six items on screen; longer authored sequences remain pending and enter the visible queue as space opens.
