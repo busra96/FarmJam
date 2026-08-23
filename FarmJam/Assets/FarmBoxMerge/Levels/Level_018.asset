@@ -10,22 +10,45 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff514382a5554d1bb906de3673decd3a, type: 3}
-  m_Name: Level_002
+  m_Name: Level_018
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
-  levelId: 00000000000000000000000000000002
-  levelName: "02 - Iki Renk"
-  designerNotes: "Egitim. Yesil ve turuncu kartlari ayirarak iki temel merge yap."
+  levelId: 00000000000000000000000000000012
+  levelName: "18 - Renk Koridoru"
+  designerNotes: "Orta zor. Bes renk iki dalga halinde gelir ve slot secimi daralir."
   itemSequence:
   - colorType: 0
     count: 2
-  - colorType: 1
+  - colorType: 2
     count: 2
+  - colorType: 4
+    count: 2
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 2
+  - colorType: 2
+    count: 2
+  - colorType: 4
+    count: 2
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
   startingCards:
   - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
+    counter: 4
   - colorType: 1
     counter: 1
   - colorType: 1
     counter: 1
+  - colorType: 2
+    counter: 2
+  - colorType: 2
+    counter: 2
+  - colorType: 3
+    counter: 2
+  - colorType: 4
+    counter: 4
+

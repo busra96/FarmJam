@@ -223,9 +223,11 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
             drawElementCallback = (rect, index, active, focused) =>
             {
                 SerializedProperty element = levels.GetArrayElementAtIndex(index);
-                Object level = element.objectReferenceValue;
-                string label = level != null ? level.name : "Eksik Level Referansı";
-                EditorGUI.LabelField(rect, $"{index + 1:00}.  {label}");
+                FarmBoxMergeLevelDefinition level = element.objectReferenceValue as FarmBoxMergeLevelDefinition;
+                string label = level != null
+                    ? $"{index + 1:00}.  {level.LevelName}  ·  {level.TotalItemCount} item  ·  {level.StartingCards.Count} kart"
+                    : $"{index + 1:00}.  Eksik Level Referansı";
+                EditorGUI.LabelField(rect, label);
             },
             onSelectCallback = list => SelectLevel(levels.GetArrayElementAtIndex(list.index).objectReferenceValue as FarmBoxMergeLevelDefinition),
             onReorderCallback = _ =>

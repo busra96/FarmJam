@@ -10,16 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff514382a5554d1bb906de3673decd3a, type: 3}
-  m_Name: Level_001
+  m_Name: Level_008
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
-  levelId: 00000000000000000000000000000001
-  levelName: "01 - Ilk Hasat"
-  designerNotes: "Egitim. Ayni renkte iki seviye bir kartla temel merge ve kutu olusturma."
+  levelId: 00000000000000000000000000000008
+  levelName: "08 - Sira Takibi"
+  designerNotes: "Kolay. Ayni renk kuyrukta yeniden geldiginde ikinci kutuyu zamaninda ac."
   itemSequence:
   - colorType: 0
     count: 2
+  - colorType: 1
+    count: 2
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 2
   startingCards:
   - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
+    counter: 3
+  - colorType: 1
+    counter: 2
+  - colorType: 1
+    counter: 2
+
