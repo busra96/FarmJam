@@ -5758,6 +5758,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2055928399}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &910000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 910000002}
+  - component: {fileID: 910000003}
+  m_Layer: 0
+  m_Name: FarmBoxMergeGameFeel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &910000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &910000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c558d59d7c44150926ba557ff15d614, type: 3}
+  m_Name: ''
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeFeedbackController
+  enableSound: 1
+  enableMusic: 1
+  enableParticles: 1
+  enableHaptics: 1
+  enableCameraFeedback: 1
+  buttonClip: {fileID: 8300000, guid: 5da706e14d53f4947a1221e707b7b7d8, type: 3}
+  mergeClip: {fileID: 8300000, guid: 146bb3e22763e9a4c9bc89bfbaaca14c, type: 3}
+  spawnClip: {fileID: 8300000, guid: d989ec9a93b4ad347a236e525b5105e2, type: 3}
+  itemLandClip: {fileID: 8300000, guid: 71ad62a3c6293c44ca8417a6b6c34621, type: 3}
+  trashClip: {fileID: 8300000, guid: c6c152fd5aadffc4eb33fc785103e75c, type: 3}
+  boxClearClip: {fileID: 8300000, guid: ca2b08866178f234b81cceaf62a0af68, type: 3}
+  winClip: {fileID: 8300000, guid: 5849e59340829194eb6429256ac38feb, type: 3}
+  confettiClip: {fileID: 8300000, guid: f47aa13c32ff68f43a6288b43f3c72ae, type: 3}
+  failClip: {fileID: 8300000, guid: 88b6eab0a534b504ab7fce5a77c37bd6, type: 3}
+  gameplayMusic: {fileID: 8300000, guid: 8856c977a29db0e42b629005272636e9, type: 3}
+  masterSfxVolume: 0.72
+  musicVolume: 0.075
+  pitchVariation: 0.055
+  worldParticleSize: 0.16
+  uiSparkleSize: 24
+  creamSparkle: {r: 1, g: 0.92, b: 0.58, a: 1}
+  leafSparkle: {r: 0.48, g: 0.78, b: 0.37, a: 1}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -5769,3 +5835,4 @@ SceneRoots:
   - {fileID: 1893135461}
   - {fileID: 1468499640}
   - {fileID: 1766778151}
+  - {fileID: 910000002}

@@ -257,6 +257,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         RectTransform.SetAsLastSibling();
 
         _targetScaleMultiplier = dragScale;
+        FarmBoxMergeFeedbackController.PlayCardPicked(RectTransform);
     }
 
     public void UpdateDragPosition(Vector2 localPointerPosition)
@@ -636,6 +637,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
         targetCard.SetCounter(targetCard.CounterValue + 1);
         targetCard.PlayMergePop();
+        FarmBoxMergeFeedbackController.PlayCardMerge(targetCard.RectTransform, targetCard.ResolveVisualColor());
         DestroyPlaceholder();
 
         if (_originalParent is RectTransform parentRect)
@@ -674,6 +676,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
             yield return null;
         }
 
+        FarmBoxMergeFeedbackController.PlayCardDiscard(trashTarget);
         DestroyPlaceholder();
         if (_originalParent is RectTransform parentRect)
         {

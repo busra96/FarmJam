@@ -163,6 +163,8 @@ public class CardSpawner : MonoBehaviour
         Card spawnedCard = Instantiate(cardPrefab, targetParent);
         spawnedCard.Initialize(resolvedBoard, FarmBoxMergeRules.ClampCardCounter(counter), colorType);
         resolvedBoard?.RegisterCard(spawnedCard);
+        spawnedCard.PlayMergePop();
+        FarmBoxMergeFeedbackController.PlayCardSpawn(spawnedCard.RectTransform, FarmBoxMergeFeedbackController.ColorFor(colorType));
         return spawnedCard;
     }
 

@@ -124,7 +124,6 @@ public class FarmBoxMergeGameController : MonoBehaviour
             actionBudget.GrantAddCardUses();
         }
 
-        spawnedCard?.PlayMergePop();
         RefreshAddCardButtonState();
     }
 

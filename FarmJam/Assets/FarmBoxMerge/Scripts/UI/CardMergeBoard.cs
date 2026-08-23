@@ -463,6 +463,7 @@ public class CardMergeBoard : MonoBehaviour
         }
 
         boxParent.Initialize(clampedBoxCount, colorType, pattern.PatternType, spawnedBoxes, pattern.Cells);
+        FarmBoxMergeFeedbackController.PlayBoxCreated(groupTransform, colorType);
         MergeItemSpawner.Instance?.TryProcessQueue();
         return boxParent;
     }

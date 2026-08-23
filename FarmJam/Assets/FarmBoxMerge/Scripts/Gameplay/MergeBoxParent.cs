@@ -192,6 +192,13 @@ public class MergeBoxParent : MonoBehaviour
             yield break;
         }
 
+        Vector3 feedbackPosition = Vector3.zero;
+        for (int i = 0; i < validBoxes.Count; i++)
+        {
+            feedbackPosition += validBoxes[i].transform.position;
+        }
+        feedbackPosition /= validBoxes.Count;
+
         float duration = Mathf.Max(0.01f, collapseDuration);
         float stagger = Mathf.Max(0f, collapseStagger);
         float totalDuration = duration + (stagger * Mathf.Max(0, validBoxes.Count - 1));
@@ -238,6 +245,8 @@ public class MergeBoxParent : MonoBehaviour
 
             yield return null;
         }
+
+        FarmBoxMergeFeedbackController.PlayBoxCleared(feedbackPosition, colorType, validBoxes.Count);
 
         for (int i = 0; i < validBoxes.Count; i++)
         {

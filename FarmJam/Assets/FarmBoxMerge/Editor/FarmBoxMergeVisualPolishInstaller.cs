@@ -59,6 +59,7 @@ public static class FarmBoxMergeVisualPolishInstaller
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        FarmBoxMergeFeedbackInstaller.ApplyGameFeelPolish();
         Debug.Log("FBM_VISUAL_POLISH_COMPLETE");
     }
 

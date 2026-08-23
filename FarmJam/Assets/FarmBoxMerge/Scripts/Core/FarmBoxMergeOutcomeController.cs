@@ -177,7 +177,9 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
     {
         _outcomeShown = true;
         _monitoring = false;
-        SetPanelState(outcome == PendingOutcome.Win, outcome == PendingOutcome.Fail);
+        bool won = outcome == PendingOutcome.Win;
+        SetPanelState(won, outcome == PendingOutcome.Fail);
+        FarmBoxMergeFeedbackController.PlayOutcome(won ? winPanel : failPanel, won);
     }
 
     private void HandleGameplayActivity()

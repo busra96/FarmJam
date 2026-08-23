@@ -280,6 +280,7 @@ public class MergeItemSpawner : MonoBehaviour
         }
 
         spawnedItems.Add(spawnedItem);
+        FarmBoxMergeFeedbackController.PlayItemSpawn(spawnedItem.transform, colorType);
         return spawnedItem;
     }
 
@@ -381,6 +382,7 @@ public class MergeItemSpawner : MonoBehaviour
         item.transform.SetParent(targetAnchor, false);
         item.transform.localPosition = Vector3.zero;
         item.transform.localRotation = Quaternion.identity;
+        FarmBoxMergeFeedbackController.PlayItemLanded(item.transform, item.ColorType);
         targetBox.NotifyItemSettled();
     }
 
