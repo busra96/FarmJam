@@ -15,7 +15,6 @@ public class MergeItemSpawner : MonoBehaviour
 
     [Header("Queue Points")]
     [SerializeField] private List<Transform> queuePoints = new List<Transform>();
-    [SerializeField, Min(1)] private int maxVisibleItems = 6;
     [SerializeField] private bool createRuntimeQueuePoints = true;
     [SerializeField] private int runtimeQueuePointCount = 20;
     [SerializeField] private float runtimeQueuePointSpacing = 1.1f;
@@ -33,7 +32,7 @@ public class MergeItemSpawner : MonoBehaviour
     [SerializeField] private List<MergeItem> spawnedItems = new List<MergeItem>();
 
     public IReadOnlyList<MergeItem> SpawnedItems => spawnedItems;
-    public int VisibleQueueCapacity => Mathf.Min(queuePoints.Count, Mathf.Max(1, maxVisibleItems));
+    public int QueueCapacity => queuePoints.Count;
     public int ActiveItemCount
     {
         get
@@ -151,7 +150,7 @@ public class MergeItemSpawner : MonoBehaviour
             }
         }
 
-        FillVisibleQueue();
+        FillQueueToCapacity();
         ItemCountChanged?.Invoke();
         RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
@@ -189,7 +188,7 @@ public class MergeItemSpawner : MonoBehaviour
             AddRemainingColor(colorType);
         }
 
-        FillVisibleQueue();
+        FillQueueToCapacity();
         RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
     }
@@ -210,7 +209,7 @@ public class MergeItemSpawner : MonoBehaviour
             AddRemainingColor(_lastInitialColors[i]);
         }
 
-        FillVisibleQueue();
+        FillQueueToCapacity();
         RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
     }
@@ -253,7 +252,7 @@ public class MergeItemSpawner : MonoBehaviour
             AddRemainingColor(colorType);
         }
 
-        FillVisibleQueue();
+        FillQueueToCapacity();
         ItemCountChanged?.Invoke();
         RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
@@ -261,7 +260,7 @@ public class MergeItemSpawner : MonoBehaviour
 
     public MergeItem SpawnItem(ColorType colorType)
     {
-        if (_pendingColors.Count > 0 || !CanSpawnVisibleItem())
+        if (_pendingColors.Count > 0 || !CanSpawnQueuedItem())
         {
             _pendingColors.Enqueue(colorType);
             AddRemainingColor(colorType);
@@ -271,7 +270,7 @@ public class MergeItemSpawner : MonoBehaviour
             return null;
         }
 
-        MergeItem spawnedItem = SpawnVisibleItem(colorType);
+        MergeItem spawnedItem = SpawnQueuedItem(colorType);
         if (spawnedItem != null)
         {
             AddRemainingColor(colorType);
@@ -281,7 +280,7 @@ public class MergeItemSpawner : MonoBehaviour
         return spawnedItem;
     }
 
-    private MergeItem SpawnVisibleItem(ColorType colorType)
+    private MergeItem SpawnQueuedItem(ColorType colorType)
     {
         ResolveReferences();
         EnsureRoots();
@@ -300,7 +299,7 @@ public class MergeItemSpawner : MonoBehaviour
             return null;
         }
 
-        if (spawnedItems.Count >= VisibleQueueCapacity)
+        if (spawnedItems.Count >= QueueCapacity)
         {
             Debug.LogWarning("Queue dolu. Yeni item spawnlanamadi.", this);
             return null;
@@ -311,6 +310,9 @@ public class MergeItemSpawner : MonoBehaviour
         RegisterActiveItem(spawnedItem);
         spawnedItem.Initialize(colorType);
 
+        // The queue is filled from front to back. Once it is full, removing the
+        // front item leaves exactly one free slot at the final (off-camera) point,
+        // so replenishment is never visibly instantiated in the play area.
         Transform targetPoint = GetQueuePoint(spawnedItems.Count);
         if (targetPoint != null)
         {
@@ -348,7 +350,7 @@ public class MergeItemSpawner : MonoBehaviour
             if (firstItem == null)
             {
                 spawnedItems.RemoveAt(0);
-                FillVisibleQueue();
+                FillQueueToCapacity();
                 continue;
             }
 
@@ -359,7 +361,7 @@ public class MergeItemSpawner : MonoBehaviour
             }
 
             spawnedItems.RemoveAt(0);
-            FillVisibleQueue();
+            FillQueueToCapacity();
             yield return AnimateItemIntoBox(firstItem, targetBox);
             yield return RepositionQueueItems();
         }
@@ -688,20 +690,20 @@ public class MergeItemSpawner : MonoBehaviour
         RemainingColorCountsChanged?.Invoke();
     }
 
-    private bool CanSpawnVisibleItem()
+    private bool CanSpawnQueuedItem()
     {
         ResolveReferences();
         EnsureRoots();
         EnsureQueuePoints();
         CleanupNullItems();
-        return itemPrefab != null && VisibleQueueCapacity > 0 && spawnedItems.Count < VisibleQueueCapacity;
+        return itemPrefab != null && QueueCapacity > 0 && spawnedItems.Count < QueueCapacity;
     }
 
-    private void FillVisibleQueue()
+    private void FillQueueToCapacity()
     {
-        while (_pendingColors.Count > 0 && CanSpawnVisibleItem())
+        while (_pendingColors.Count > 0 && CanSpawnQueuedItem())
         {
-            SpawnVisibleItem(_pendingColors.Dequeue());
+            SpawnQueuedItem(_pendingColors.Dequeue());
         }
     }
 

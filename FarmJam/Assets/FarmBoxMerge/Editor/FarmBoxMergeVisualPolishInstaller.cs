@@ -87,6 +87,32 @@ public static class FarmBoxMergeVisualPolishInstaller
         Debug.Log("FBM_PLATFORM_POLISH_COMPLETE");
     }
 
+    [MenuItem("Tools/FarmBoxMerge/Apply Trash Icon")]
+    public static void ApplyTrashIconOnly()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogWarning("FarmBoxMerge trash icon can only be applied outside Play Mode.");
+            return;
+        }
+
+        ConfigureSpriteImporter(RoundedSpritePath, alpha: true, border: new Vector4(22f, 22f, 22f, 22f), maxSize: 128);
+        Scene scene = EditorSceneManager.GetActiveScene();
+        if (scene.path != ScenePath)
+        {
+            scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        }
+
+        Sprite roundedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(RoundedSpritePath);
+        GameObject trashDropZone = FindInSceneObject(scene, "TrashDropZone");
+        StyleTopSurface(trashDropZone, new Vector2(-120f, -185f), Red, roundedSprite);
+        StyleTrashIcon(trashDropZone, roundedSprite);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("FBM_TRASH_ICON_COMPLETE");
+    }
+
     private static void ApplyWorldPolish(Scene scene, Sprite backdropSprite, Texture2D platformWoodTexture)
     {
         Camera camera = FindInScene<Camera>(scene, "Main Camera");
@@ -127,10 +153,6 @@ public static class FarmBoxMergeVisualPolishInstaller
         {
             Undo.RecordObject(itemSpawner.transform, "Center FarmBoxMerge item queue");
             itemSpawner.transform.position = new Vector3(0f, 4f, 6.9f);
-
-            SerializedObject serializedSpawner = new SerializedObject(itemSpawner);
-            serializedSpawner.FindProperty("maxVisibleItems").intValue = 6;
-            serializedSpawner.ApplyModifiedPropertiesWithoutUndo();
 
             Transform queueRoot = itemSpawner.transform.Find("ItemQueuePoints");
             if (queueRoot != null)
@@ -263,7 +285,9 @@ public static class FarmBoxMergeVisualPolishInstaller
         CreateOrUpdateRemainingItemsPanel(scene, canvasRect, font, roundedSprite);
 
         StyleTopButton(FindInScene<Button>(scene, "AddCardButton"), new Vector2(-360f, -185f), Blue, roundedSprite);
-        StyleTopSurface(FindInSceneObject(scene, "TrashDropZone"), new Vector2(-120f, -185f), Red, roundedSprite);
+        GameObject trashDropZone = FindInSceneObject(scene, "TrashDropZone");
+        StyleTopSurface(trashDropZone, new Vector2(-120f, -185f), Red, roundedSprite);
+        StyleTrashIcon(trashDropZone, roundedSprite);
         StyleTopButton(FindInScene<Button>(scene, "RefreshButton"), new Vector2(120f, -185f), Green, roundedSprite);
         StyleTopButton(FindInScene<Button>(scene, "RetryButton"), new Vector2(360f, -185f), Orange, roundedSprite);
 
@@ -614,6 +638,75 @@ public static class FarmBoxMergeVisualPolishInstaller
             label.fontSizeMax = 31f;
             label.margin = new Vector4(10f, 5f, 10f, 5f);
         }
+    }
+
+    private static void StyleTrashIcon(GameObject trashDropZone, Sprite roundedSprite)
+    {
+        if (trashDropZone == null || roundedSprite == null)
+        {
+            return;
+        }
+
+        Transform iconTransform = trashDropZone.transform.Find("trash-icon");
+        if (iconTransform == null)
+        {
+            return;
+        }
+
+        Image icon = iconTransform.GetComponent<Image>();
+        RectTransform iconRect = iconTransform as RectTransform;
+        if (icon == null || iconRect == null)
+        {
+            return;
+        }
+
+        Undo.RecordObject(icon, "Style FarmBoxMerge trash icon");
+        Undo.RecordObject(iconRect, "Layout FarmBoxMerge trash icon");
+        SetRect(iconRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-70f, 0f), new Vector2(64f, 64f), Vector2.one * 0.5f);
+        icon.sprite = null;
+        icon.type = Image.Type.Simple;
+        icon.preserveAspect = false;
+        icon.color = Color.clear;
+        icon.raycastTarget = false;
+
+        CreateOrUpdateTrashIconShape(iconRect, "Body", new Vector2(0f, -9f), new Vector2(42f, 38f), Color.white, roundedSprite);
+        CreateOrUpdateTrashIconShape(iconRect, "SlotLeft", new Vector2(-9f, -9f), new Vector2(6f, 22f), Red, roundedSprite);
+        CreateOrUpdateTrashIconShape(iconRect, "SlotRight", new Vector2(9f, -9f), new Vector2(6f, 22f), Red, roundedSprite);
+        CreateOrUpdateTrashIconShape(iconRect, "Lid", new Vector2(0f, 14f), new Vector2(52f, 9f), Color.white, roundedSprite);
+        CreateOrUpdateTrashIconShape(iconRect, "Handle", new Vector2(0f, 24f), new Vector2(23f, 14f), Color.white, roundedSprite);
+        CreateOrUpdateTrashIconShape(iconRect, "HandleCutout", new Vector2(0f, 24f), new Vector2(13f, 7f), Red, roundedSprite);
+
+        TextMeshProUGUI label = trashDropZone.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (label != null)
+        {
+            Undo.RecordObject(label, "Style FarmBoxMerge trash label");
+            label.color = Color.white;
+            label.alignment = TextAlignmentOptions.Center;
+            label.margin = new Vector4(64f, 5f, 8f, 5f);
+        }
+    }
+
+    private static void CreateOrUpdateTrashIconShape(RectTransform parent, string name, Vector2 position, Vector2 size, Color color, Sprite roundedSprite)
+    {
+        Transform existing = parent.Find(name);
+        GameObject shapeObject = existing != null
+            ? existing.gameObject
+            : new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        if (existing == null)
+        {
+            Undo.RegisterCreatedObjectUndo(shapeObject, "Create FarmBoxMerge trash icon shape");
+        }
+
+        RectTransform rect = shapeObject.transform as RectTransform;
+        rect.SetParent(parent, false);
+        SetRect(rect, Vector2.one * 0.5f, Vector2.one * 0.5f, position, size, Vector2.one * 0.5f);
+
+        Image image = shapeObject.GetComponent<Image>();
+        image.sprite = roundedSprite;
+        image.type = Image.Type.Sliced;
+        image.color = color;
+        image.raycastTarget = false;
+        shapeObject.transform.SetAsLastSibling();
     }
 
     private static void StyleOutcomePanel(Scene scene, string panelName, string textName, string title, string buttonName, Color accent, Sprite roundedSprite)

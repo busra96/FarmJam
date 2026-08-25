@@ -38,7 +38,7 @@ The card board holds at most 12 cards. `ADD CARD` always creates a level-one car
 
 ## Visual setup
 
-`Tools > FarmBoxMerge > Apply Mobile Visual Polish` reapplies the responsive portrait UI, camera, lighting, farm backdrop, market-table platform and card-prefab styling. `Tools > FarmBoxMerge > Apply Platform Polish` refreshes only the item platform. Both operations are idempotent, so they can be run again after scene hierarchy changes. The item queue shows at most six items on screen; longer authored sequences remain pending and enter the visible queue as space opens.
+`Tools > FarmBoxMerge > Apply Mobile Visual Polish` reapplies the responsive portrait UI, camera, lighting, farm backdrop, market-table platform and card-prefab styling. `Tools > FarmBoxMerge > Apply Platform Polish` refreshes only the item platform. Both operations are idempotent, so they can be run again after scene hierarchy changes. Item queue capacity comes directly from the authored `ItemQueuePoints` list. When the queue is full and its front item leaves, the next pending item is created at the final off-camera point before the line shifts forward, avoiding visible pop-in.
 
 ## Game feel
 
