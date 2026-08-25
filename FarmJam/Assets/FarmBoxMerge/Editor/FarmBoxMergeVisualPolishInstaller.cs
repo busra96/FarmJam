@@ -260,6 +260,7 @@ public static class FarmBoxMergeVisualPolishInstaller
         SetRect(level.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -111f), new Vector2(420f, 52f), new Vector2(0.5f, 1f));
 
         CreateOrUpdateQueuePill(canvasRect, font, roundedSprite);
+        CreateOrUpdateRemainingItemsPanel(scene, canvasRect, font, roundedSprite);
 
         StyleTopButton(FindInScene<Button>(scene, "AddCardButton"), new Vector2(-360f, -185f), Blue, roundedSprite);
         StyleTopSurface(FindInSceneObject(scene, "TrashDropZone"), new Vector2(-120f, -185f), Red, roundedSprite);
@@ -409,6 +410,162 @@ public static class FarmBoxMergeVisualPolishInstaller
 
         TextMeshProUGUI label = CreateOrUpdateLabel(rect, "QueueText", "NEXT PRODUCE", font, 24f, Ink.WithAlpha(0.82f));
         SetStretch(label.rectTransform, 12f);
+    }
+
+    [MenuItem("Tools/FarmBoxMerge/Apply Remaining Items HUD")]
+    public static void ApplyRemainingItemsHudOnly()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogWarning("FarmBoxMerge remaining-items HUD can only be applied outside Play Mode.");
+            return;
+        }
+
+        ConfigureSpriteImporter(RoundedSpritePath, alpha: true, border: new Vector4(22f, 22f, 22f, 22f), maxSize: 128);
+        Scene scene = EditorSceneManager.GetActiveScene();
+        if (scene.path != ScenePath)
+        {
+            scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        }
+
+        Canvas canvas = FindInScene<Canvas>(scene, "Canvas");
+        if (canvas == null)
+        {
+            Debug.LogWarning("FarmBoxMerge Canvas could not be found.");
+            return;
+        }
+
+        TMP_FontAsset font = FindInScene<TextMeshProUGUI>(scene)?.font;
+        Sprite roundedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(RoundedSpritePath);
+        CreateOrUpdateRemainingItemsPanel(scene, canvas.transform as RectTransform, font, roundedSprite);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("FBM_REMAINING_ITEMS_HUD_COMPLETE");
+    }
+
+    private static void CreateOrUpdateRemainingItemsPanel(Scene scene, RectTransform canvas, TMP_FontAsset font, Sprite roundedSprite)
+    {
+        if (canvas == null)
+        {
+            return;
+        }
+
+        Transform existing = canvas.Find("RemainingItemsPanel");
+        GameObject panel = existing != null
+            ? existing.gameObject
+            : new GameObject("RemainingItemsPanel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        RectTransform panelRect = panel.GetComponent<RectTransform>();
+        panelRect.SetParent(canvas, false);
+        SetRect(panelRect, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -394f), new Vector2(760f, 96f), new Vector2(0.5f, 1f));
+        StyleImage(panel.GetComponent<Image>(), Cream.WithAlpha(0.94f), roundedSprite);
+        panel.GetComponent<Image>().raycastTarget = false;
+        StyleShadow(panel, new Color(0.16f, 0.22f, 0.12f, 0.24f), new Vector2(0f, -6f));
+
+        HorizontalLayoutGroup panelLayout = panel.GetComponent<HorizontalLayoutGroup>();
+        if (panelLayout == null)
+        {
+            panelLayout = Undo.AddComponent<HorizontalLayoutGroup>(panel);
+        }
+
+        panelLayout.padding = new RectOffset(18, 18, 12, 12);
+        panelLayout.spacing = 12f;
+        panelLayout.childAlignment = TextAnchor.MiddleCenter;
+        panelLayout.childControlWidth = false;
+        panelLayout.childControlHeight = false;
+        panelLayout.childForceExpandWidth = false;
+        panelLayout.childForceExpandHeight = false;
+
+        ContentSizeFitter panelFitter = panel.GetComponent<ContentSizeFitter>();
+        if (panelFitter == null)
+        {
+            panelFitter = Undo.AddComponent<ContentSizeFitter>(panel);
+        }
+
+        panelFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        panelFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+        TextMeshProUGUI title = CreateOrUpdateLabel(panelRect, "RemainingTitle", "ITEMS\nLEFT", font, 21f, Ink.WithAlpha(0.82f));
+        title.fontStyle = FontStyles.Bold;
+        title.alignment = TextAlignmentOptions.Center;
+        SetRect(title.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-330f, 0f), new Vector2(130f, 70f), Vector2.one * 0.5f);
+        LayoutElement titleLayout = title.GetComponent<LayoutElement>();
+        if (titleLayout == null)
+        {
+            titleLayout = Undo.AddComponent<LayoutElement>(title.gameObject);
+        }
+
+        titleLayout.preferredWidth = 130f;
+        titleLayout.preferredHeight = 70f;
+
+        string[] names = { "GREEN", "ORANGE", "PURPLE", "RED", "YELLOW" };
+        Color[] colors = { Hex("76B947"), Hex("F39A3F"), Hex("A875C4"), Hex("E45D5D"), Hex("F2C94C") };
+        RectTransform[] entryRoots = new RectTransform[colors.Length];
+        Image[] backgrounds = new Image[colors.Length];
+        TextMeshProUGUI[] countLabels = new TextMeshProUGUI[colors.Length];
+
+        for (int i = 0; i < colors.Length; i++)
+        {
+            string entryName = $"Remaining_{(ColorType)i}";
+            Transform existingEntry = panelRect.Find(entryName);
+            GameObject entry = existingEntry != null
+                ? existingEntry.gameObject
+                : new GameObject(entryName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(CanvasGroup));
+            RectTransform entryRect = entry.GetComponent<RectTransform>();
+            entryRect.SetParent(panelRect, false);
+            SetRect(entryRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-220f + (i * 110f), 0f), new Vector2(96f, 68f), Vector2.one * 0.5f);
+            LayoutElement entryLayout = entry.GetComponent<LayoutElement>();
+            if (entryLayout == null)
+            {
+                entryLayout = Undo.AddComponent<LayoutElement>(entry);
+            }
+
+            entryLayout.preferredWidth = 96f;
+            entryLayout.preferredHeight = 68f;
+
+            Image entryImage = entry.GetComponent<Image>();
+            StyleImage(entryImage, colors[i], roundedSprite);
+            entryImage.raycastTarget = false;
+
+            TextMeshProUGUI nameLabel = CreateOrUpdateLabel(entryRect, "Name", names[i], font, 12f, Color.white.WithAlpha(0.88f));
+            nameLabel.fontStyle = FontStyles.Bold;
+            nameLabel.alignment = TextAlignmentOptions.Center;
+            nameLabel.enableAutoSizing = true;
+            nameLabel.fontSizeMin = 8f;
+            nameLabel.fontSizeMax = 12f;
+            SetRect(nameLabel.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -5f), new Vector2(88f, 20f), new Vector2(0.5f, 1f));
+
+            TextMeshProUGUI countLabel = CreateOrUpdateLabel(entryRect, "Count", "0", font, 30f, Color.white);
+            countLabel.fontStyle = FontStyles.Bold;
+            countLabel.alignment = TextAlignmentOptions.Center;
+            SetRect(countLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(88f, 42f), new Vector2(0.5f, 0f));
+
+            entryRoots[i] = entryRect;
+            backgrounds[i] = entryImage;
+            countLabels[i] = countLabel;
+        }
+
+        FarmBoxMergeRemainingItemsView view = panel.GetComponent<FarmBoxMergeRemainingItemsView>();
+        if (view == null)
+        {
+            view = Undo.AddComponent<FarmBoxMergeRemainingItemsView>(panel);
+        }
+
+        SerializedObject serializedView = new SerializedObject(view);
+        serializedView.FindProperty("itemSpawner").objectReferenceValue = FindInScene<MergeItemSpawner>(scene);
+        serializedView.FindProperty("layoutRoot").objectReferenceValue = panelRect;
+        SerializedProperty entries = serializedView.FindProperty("entries");
+        entries.arraySize = colors.Length;
+        for (int i = 0; i < colors.Length; i++)
+        {
+            SerializedProperty entry = entries.GetArrayElementAtIndex(i);
+            entry.FindPropertyRelative("colorType").enumValueIndex = i;
+            entry.FindPropertyRelative("root").objectReferenceValue = entryRoots[i];
+            entry.FindPropertyRelative("background").objectReferenceValue = backgrounds[i];
+            entry.FindPropertyRelative("countLabel").objectReferenceValue = countLabels[i];
+        }
+
+        serializedView.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static void StyleTopButton(Button button, Vector2 position, Color color, Sprite sprite)

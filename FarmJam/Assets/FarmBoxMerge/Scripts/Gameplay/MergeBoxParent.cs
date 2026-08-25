@@ -37,6 +37,22 @@ public class MergeBoxParent : MonoBehaviour
     public MergeBoxPatternType PatternType => patternType;
     public IReadOnlyList<Box> Boxes => boxes;
     public bool IsCollapsing => _isCollapsing;
+    public int EmptyBoxCount
+    {
+        get
+        {
+            int count = 0;
+            for (int i = 0; i < boxes.Count; i++)
+            {
+                if (boxes[i] != null && !boxes[i].HasAssignedItem)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+    }
 
     public void Initialize(int newCounterValue, ColorType newColorType, MergeBoxPatternType newPatternType, IList<Box> spawnedBoxes, IList<Vector2Int> boxCells)
     {

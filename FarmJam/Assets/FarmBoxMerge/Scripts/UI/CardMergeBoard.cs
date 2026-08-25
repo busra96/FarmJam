@@ -9,6 +9,15 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public class CardMergeBoard : MonoBehaviour
 {
+    private static readonly ColorType[] AllColorTypes =
+    {
+        ColorType.Green,
+        ColorType.Orange,
+        ColorType.Purple,
+        ColorType.Red,
+        ColorType.Yellow
+    };
+
     private readonly List<RaycastResult> _uiRaycastResults = new List<RaycastResult>();
     private readonly HashSet<Card> _registeredCards = new HashSet<Card>();
 
@@ -67,6 +76,33 @@ public class CardMergeBoard : MonoBehaviour
         }
     }
     public bool HasCardCapacity => CardCount < FarmBoxMergeRules.MaxCardsOnBoard;
+    public bool HasActiveBoxGroups => ActiveBoxGroupCount > 0;
+    public int ActiveBoxGroupCount
+    {
+        get
+        {
+            EnsureSpawnPoints();
+            int count = 0;
+            for (int i = 0; i < spawnPoints.Count; i++)
+            {
+                Transform spawnPoint = spawnPoints[i];
+                if (spawnPoint == null)
+                {
+                    continue;
+                }
+
+                for (int childIndex = 0; childIndex < spawnPoint.childCount; childIndex++)
+                {
+                    if (spawnPoint.GetChild(childIndex).TryGetComponent(out MergeBoxParent group) && group != null)
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+    }
     public bool AreAllSpawnPointsOccupied
     {
         get
@@ -331,6 +367,54 @@ public class CardMergeBoard : MonoBehaviour
         foreach (Card card in _registeredCards)
         {
             if (card.CardColorType == colorType && card.CounterValue == FarmBoxMergeRules.MinCardCounter)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int GetOutstandingBoxDemand(ColorType colorType)
+    {
+        EnsureSpawnPoints();
+        int demand = 0;
+        for (int i = 0; i < spawnPoints.Count; i++)
+        {
+            Transform spawnPoint = spawnPoints[i];
+            if (spawnPoint == null)
+            {
+                continue;
+            }
+
+            for (int childIndex = 0; childIndex < spawnPoint.childCount; childIndex++)
+            {
+                if (!spawnPoint.GetChild(childIndex).TryGetComponent(out MergeBoxParent group)
+                    || group == null
+                    || group.IsCollapsing
+                    || group.ColorType != colorType)
+                {
+                    continue;
+                }
+
+                demand += group.EmptyBoxCount;
+            }
+        }
+
+        return demand;
+    }
+
+    public bool HasImpossibleBoxDemand(MergeItemSpawner itemSpawner)
+    {
+        if (itemSpawner == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < AllColorTypes.Length; i++)
+        {
+            ColorType colorType = AllColorTypes[i];
+            if (GetOutstandingBoxDemand(colorType) > itemSpawner.GetRemainingUnplacedCount(colorType))
             {
                 return true;
             }

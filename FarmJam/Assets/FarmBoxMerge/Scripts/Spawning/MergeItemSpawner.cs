@@ -44,6 +44,20 @@ public class MergeItemSpawner : MonoBehaviour
     }
     public int RemainingItemCount => ActiveItemCount + _pendingColors.Count;
     public bool HasRemainingItems => RemainingItemCount > 0;
+    public int RemainingUnplacedItemCount
+    {
+        get
+        {
+            int total = 0;
+            foreach (KeyValuePair<ColorType, int> entry in _remainingUnplacedByColor)
+            {
+                total += Mathf.Max(0, entry.Value);
+            }
+
+            return total;
+        }
+    }
+    public bool HasUnplacedItems => RemainingUnplacedItemCount > 0;
     public bool IsNextQueuedItemBlocked
     {
         get
@@ -59,11 +73,13 @@ public class MergeItemSpawner : MonoBehaviour
     }
 
     public event Action ItemCountChanged;
+    public event Action RemainingColorCountsChanged;
 
     private Coroutine _processRoutine;
     private readonly List<ColorType> _lastInitialColors = new List<ColorType>();
     private readonly HashSet<MergeItem> _activeItems = new HashSet<MergeItem>();
     private readonly Queue<ColorType> _pendingColors = new Queue<ColorType>();
+    private readonly Dictionary<ColorType, int> _remainingUnplacedByColor = new Dictionary<ColorType, int>();
 
     private void Reset()
     {
@@ -113,6 +129,7 @@ public class MergeItemSpawner : MonoBehaviour
     {
         _lastInitialColors.Clear();
         _pendingColors.Clear();
+        _remainingUnplacedByColor.Clear();
 
         if (itemSequence != null)
         {
@@ -129,12 +146,14 @@ public class MergeItemSpawner : MonoBehaviour
                 {
                     _lastInitialColors.Add(itemRun.colorType);
                     _pendingColors.Enqueue(itemRun.colorType);
+                    AddRemainingColor(itemRun.colorType);
                 }
             }
         }
 
         FillVisibleQueue();
         ItemCountChanged?.Invoke();
+        RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
     }
 
@@ -154,8 +173,10 @@ public class MergeItemSpawner : MonoBehaviour
     {
         _lastInitialColors.Clear();
         _pendingColors.Clear();
+        _remainingUnplacedByColor.Clear();
         if (!spawnOnStart)
         {
+            RemainingColorCountsChanged?.Invoke();
             return;
         }
 
@@ -165,9 +186,11 @@ public class MergeItemSpawner : MonoBehaviour
             ColorType colorType = GetRandomColorType();
             _lastInitialColors.Add(colorType);
             _pendingColors.Enqueue(colorType);
+            AddRemainingColor(colorType);
         }
 
         FillVisibleQueue();
+        RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
     }
 
@@ -180,12 +203,15 @@ public class MergeItemSpawner : MonoBehaviour
         }
 
         _pendingColors.Clear();
+        _remainingUnplacedByColor.Clear();
         for (int i = 0; i < _lastInitialColors.Count; i++)
         {
             _pendingColors.Enqueue(_lastInitialColors[i]);
+            AddRemainingColor(_lastInitialColors[i]);
         }
 
         FillVisibleQueue();
+        RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
     }
 
@@ -212,7 +238,9 @@ public class MergeItemSpawner : MonoBehaviour
         spawnedItems.Clear();
         _activeItems.Clear();
         _pendingColors.Clear();
+        _remainingUnplacedByColor.Clear();
         ItemCountChanged?.Invoke();
+        RemainingColorCountsChanged?.Invoke();
     }
 
     public void SpawnRandomItems(int count)
@@ -220,11 +248,14 @@ public class MergeItemSpawner : MonoBehaviour
         int itemCount = Mathf.Max(0, count);
         for (int i = 0; i < itemCount; i++)
         {
-            _pendingColors.Enqueue(GetRandomColorType());
+            ColorType colorType = GetRandomColorType();
+            _pendingColors.Enqueue(colorType);
+            AddRemainingColor(colorType);
         }
 
         FillVisibleQueue();
         ItemCountChanged?.Invoke();
+        RemainingColorCountsChanged?.Invoke();
         TryProcessQueue();
     }
 
@@ -233,12 +264,19 @@ public class MergeItemSpawner : MonoBehaviour
         if (_pendingColors.Count > 0 || !CanSpawnVisibleItem())
         {
             _pendingColors.Enqueue(colorType);
+            AddRemainingColor(colorType);
             ItemCountChanged?.Invoke();
+            RemainingColorCountsChanged?.Invoke();
             TryProcessQueue();
             return null;
         }
 
         MergeItem spawnedItem = SpawnVisibleItem(colorType);
+        if (spawnedItem != null)
+        {
+            AddRemainingColor(colorType);
+            RemainingColorCountsChanged?.Invoke();
+        }
         TryProcessQueue();
         return spawnedItem;
     }
@@ -382,6 +420,7 @@ public class MergeItemSpawner : MonoBehaviour
         item.transform.SetParent(targetAnchor, false);
         item.transform.localPosition = Vector3.zero;
         item.transform.localRotation = Quaternion.identity;
+        NotifyItemPlaced(item.ColorType);
         FarmBoxMergeFeedbackController.PlayItemLanded(item.transform, item.ColorType);
         targetBox.NotifyItemSettled();
     }
@@ -618,6 +657,35 @@ public class MergeItemSpawner : MonoBehaviour
     private ColorType GetRandomColorType()
     {
         return FarmBoxMergeRandom.ColorType();
+    }
+
+    public int GetRemainingUnplacedCount(ColorType colorType)
+    {
+        return _remainingUnplacedByColor.TryGetValue(colorType, out int count)
+            ? Mathf.Max(0, count)
+            : 0;
+    }
+
+    public bool IsColorUsedInCurrentSequence(ColorType colorType)
+    {
+        return _remainingUnplacedByColor.ContainsKey(colorType);
+    }
+
+    private void AddRemainingColor(ColorType colorType)
+    {
+        _remainingUnplacedByColor.TryGetValue(colorType, out int currentCount);
+        _remainingUnplacedByColor[colorType] = currentCount + 1;
+    }
+
+    public void NotifyItemPlaced(ColorType colorType)
+    {
+        if (!_remainingUnplacedByColor.TryGetValue(colorType, out int currentCount) || currentCount <= 0)
+        {
+            return;
+        }
+
+        _remainingUnplacedByColor[colorType] = currentCount - 1;
+        RemainingColorCountsChanged?.Invoke();
     }
 
     private bool CanSpawnVisibleItem()

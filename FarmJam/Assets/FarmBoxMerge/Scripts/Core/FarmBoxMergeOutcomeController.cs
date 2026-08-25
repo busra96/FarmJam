@@ -54,7 +54,8 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
             return;
         }
 
-        if (itemSpawner != null && !itemSpawner.HasRemainingItems)
+        bool hasActiveBoxGroups = cardMergeBoard != null && cardMergeBoard.HasActiveBoxGroups;
+        if (itemSpawner != null && !itemSpawner.HasRemainingItems && !hasActiveBoxGroups)
         {
             AdvancePendingOutcome(PendingOutcome.Win);
             return;
@@ -63,10 +64,11 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         bool allBoxSlotsOccupied = cardMergeBoard != null && cardMergeBoard.AreAllSpawnPointsOccupied;
         bool cardBoardIsFull = cardMergeBoard != null && !cardMergeBoard.HasCardCapacity;
         bool nextItemCannotJump = itemSpawner != null && itemSpawner.IsNextQueuedItemBlocked;
-        bool boardIsBlocked = itemSpawner != null
+        bool impossibleBoxDemand = cardMergeBoard != null && cardMergeBoard.HasImpossibleBoxDemand(itemSpawner);
+        bool boardIsBlocked = impossibleBoxDemand || (itemSpawner != null
             && itemSpawner.HasRemainingItems
             && allBoxSlotsOccupied
-            && (cardBoardIsFull || nextItemCannotJump);
+            && (cardBoardIsFull || nextItemCannotJump));
 
         AdvancePendingOutcome(boardIsBlocked ? PendingOutcome.Fail : PendingOutcome.None);
     }
@@ -117,6 +119,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         if (itemSpawner != null)
         {
             itemSpawner.ItemCountChanged += HandleGameplayActivity;
+            itemSpawner.RemainingColorCountsChanged += HandleGameplayActivity;
         }
 
         if (actionBudget != null)
@@ -141,6 +144,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         if (itemSpawner != null)
         {
             itemSpawner.ItemCountChanged -= HandleGameplayActivity;
+            itemSpawner.RemainingColorCountsChanged -= HandleGameplayActivity;
         }
 
         if (actionBudget != null)
