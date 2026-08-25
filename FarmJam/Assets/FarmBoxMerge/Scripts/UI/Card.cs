@@ -355,6 +355,11 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         }
 
         EnsureReadyForInteraction();
+        if (_board != null && !_board.CanAcceptGameplayInput)
+        {
+            return;
+        }
+
         _targetScaleMultiplier = selectedScale;
     }
 
@@ -371,6 +376,11 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     public void OnBeginDrag(PointerEventData eventData)
     {
         EnsureReadyForInteraction();
+        if (_board != null && !_board.CanAcceptGameplayInput)
+        {
+            return;
+        }
+
         _board?.BeginDrag(this, eventData);
     }
 
@@ -398,6 +408,11 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         }
 
         EnsureReadyForInteraction();
+        if (_board != null && !_board.CanAcceptGameplayInput)
+        {
+            return;
+        }
+
         _board?.TryMerge(draggedCard, this);
     }
 

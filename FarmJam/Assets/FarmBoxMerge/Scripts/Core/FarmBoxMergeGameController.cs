@@ -26,10 +26,13 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [SerializeField] private Color addCardButtonColor = new Color(0.2f, 0.55f, 0.9f, 1f);
 
     private Coroutine _resetRoutine;
+    private bool _gameplayInputEnabled = true;
 
     public bool IsResetting => _resetRoutine != null;
+    public bool GameplayInputEnabled => _gameplayInputEnabled && !IsResetting;
     public event Action AttemptResetStarted;
     public event Action AttemptReady;
+    public event Action<bool> GameplayInputChanged;
 
     private void Awake()
     {
@@ -108,7 +111,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     public void AddRecommendedCard()
     {
-        if (!Application.isPlaying || _resetRoutine != null)
+        if (!Application.isPlaying || !GameplayInputEnabled)
         {
             return;
         }
@@ -132,6 +135,18 @@ public class FarmBoxMergeGameController : MonoBehaviour
         AddRecommendedCard();
     }
 
+    public void SetGameplayInputEnabled(bool enabled)
+    {
+        bool stateChanged = _gameplayInputEnabled != enabled;
+        _gameplayInputEnabled = enabled;
+        SetButtonsInteractable(GameplayInputEnabled);
+
+        if (stateChanged)
+        {
+            GameplayInputChanged?.Invoke(GameplayInputEnabled);
+        }
+    }
+
     private void StartReset(bool replaySameLevel)
     {
         if (!Application.isPlaying || _resetRoutine != null)
@@ -139,6 +154,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
             return;
         }
 
+        SetGameplayInputEnabled(false);
         actionBudget?.ResetForAttempt();
         AttemptResetStarted?.Invoke();
         _resetRoutine = StartCoroutine(ResetRoutine(replaySameLevel));
@@ -171,8 +187,8 @@ public class FarmBoxMergeGameController : MonoBehaviour
             itemSpawner?.SpawnInitialItems();
         }
 
-        SetButtonsInteractable(true);
         _resetRoutine = null;
+        SetGameplayInputEnabled(true);
         AttemptReady?.Invoke();
     }
 
@@ -263,7 +279,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
     {
         if (addCardButton != null)
         {
-            addCardButton.interactable = _resetRoutine == null
+            addCardButton.interactable = GameplayInputEnabled
                 && actionBudget != null
                 && actionBudget.CanAddCard
                 && cardSpawner != null

@@ -27,6 +27,9 @@ public class MergeItemSpawner : MonoBehaviour
     [SerializeField] private float queueMoveDuration = 0.1f;
     [SerializeField] private float jumpDuration = 0.22f;
     [SerializeField] private float jumpHeight = 0.95f;
+    [SerializeField] private Vector3 queueItemEulerAngles = new Vector3(30f, 30f, 0f);
+    [SerializeField] private Vector3 boxItemEulerAngles = Vector3.zero;
+    [SerializeField] private float boxItemFloorHeight = 0.1f;
 
     [Header("Runtime")]
     [SerializeField] private List<MergeItem> spawnedItems = new List<MergeItem>();
@@ -316,7 +319,7 @@ public class MergeItemSpawner : MonoBehaviour
         Transform targetPoint = GetQueuePoint(spawnedItems.Count);
         if (targetPoint != null)
         {
-            spawnedItem.transform.SetPositionAndRotation(targetPoint.position, targetPoint.rotation);
+            spawnedItem.transform.SetPositionAndRotation(targetPoint.position, GetQueueItemRotation(targetPoint));
         }
 
         spawnedItems.Add(spawnedItem);
@@ -390,8 +393,10 @@ public class MergeItemSpawner : MonoBehaviour
 
         Vector3 startPosition = item.transform.position;
         Quaternion startRotation = item.transform.rotation;
-        Vector3 targetPosition = targetAnchor.position;
-        Quaternion targetRotation = targetAnchor.rotation;
+        Quaternion targetLocalRotation = Quaternion.Euler(boxItemEulerAngles);
+        Vector3 targetLocalPosition = Vector3.up * (boxItemFloorHeight - item.GetVisualBottomLocalY());
+        Vector3 targetPosition = targetAnchor.TransformPoint(targetLocalPosition);
+        Quaternion targetRotation = targetAnchor.rotation * targetLocalRotation;
 
         float duration = Mathf.Max(0.01f, jumpDuration);
         float elapsed = 0f;
@@ -420,8 +425,8 @@ public class MergeItemSpawner : MonoBehaviour
         }
 
         item.transform.SetParent(targetAnchor, false);
-        item.transform.localPosition = Vector3.zero;
-        item.transform.localRotation = Quaternion.identity;
+        item.transform.localPosition = targetLocalPosition;
+        item.transform.localRotation = targetLocalRotation;
         NotifyItemPlaced(item.ColorType);
         FarmBoxMergeFeedbackController.PlayItemLanded(item.transform, item.ColorType);
         targetBox.NotifyItemSettled();
@@ -464,7 +469,7 @@ public class MergeItemSpawner : MonoBehaviour
             startPositions.Add(item.transform.position);
             startRotations.Add(item.transform.rotation);
             targetPositions.Add(targetPoint.position);
-            targetRotations.Add(targetPoint.rotation);
+            targetRotations.Add(GetQueueItemRotation(targetPoint));
         }
 
         if (itemsToMove.Count == 0)
@@ -654,6 +659,11 @@ public class MergeItemSpawner : MonoBehaviour
 
         int clampedIndex = Mathf.Clamp(index, 0, queuePoints.Count - 1);
         return queuePoints[clampedIndex];
+    }
+
+    private Quaternion GetQueueItemRotation(Transform queuePoint)
+    {
+        return queuePoint.rotation * Quaternion.Euler(queueItemEulerAngles);
     }
 
     private ColorType GetRandomColorType()

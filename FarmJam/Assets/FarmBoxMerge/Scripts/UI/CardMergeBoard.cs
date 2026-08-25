@@ -34,6 +34,7 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private RectTransform spawnDropLayer;
     [SerializeField] private RectTransform trashDropLayer;
     [SerializeField] private FarmBoxMergeActionBudget actionBudget;
+    [SerializeField] private FarmBoxMergeGameController gameController;
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private bool createRuntimeDragLayer = true;
     [SerializeField] private bool createRuntimeSpawnDropLayer = true;
@@ -67,6 +68,7 @@ public class CardMergeBoard : MonoBehaviour
     public Camera EventCamera => ResolveCanvasEventCamera();
     public IReadOnlyList<ColorPaletteEntry> ColorPalette => colorPalette;
     public bool HasColorPalette => colorPalette != null && colorPalette.Count > 0;
+    public bool CanAcceptGameplayInput => gameController == null || gameController.GameplayInputEnabled;
     public int CardCount
     {
         get
@@ -147,6 +149,11 @@ public class CardMergeBoard : MonoBehaviour
             actionBudget.Changed += RefreshTrashState;
         }
 
+        if (gameController != null)
+        {
+            gameController.GameplayInputChanged += HandleGameplayInputChanged;
+        }
+
         RefreshTrashState();
     }
 
@@ -155,6 +162,11 @@ public class CardMergeBoard : MonoBehaviour
         if (actionBudget != null)
         {
             actionBudget.Changed -= RefreshTrashState;
+        }
+
+        if (gameController != null)
+        {
+            gameController.GameplayInputChanged -= HandleGameplayInputChanged;
         }
     }
 
@@ -259,7 +271,7 @@ public class CardMergeBoard : MonoBehaviour
 
     public void BeginDrag(Card card, PointerEventData eventData)
     {
-        if (card == null)
+        if (card == null || !CanAcceptGameplayInput)
         {
             return;
         }
@@ -275,6 +287,12 @@ public class CardMergeBoard : MonoBehaviour
     {
         if (card == null || !card.IsDragging)
         {
+            return;
+        }
+
+        if (!CanAcceptGameplayInput)
+        {
+            card.ReturnToOriginalSlot();
             return;
         }
 
@@ -294,6 +312,16 @@ public class CardMergeBoard : MonoBehaviour
             return;
         }
 
+        if (!CanAcceptGameplayInput)
+        {
+            if (card.IsDragging)
+            {
+                card.ReturnToOriginalSlot();
+            }
+
+            return;
+        }
+
         if (TryDiscardCard(card, eventData) || TrySpawnBoxesFromCard(card, eventData))
         {
             return;
@@ -304,7 +332,7 @@ public class CardMergeBoard : MonoBehaviour
 
     public bool TryMerge(Card draggedCard, Card targetCard)
     {
-        if (draggedCard == null || targetCard == null || draggedCard == targetCard)
+        if (!CanAcceptGameplayInput || draggedCard == null || targetCard == null || draggedCard == targetCard)
         {
             return false;
         }
@@ -592,6 +620,7 @@ public class CardMergeBoard : MonoBehaviour
         }
 
         actionBudget ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeActionBudget>();
+        gameController ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeGameController>();
 
         if (spawnSurface == null)
         {
@@ -603,6 +632,25 @@ public class CardMergeBoard : MonoBehaviour
         }
 
         spawnPoints.RemoveAll(point => point == null);
+    }
+
+    private void HandleGameplayInputChanged(bool inputEnabled)
+    {
+        RefreshTrashState();
+
+        if (inputEnabled)
+        {
+            return;
+        }
+
+        _registeredCards.RemoveWhere(card => card == null);
+        foreach (Card card in _registeredCards)
+        {
+            if (card.IsDragging && !card.MergeCompleted)
+            {
+                card.ReturnToOriginalSlot();
+            }
+        }
     }
 
     private void EnsureDefaultPalette()
@@ -796,7 +844,7 @@ public class CardMergeBoard : MonoBehaviour
             return;
         }
 
-        bool canUseTrash = actionBudget != null && actionBudget.CanUseTrash;
+        bool canUseTrash = CanAcceptGameplayInput && actionBudget != null && actionBudget.CanUseTrash;
         if (trashDropLayer.TryGetComponent(out Image image))
         {
             image.color = canUseTrash ? trashAvailableColor : trashUnavailableColor;

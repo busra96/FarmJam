@@ -3212,7 +3212,7 @@ Transform:
   m_GameObject: {fileID: 945199554}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.3, z: 150}
+  m_LocalPosition: {x: 0, y: -20.5, z: 150}
   m_LocalScale: {x: 12, y: 12, z: 12}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3338,6 +3338,9 @@ MonoBehaviour:
   queueMoveDuration: 0.1
   jumpDuration: 0.22
   jumpHeight: 0.95
+  queueItemEulerAngles: {x: 30, y: 30, z: 0}
+  boxItemEulerAngles: {x: 0, y: 0, z: 0}
+  boxItemFloorHeight: 0.1
   spawnedItems: []
 --- !u!4 &978142775
 Transform:
@@ -3480,7 +3483,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 57.956635, y: 5, z: 10, w: 5}
+  m_margin: {x: 70.68204, y: 5, z: 4.873596, w: 5}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -5150,6 +5153,7 @@ MonoBehaviour:
   spawnDropLayer: {fileID: 343940159}
   trashDropLayer: {fileID: 1263846645}
   actionBudget: {fileID: 791694496}
+  gameController: {fileID: 791694495}
   rootCanvas: {fileID: 791694493}
   createRuntimeDragLayer: 1
   createRuntimeSpawnDropLayer: 1

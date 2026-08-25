@@ -40,6 +40,8 @@ The card board holds at most 12 cards. `ADD CARD` always creates a level-one car
 
 `Tools > FarmBoxMerge > Apply Mobile Visual Polish` reapplies the responsive portrait UI, camera, lighting, farm backdrop, market-table platform and card-prefab styling. `Tools > FarmBoxMerge > Apply Platform Polish` refreshes only the item platform. Both operations are idempotent, so they can be run again after scene hierarchy changes. Item queue capacity comes directly from the authored `ItemQueuePoints` list. When the queue is full and its front item leaves, the next pending item is created at the final off-camera point before the line shifts forward, avoiding visible pop-in.
 
+Queued collectables use the serialized `queueItemEulerAngles` presentation rotation (30 degrees on X and Y by default). On landing, `MergeItem.GetVisualBottomLocalY` measures the active model mesh and aligns its real bottom to `boxItemFloorHeight`, so differently pivoted produce models sit on the box floor instead of clipping through it.
+
 ## Game feel
 
 `Tools > FarmBoxMerge > Apply Game Feel Polish` adds the centralized sound, particle, haptic and animation controller and assigns the existing FarmJam SFX library.

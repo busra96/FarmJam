@@ -55,7 +55,13 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         }
 
         bool hasActiveBoxGroups = cardMergeBoard != null && cardMergeBoard.HasActiveBoxGroups;
-        if (itemSpawner != null && !itemSpawner.HasRemainingItems && !hasActiveBoxGroups)
+        bool collectableItemsFinished = itemSpawner != null && !itemSpawner.HasRemainingItems;
+        if (collectableItemsFinished)
+        {
+            gameController.SetGameplayInputEnabled(false);
+        }
+
+        if (collectableItemsFinished && !hasActiveBoxGroups)
         {
             AdvancePendingOutcome(PendingOutcome.Win);
             return;
@@ -181,6 +187,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
     {
         _outcomeShown = true;
         _monitoring = false;
+        gameController?.SetGameplayInputEnabled(false);
         bool won = outcome == PendingOutcome.Win;
         SetPanelState(won, outcome == PendingOutcome.Fail);
         FarmBoxMergeFeedbackController.PlayOutcome(won ? winPanel : failPanel, won);
@@ -188,6 +195,11 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
 
     private void HandleGameplayActivity()
     {
+        if (!_outcomeShown && itemSpawner != null && !itemSpawner.HasRemainingItems)
+        {
+            gameController?.SetGameplayInputEnabled(false);
+        }
+
         if (!_outcomeShown && _pendingOutcome == PendingOutcome.Fail)
         {
             CancelPendingOutcome();
@@ -197,6 +209,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
     private void HandleAttemptResetStarted()
     {
         StopMonitoringRoutine();
+        gameController?.SetGameplayInputEnabled(false);
         _monitoring = false;
         _outcomeShown = false;
         CancelPendingOutcome();
@@ -206,6 +219,8 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
     private void RestartMonitoringAfterSetup()
     {
         StopMonitoringRoutine();
+        bool hasCollectableItems = itemSpawner == null || itemSpawner.HasRemainingItems;
+        gameController?.SetGameplayInputEnabled(hasCollectableItems);
         _enableMonitoringRoutine = StartCoroutine(EnableMonitoringAfterSetup());
     }
 
