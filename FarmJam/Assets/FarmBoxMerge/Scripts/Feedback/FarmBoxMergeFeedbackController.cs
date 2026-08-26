@@ -38,6 +38,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
     [SerializeField, Range(0f, 0.3f)] private float pitchVariation = 0.055f;
 
     [Header("Visual Feel")]
+    [SerializeField] private Material worldParticleMaterial;
     [SerializeField, Min(0.01f)] private float worldParticleSize = 0.16f;
     [SerializeField, Min(0.01f)] private float uiSparkleSize = 24f;
     [SerializeField] private Color creamSparkle = new Color(1f, 0.92f, 0.58f, 1f);
@@ -381,16 +382,9 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         particleRenderer.renderMode = ParticleSystemRenderMode.Billboard;
         particleRenderer.sortingOrder = 25;
 
-        Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
-        shader ??= Shader.Find("Particles/Standard Unlit");
-        if (shader != null)
+        _particleMaterial = CreateRuntimeParticleMaterial();
+        if (_particleMaterial != null)
         {
-            _particleMaterial = new Material(shader)
-            {
-                name = "FarmBoxMergeRuntimeParticleMaterial",
-                hideFlags = HideFlags.HideAndDontSave
-            };
-
             if (_particleMaterial.HasProperty("_BaseMap"))
             {
                 _particleMaterial.SetTexture("_BaseMap", _particleSprite.texture);
@@ -400,8 +394,37 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
                 _particleMaterial.SetTexture("_MainTex", _particleSprite.texture);
             }
 
-            particleRenderer.material = _particleMaterial;
+            particleRenderer.sharedMaterial = _particleMaterial;
         }
+    }
+
+    private Material CreateRuntimeParticleMaterial()
+    {
+        if (worldParticleMaterial != null && worldParticleMaterial.shader != null)
+        {
+            return new Material(worldParticleMaterial)
+            {
+                name = "FarmBoxMergeRuntimeParticleMaterial",
+                hideFlags = HideFlags.HideAndDontSave
+            };
+        }
+
+        // This fallback keeps the controller usable in setup scenes. Production
+        // scenes should reference the URP particle material so its Android shader
+        // variants cannot be removed by build-time shader stripping.
+        Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+        shader ??= Shader.Find("Particles/Standard Unlit");
+        if (shader == null)
+        {
+            Debug.LogError("FarmBoxMerge particle shader is unavailable. Assign World Particle Material.", this);
+            return null;
+        }
+
+        return new Material(shader)
+        {
+            name = "FarmBoxMergeRuntimeParticleMaterial",
+            hideFlags = HideFlags.HideAndDontSave
+        };
     }
 
     private void EmitWorldBurst(Vector3 position, Color color, int count, float speed)
