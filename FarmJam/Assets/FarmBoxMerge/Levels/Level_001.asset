@@ -13,13 +13,12 @@ MonoBehaviour:
   m_Name: Level_001
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000001
-  levelName: "01 - Ilk Hasat"
-  designerNotes: "Egitim. Ayni renkte iki seviye bir kartla temel merge ve kutu olusturma."
+  levelName: 01 - Ilk Hasat
+  designerNotes: Egitim. Ayni renkte iki seviye bir kartla temel merge ve kutu olusturma.
   itemSequence:
   - colorType: 0
     count: 2
-  startingCards:
+  cardSpawnPlan:
   - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
+    count: 2
+  cardPlanVersion: 1

@@ -13,19 +13,20 @@ MonoBehaviour:
   m_Name: Level_002
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000002
-  levelName: "02 - Iki Renk"
-  designerNotes: "Egitim. Yesil ve turuncu kartlari ayirarak iki temel merge yap."
+  levelName: 02 - Iki Renk
+  designerNotes: Egitim. Yesil ve turuncu kartlari ayirarak iki temel merge yap.
   itemSequence:
   - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
     count: 2
   - colorType: 1
     count: 2
-  startingCards:
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 1
-    counter: 1
-  - colorType: 1
-    counter: 1
+  cardPlanVersion: 1

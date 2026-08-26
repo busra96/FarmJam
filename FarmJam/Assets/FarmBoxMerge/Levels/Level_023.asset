@@ -13,38 +13,50 @@ MonoBehaviour:
   m_Name: Level_023
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000017
-  levelName: "23 - Uclu Maraton"
-  designerNotes: "Zor. Uc rengin altisar itemini bloklar arasinda gecis yaparak tamamla."
+  levelName: 23 - Uclu Maraton
+  designerNotes: Zor. Uc rengin altisar itemini bloklar arasinda gecis yaparak tamamla.
   itemSequence:
   - colorType: 0
-    count: 3
-  - colorType: 1
-    count: 2
+    count: 1
   - colorType: 2
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 2
-    count: 2
   - colorType: 1
-    count: 2
+    count: 1
   - colorType: 2
-    count: 3
+    count: 1
   - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
-  startingCards:
+    count: 1
   - colorType: 0
-    counter: 3
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 0
-    counter: 3
+    count: 1
   - colorType: 1
-    counter: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
-    counter: 3
+    count: 1
   - colorType: 2
-    counter: 3
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 2
-    counter: 3
-
+    count: 1
+  - colorType: 1
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 8
+  - colorType: 1
+    count: 8
+  - colorType: 2
+    count: 8
+  cardPlanVersion: 1

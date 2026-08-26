@@ -184,7 +184,16 @@ public class FarmBoxMergeGameController : MonoBehaviour
         SetButtonsInteractable(false);
 
         cardMergeBoard?.ClearSpawnedBoxGroups();
-        cardMergeBoard?.ClearCards();
+        if (cardSpawner != null)
+        {
+            // Stop the level deck before cards are destroyed. Otherwise each
+            // removal could refill a slot while a retry/refresh is in progress.
+            cardSpawner.ClearCards();
+        }
+        else
+        {
+            cardMergeBoard?.ClearCards();
+        }
         itemSpawner?.ClearSpawnedItems();
 
         // Destroy is deferred until the end of the frame. Waiting keeps old and new

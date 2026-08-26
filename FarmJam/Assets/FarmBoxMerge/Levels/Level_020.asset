@@ -13,38 +13,43 @@ MonoBehaviour:
   m_Name: Level_020
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000014
-  levelName: "20 - Uclu Baski"
-  designerNotes: "Orta zor. Uc rengin farkli boyuttaki iki kutusunu dogru zamanda kullan."
+  levelName: 20 - Uclu Baski
+  designerNotes: Orta zor. Uc rengin farkli boyuttaki iki kutusunu dogru zamanda
+    kullan.
   itemSequence:
+  - colorType: 2
+    count: 1
   - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
     count: 1
   - colorType: 2
     count: 1
   - colorType: 0
     count: 1
   - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
-  - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
-  - colorType: 2
     count: 1
-  startingCards:
   - colorType: 0
-    counter: 3
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
-    counter: 2
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 6
   - colorType: 1
-    counter: 4
-  - colorType: 1
-    counter: 1
+    count: 9
   - colorType: 2
-    counter: 2
-  - colorType: 2
-    counter: 2
-
+    count: 4
+  cardPlanVersion: 1

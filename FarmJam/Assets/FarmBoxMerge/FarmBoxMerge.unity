@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0.9529412, g: 0.6039216, b: 0.24705882, a: 1}
@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
   m_IgnoreLayout: 0
   m_MinWidth: -1
@@ -2432,7 +2432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLifetimeScope
   parentReference:
-    TypeName:
+    TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
   audioCatalog: {fileID: 11400000, guid: 0846e812ea2382b48bb614d709d86b4c, type: 2}
@@ -2642,7 +2642,7 @@ MonoBehaviour:
   catalog: {fileID: 11400000, guid: 0e0658d16d1d4e23bef8c0bc8d9b80a9, type: 2}
   startLevelIndex: 0
   loopAfterLastLevel: 1
-  useSavedProgress: 0
+  useSavedProgress: 1
   progressKey: FarmBoxMerge.CurrentLevel
   cardSpawner: {fileID: 1402966116}
   itemSpawner: {fileID: 978142774}

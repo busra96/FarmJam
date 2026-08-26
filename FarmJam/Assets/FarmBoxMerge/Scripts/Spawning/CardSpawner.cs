@@ -32,10 +32,20 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private List<CardSpawnEntry> manualCards = new List<CardSpawnEntry>();
 
     private readonly List<CardSpawnEntry> _lastSpawnedCards = new List<CardSpawnEntry>();
+    private readonly Queue<ColorType> _pendingLevelCards = new Queue<ColorType>();
+    private readonly List<ColorType> _lastLevelCardDeck = new List<ColorType>();
     private ICardFactory _cardFactory;
     private IFarmBoxMergeBoxRegistry _boxRegistry;
     private IFarmBoxMergeFeedbackService _feedback;
     private bool _initialized;
+    private bool _levelCardFlowActive;
+    private bool _isFillingLevelCards;
+    private int _levelCardsSpawned;
+
+    public int TotalLevelCardCount => _lastLevelCardDeck.Count;
+    public int SpawnedLevelCardCount => _levelCardsSpawned;
+    public int PendingLevelCardCount => _pendingLevelCards.Count;
+    public bool HasPendingLevelCards => _pendingLevelCards.Count > 0;
 
     [Inject]
     public void Construct(
@@ -72,9 +82,23 @@ public class CardSpawner : MonoBehaviour
         EnsureBoardReference();
         SyncPaletteWithBoard();
 
+        if (board != null)
+        {
+            board.CardCountChanged -= HandleBoardCardCountChanged;
+            board.CardCountChanged += HandleBoardCardCountChanged;
+        }
+
         if (spawnOnStart)
         {
             SpawnConfiguredCards();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (board != null)
+        {
+            board.CardCountChanged -= HandleBoardCardCountChanged;
         }
     }
 
@@ -83,36 +107,128 @@ public class CardSpawner : MonoBehaviour
         spawnOnStart = shouldSpawnOnStart;
     }
 
-    public void SpawnLevelCards(IReadOnlyList<FarmBoxMergeStartingCard> startingCards)
+    public void SpawnLevelCards(IReadOnlyList<FarmBoxMergeCardSpawnGroup> cardSpawnPlan)
     {
+        CancelLevelCardFlow();
         _lastSpawnedCards.Clear();
-        if (startingCards == null)
+        _lastLevelCardDeck.Clear();
+        _levelCardsSpawned = 0;
+
+        if (cardSpawnPlan == null)
         {
             return;
         }
 
-        int cardCount = Mathf.Min(startingCards.Count, FarmBoxMergeRules.MaxCardsOnBoard);
-        for (int i = 0; i < cardCount; i++)
+        for (int i = 0; i < cardSpawnPlan.Count; i++)
         {
-            FarmBoxMergeStartingCard cardData = startingCards[i];
-            if (cardData == null)
+            FarmBoxMergeCardSpawnGroup group = cardSpawnPlan[i];
+            if (group == null)
             {
                 continue;
             }
 
-            int counter = FarmBoxMergeRules.ClampCardCounter(cardData.counter);
-            if (SpawnCard(counter, cardData.colorType) == null)
+            int count = Mathf.Max(1, group.count);
+            for (int cardIndex = 0; cardIndex < count; cardIndex++)
             {
-                break;
+                _lastLevelCardDeck.Add(group.colorType);
+            }
+        }
+
+        ShuffleLevelDeck(_lastLevelCardDeck);
+        for (int i = 0; i < _lastLevelCardDeck.Count; i++)
+        {
+            _pendingLevelCards.Enqueue(_lastLevelCardDeck[i]);
+        }
+
+        _levelCardFlowActive = _pendingLevelCards.Count > 0;
+        FillAvailableLevelCardSlots();
+    }
+
+    public void CancelLevelCardFlow()
+    {
+        _levelCardFlowActive = false;
+        _pendingLevelCards.Clear();
+        _isFillingLevelCards = false;
+    }
+
+    private void HandleBoardCardCountChanged()
+    {
+        if (_levelCardFlowActive && !_isFillingLevelCards)
+        {
+            FillAvailableLevelCardSlots();
+        }
+    }
+
+    private void FillAvailableLevelCardSlots()
+    {
+        if (!_levelCardFlowActive || _isFillingLevelCards)
+        {
+            return;
+        }
+
+        _isFillingLevelCards = true;
+        try
+        {
+            while (_pendingLevelCards.Count > 0 && CanSpawnCard())
+            {
+                ColorType colorType = _pendingLevelCards.Peek();
+                if (SpawnCard(FarmBoxMergeRules.MinCardCounter, colorType) == null)
+                {
+                    break;
+                }
+
+                _pendingLevelCards.Dequeue();
+                _levelCardsSpawned++;
             }
 
-            RememberCard(counter, cardData.colorType);
+            if (_pendingLevelCards.Count == 0)
+            {
+                _levelCardFlowActive = false;
+            }
+        }
+        finally
+        {
+            _isFillingLevelCards = false;
+        }
+    }
+
+    private static void ShuffleLevelDeck(List<ColorType> deck)
+    {
+        for (int i = deck.Count - 1; i > 0; i--)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, i + 1);
+            (deck[i], deck[randomIndex]) = (deck[randomIndex], deck[i]);
+        }
+
+        for (int i = 1; i < deck.Count; i++)
+        {
+            if (deck[i] != deck[i - 1])
+            {
+                continue;
+            }
+
+            int swapIndex = -1;
+            for (int candidate = i + 1; candidate < deck.Count; candidate++)
+            {
+                if (deck[candidate] != deck[i - 1]
+                    && (candidate + 1 >= deck.Count || deck[candidate + 1] != deck[i]))
+                {
+                    swapIndex = candidate;
+                    break;
+                }
+            }
+
+            if (swapIndex >= 0)
+            {
+                (deck[i], deck[swapIndex]) = (deck[swapIndex], deck[i]);
+            }
         }
     }
 
     [ContextMenu("Spawn Configured Cards")]
     public void SpawnConfiguredCards()
     {
+        CancelLevelCardFlow();
         if (_cardFactory == null)
         {
             Debug.LogWarning("Card factory is not available. Check FarmBoxMergeLifetimeScope.", this);
@@ -148,6 +264,7 @@ public class CardSpawner : MonoBehaviour
     [ContextMenu("Clear Spawned Cards")]
     public void ClearCards()
     {
+        CancelLevelCardFlow();
         if (board != null)
         {
             board.ClearCards();
@@ -226,6 +343,7 @@ public class CardSpawner : MonoBehaviour
 
     public void ReplayLastCards()
     {
+        CancelLevelCardFlow();
         if (_lastSpawnedCards.Count == 0)
         {
             SpawnConfiguredCards();

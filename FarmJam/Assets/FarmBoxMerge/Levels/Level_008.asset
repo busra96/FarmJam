@@ -13,22 +13,27 @@ MonoBehaviour:
   m_Name: Level_008
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000008
-  levelName: "08 - Sira Takibi"
-  designerNotes: "Kolay. Ayni renk kuyrukta yeniden geldiginde ikinci kutuyu zamaninda ac."
+  levelName: 08 - Sira Takibi
+  designerNotes: Kolay. Ayni renk kuyrukta yeniden geldiginde ikinci kutuyu zamaninda
+    ac.
   itemSequence:
-  - colorType: 0
-    count: 2
   - colorType: 1
-    count: 2
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 1
-    count: 2
-  startingCards:
+    count: 1
   - colorType: 0
-    counter: 3
+    count: 1
   - colorType: 1
-    counter: 2
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
-    counter: 2
-
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 4
+  - colorType: 1
+    count: 4
+  cardPlanVersion: 1

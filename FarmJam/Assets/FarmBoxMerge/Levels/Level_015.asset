@@ -13,44 +13,42 @@ MonoBehaviour:
   m_Name: Level_015
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000f
-  levelName: "15 - Bes Renk"
-  designerNotes: "Orta. Bes renk ve karisik merge ihtiyaci ile ilk bolumu tamamla."
+  levelName: 15 - Bes Renk
+  designerNotes: Orta. Bes renk ve karisik merge ihtiyaci ile ilk bolumu tamamla.
   itemSequence:
+  - colorType: 1
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 1
     count: 1
   - colorType: 2
-    count: 2
-  - colorType: 3
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
   - colorType: 3
     count: 1
-  - colorType: 4
+  - colorType: 0
     count: 1
-  startingCards:
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 1
-    counter: 3
   - colorType: 2
-    counter: 2
-  - colorType: 3
-    counter: 1
-  - colorType: 3
-    counter: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 4
-    counter: 2
-
+    count: 1
+  - colorType: 3
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 4
+  - colorType: 1
+    count: 4
+  - colorType: 2
+    count: 2
+  - colorType: 3
+    count: 2
+  - colorType: 4
+    count: 2
+  cardPlanVersion: 1

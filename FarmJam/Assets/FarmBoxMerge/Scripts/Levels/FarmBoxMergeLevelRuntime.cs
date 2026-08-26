@@ -63,7 +63,7 @@ public class FarmBoxMergeLevelRuntime : MonoBehaviour
             return;
         }
 
-        cardSpawner?.SpawnLevelCards(level.StartingCards);
+        cardSpawner?.SpawnLevelCards(level.CardSpawnPlan);
         itemSpawner?.SpawnLevelItems(level.ItemSequence);
     }
 

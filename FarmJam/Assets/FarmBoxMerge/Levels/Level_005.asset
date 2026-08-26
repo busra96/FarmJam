@@ -13,26 +13,12 @@ MonoBehaviour:
   m_Name: Level_005
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000005
-  levelName: "05 - Dortlu Ustaligi"
-  designerNotes: "Egitim finali. Merge zincirinin maksimum seviye dort oldugunu gosterir."
+  levelName: 05 - Dortlu Ustaligi
+  designerNotes: Egitim finali. Merge zincirinin maksimum seviye dort oldugunu gosterir.
   itemSequence:
   - colorType: 0
     count: 4
-  startingCards:
+  cardSpawnPlan:
   - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-
+    count: 8
+  cardPlanVersion: 1

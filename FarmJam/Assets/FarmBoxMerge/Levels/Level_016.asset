@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Level_016
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000010
-  levelName: "16 - Tam Tur"
-  designerNotes: "Orta. Bes rengin uc tam dongusunde slotlari kuyruga gore yenile."
+  levelName: 16 - Tam Tur
+  designerNotes: Orta. Bes rengin uc tam dongusunde slotlari kuyruga gore yenile.
   itemSequence:
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
   - colorType: 2
     count: 1
   - colorType: 3
+    count: 1
+  - colorType: 1
     count: 1
   - colorType: 4
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
-    count: 1
   - colorType: 2
     count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
+  - colorType: 1
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
   - colorType: 4
     count: 1
-  startingCards:
+  - colorType: 1
+    count: 1
   - colorType: 0
-    counter: 3
-  - colorType: 1
-    counter: 3
-  - colorType: 2
-    counter: 3
+    count: 1
   - colorType: 3
-    counter: 3
+    count: 1
   - colorType: 4
-    counter: 3
-
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 4
+  - colorType: 1
+    count: 4
+  - colorType: 2
+    count: 4
+  - colorType: 3
+    count: 4
+  - colorType: 4
+    count: 4
+  cardPlanVersion: 1

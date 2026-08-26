@@ -13,32 +13,38 @@ MonoBehaviour:
   m_Name: Level_011
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000b
-  levelName: "11 - Uclu Dongu"
-  designerNotes: "Orta. Uc renk ikinci kez donmeden once bos slot yarat."
+  levelName: 11 - Uclu Dongu
+  designerNotes: Orta. Uc renk ikinci kez donmeden once bos slot yarat.
   itemSequence:
   - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
+    count: 1
   - colorType: 2
-    count: 2
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
+    count: 1
   - colorType: 2
-    count: 2
-  startingCards:
+    count: 1
   - colorType: 0
-    counter: 2
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
-    counter: 2
+    count: 1
   - colorType: 1
-    counter: 2
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 1
-    counter: 2
+    count: 1
   - colorType: 2
-    counter: 2
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 4
+  - colorType: 1
+    count: 4
   - colorType: 2
-    counter: 2
-
+    count: 4
+  cardPlanVersion: 1

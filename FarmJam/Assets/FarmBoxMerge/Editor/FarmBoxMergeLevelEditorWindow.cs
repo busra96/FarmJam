@@ -13,7 +13,7 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
     private SerializedObject _levelObject;
     private ReorderableList _catalogList;
     private ReorderableList _itemRunList;
-    private ReorderableList _startingCardList;
+    private ReorderableList _cardSpawnPlanList;
     private Vector2 _levelScroll;
 
     [MenuItem("Tools/FarmBoxMerge/Level Editor")]
@@ -170,11 +170,11 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
         _itemRunList.DoLayoutList();
 
         EditorGUILayout.Space(8f);
-        EditorGUILayout.LabelField("BAŞLANGIÇ KARTLARI", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("LEVEL-1 KART SPAWN PLANI", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
-            "Kartlar listedeki sırayla alt tahtaya eklenir. Sahne en fazla 12 kart gösterir.",
+            "Her kart 1 değeriyle doğar. Renk başına toplam kart adetleri karışık sırayla spawnlanır; tahta aynı anda en fazla 12 kart gösterir.",
             MessageType.None);
-        _startingCardList.DoLayoutList();
+        _cardSpawnPlanList.DoLayoutList();
 
         DrawLevelSummary();
         EditorGUILayout.EndScrollView();
@@ -187,14 +187,12 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
         EditorGUILayout.Space(8f);
         EditorGUILayout.LabelField("Özet", EditorStyles.boldLabel);
         EditorGUILayout.LabelField("Toplam item", _selectedLevel.TotalItemCount.ToString());
-        EditorGUILayout.LabelField("Başlangıç kartı", _selectedLevel.StartingCards.Count.ToString());
-        EditorGUILayout.LabelField("Kartların toplam kutu kapasitesi", _selectedLevel.StartingCardCapacity.ToString());
+        EditorGUILayout.LabelField("Toplam spawnlanacak kart", _selectedLevel.TotalCardSpawnCount.ToString());
+        EditorGUILayout.LabelField(
+            "Başlangıçta görünecek kart",
+            Mathf.Min(_selectedLevel.TotalCardSpawnCount, FarmBoxMergeRules.MaxCardsOnBoard).ToString());
 
-        if (_selectedLevel.StartingCards.Count > FarmBoxMergeRules.MaxCardsOnBoard)
-        {
-            EditorGUILayout.HelpBox("Başlangıç kartı sayısı 12'yi aşıyor. Fazla kartlar runtime'da oluşturulmaz.", MessageType.Error);
-        }
-        else if (_selectedLevel.StartingCards.Count == 0 || _selectedLevel.TotalItemCount == 0)
+        if (_selectedLevel.TotalCardSpawnCount == 0 || _selectedLevel.TotalItemCount == 0)
         {
             EditorGUILayout.HelpBox("Level başlamadan önce item akışı ve başlangıç kartlarını doldurun.", MessageType.Warning);
         }
@@ -225,7 +223,7 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
                 SerializedProperty element = levels.GetArrayElementAtIndex(index);
                 FarmBoxMergeLevelDefinition level = element.objectReferenceValue as FarmBoxMergeLevelDefinition;
                 string label = level != null
-                    ? $"{index + 1:00}.  {level.LevelName}  ·  {level.TotalItemCount} item  ·  {level.StartingCards.Count} kart"
+                    ? $"{index + 1:00}.  {level.LevelName}  ·  {level.TotalItemCount} item  ·  {level.TotalCardSpawnCount} kart"
                     : $"{index + 1:00}.  Eksik Level Referansı";
                 EditorGUI.LabelField(rect, label);
             },
@@ -262,13 +260,13 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
             }
         };
 
-        SerializedProperty cards = _levelObject.FindProperty("startingCards");
-        _startingCardList = new ReorderableList(_levelObject, cards, true, true, true, true)
+        SerializedProperty cardSpawnPlan = _levelObject.FindProperty("cardSpawnPlan");
+        _cardSpawnPlanList = new ReorderableList(_levelObject, cardSpawnPlan, true, true, true, true)
         {
-            drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Kart Rengi / Kart Üzerindeki Sayı"),
+            drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Kart Rengi / Spawnlanacak Level-1 Kart Adedi"),
             drawElementCallback = (rect, index, active, focused) =>
             {
-                SerializedProperty element = cards.GetArrayElementAtIndex(index);
+                SerializedProperty element = cardSpawnPlan.GetArrayElementAtIndex(index);
                 rect.y += 2f;
                 float colorWidth = rect.width * 0.62f;
                 EditorGUI.PropertyField(
@@ -277,7 +275,7 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
                     GUIContent.none);
                 EditorGUI.PropertyField(
                     new Rect(rect.x + colorWidth, rect.y, rect.width - colorWidth, EditorGUIUtility.singleLineHeight),
-                    element.FindPropertyRelative("counter"),
+                    element.FindPropertyRelative("count"),
                     GUIContent.none);
             }
         };
@@ -295,7 +293,7 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
         _selectedLevel = level;
         _levelObject = null;
         _itemRunList = null;
-        _startingCardList = null;
+        _cardSpawnPlanList = null;
         Repaint();
     }
 

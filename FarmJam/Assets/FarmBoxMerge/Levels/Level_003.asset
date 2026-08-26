@@ -13,18 +13,12 @@ MonoBehaviour:
   m_Name: Level_003
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000003
-  levelName: "03 - Uclu Sandik"
-  designerNotes: "Egitim. Dort seviye bir karttan uclu Tetris kutusu olusturmayi kesfet."
+  levelName: 03 - Uclu Sandik
+  designerNotes: Egitim. Dort seviye bir karttan uclu Tetris kutusu olusturmayi kesfet.
   itemSequence:
   - colorType: 0
     count: 3
-  startingCards:
+  cardSpawnPlan:
   - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-
+    count: 4
+  cardPlanVersion: 1

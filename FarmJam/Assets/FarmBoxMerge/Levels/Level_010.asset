@@ -13,9 +13,30 @@ MonoBehaviour:
   m_Name: Level_010
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000a
-  levelName: "10 - Renk Senligi"
-  designerNotes: "Kolay orta. Bes rengin ilk tanitimi ve kart tahtasi yonetimi."
+  levelName: 10 - Renk Senligi
+  designerNotes: Kolay orta. Bes rengin ilk tanitimi ve kart tahtasi yonetimi.
   itemSequence:
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  cardSpawnPlan:
   - colorType: 0
     count: 2
   - colorType: 1
@@ -26,25 +47,4 @@ MonoBehaviour:
     count: 2
   - colorType: 4
     count: 2
-  startingCards:
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 1
-    counter: 1
-  - colorType: 1
-    counter: 1
-  - colorType: 2
-    counter: 1
-  - colorType: 2
-    counter: 1
-  - colorType: 3
-    counter: 1
-  - colorType: 3
-    counter: 1
-  - colorType: 4
-    counter: 1
-  - colorType: 4
-    counter: 1
-
+  cardPlanVersion: 1

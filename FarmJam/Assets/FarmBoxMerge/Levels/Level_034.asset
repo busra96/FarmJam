@@ -13,68 +13,90 @@ MonoBehaviour:
   m_Name: Level_034
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000022
-  levelName: "34 - Son Prova"
-  designerNotes: "Uzman. Otuz alti itemlik asimetrik akis final oncesi planlama sinavi."
+  levelName: 34 - Son Prova
+  designerNotes: Uzman. Otuz alti itemlik asimetrik akis final oncesi planlama sinavi.
   itemSequence:
   - colorType: 0
-    count: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
   - colorType: 3
     count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
-  - colorType: 4
-    count: 2
-  - colorType: 0
-    count: 2
-  - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
-  - colorType: 4
-    count: 2
-  - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
-  - colorType: 3
-    count: 2
-  - colorType: 4
-    count: 2
   - colorType: 0
     count: 1
-  - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
-  startingCards:
-  - colorType: 0
-    counter: 4
-  - colorType: 0
-    counter: 4
-  - colorType: 1
-    counter: 4
-  - colorType: 1
-    counter: 3
-  - colorType: 2
-    counter: 4
-  - colorType: 2
-    counter: 3
   - colorType: 3
-    counter: 4
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 16
+  - colorType: 1
+    count: 12
+  - colorType: 2
+    count: 12
   - colorType: 3
-    counter: 3
+    count: 12
   - colorType: 4
-    counter: 4
-  - colorType: 4
-    counter: 3
-
+    count: 12
+  cardPlanVersion: 1

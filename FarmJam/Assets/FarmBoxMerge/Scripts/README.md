@@ -19,11 +19,13 @@ Open `Tools > FarmBoxMerge > Level Editor`. Each `FarmBoxMergeLevelDefinition` a
 
 - a level name and designer notes;
 - an ordered item sequence expressed as color + consecutive count runs;
-- the ordered starting-card list, including each card's color and counter.
+- a card spawn plan containing each color and its total level-one card count.
 
 `FarmBoxMergeLevelCatalog` owns the playable level order. Drag levels in the editor window to reorder them. `FarmBoxMergeLevelRuntime` reads the catalog assigned in the scene, disables legacy automatic spawning and loads the selected level. Item sequences longer than the visible queue are retained in a pending queue and fed into the scene without dropping entries.
 
-The default catalog contains 35 authored levels in difficulty order. Levels 1-5 teach merge sizes, levels 6-15 introduce all five colors, levels 16-25 focus on queue and three-slot planning, and levels 26-35 provide longer expert layouts. Every level stays within the 12-card board limit and has enough color capacity to clear its authored item flow.
+`Tools > FarmBoxMerge > Mix All Level Item Flows` redistributes every multi-color level with a deterministic, non-repeating color order. It preserves each color's total item count, the card spawn plan and the catalog order; single-color tutorial levels remain unchanged.
+
+The default catalog contains 35 authored levels in difficulty order. Levels 1-5 teach merge sizes, levels 6-15 introduce all five colors, levels 16-25 focus on queue and three-slot planning, and levels 26-35 provide longer expert layouts. Every authored card now enters play at counter `1`. The level deck is shuffled without changing its configured per-color totals, fills at most 12 board slots and automatically deals another card whenever a merge, box creation or discard frees a slot, until the level deck is exhausted.
 
 With a level catalog assigned, `RefreshGame` and `RetryLevel` both reload the current authored level. `NextLevel` advances through the catalog order. If no catalog is assigned, the old configured-random and replay behavior remains available as a fallback.
 

@@ -13,22 +13,26 @@ MonoBehaviour:
   m_Name: Level_007
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000007
-  levelName: "07 - Dogru Eslesme"
-  designerNotes: "Kolay. Farkli kutu boyutlarini ayni level icinde kullan."
+  levelName: 07 - Dogru Eslesme
+  designerNotes: Kolay. Farkli kutu boyutlarini ayni level icinde kullan.
   itemSequence:
+  - colorType: 1
+    count: 1
   - colorType: 0
-    count: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 4
   - colorType: 1
     count: 2
   - colorType: 2
     count: 1
-  startingCards:
-  - colorType: 0
-    counter: 3
-  - colorType: 1
-    counter: 1
-  - colorType: 1
-    counter: 1
-  - colorType: 2
-    counter: 1
-
+  cardPlanVersion: 1

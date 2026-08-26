@@ -13,11 +13,19 @@ MonoBehaviour:
   m_Name: Level_024
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000018
-  levelName: "24 - Dortlu Maraton"
-  designerNotes: "Zor. Dort rengin beser itemi icin ikili ve uclu kutulari planla."
+  levelName: 24 - Dortlu Maraton
+  designerNotes: Zor. Dort rengin beser itemi icin ikili ve uclu kutulari planla.
   itemSequence:
   - colorType: 0
-    count: 2
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
@@ -25,36 +33,36 @@ MonoBehaviour:
   - colorType: 3
     count: 1
   - colorType: 1
-    count: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 2
-    count: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 3
     count: 1
   - colorType: 0
     count: 1
   - colorType: 3
-    count: 3
-  - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
-  startingCards:
+    count: 1
+  cardSpawnPlan:
   - colorType: 0
-    counter: 3
-  - colorType: 0
-    counter: 2
+    count: 6
   - colorType: 1
-    counter: 3
-  - colorType: 1
-    counter: 2
+    count: 6
   - colorType: 2
-    counter: 3
-  - colorType: 2
-    counter: 2
+    count: 6
   - colorType: 3
-    counter: 3
-  - colorType: 3
-    counter: 2
-
+    count: 6
+  cardPlanVersion: 1

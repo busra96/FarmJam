@@ -13,52 +13,67 @@ MonoBehaviour:
   m_Name: Level_027
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001b
-  levelName: "27 - Oncelik Sirasi"
-  designerNotes: "Zor. Iki baskin renk ile uc destek renginin onceligini gorunen kuyruktan oku."
+  levelName: 27 - Oncelik Sirasi
+  designerNotes: Zor. Iki baskin renk ile uc destek renginin onceligini gorunen kuyruktan
+    oku.
   itemSequence:
-  - colorType: 0
-    count: 2
   - colorType: 1
-    count: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 3
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 0
-    count: 2
   - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
-  - colorType: 4
-    count: 2
-  - colorType: 1
-    count: 2
-  - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 1
-  - colorType: 3
     count: 1
   - colorType: 4
     count: 1
-  startingCards:
   - colorType: 0
-    counter: 4
-  - colorType: 0
-    counter: 2
+    count: 1
   - colorType: 1
-    counter: 4
-  - colorType: 1
-    counter: 2
-  - colorType: 2
-    counter: 4
-  - colorType: 3
-    counter: 4
+    count: 1
   - colorType: 4
-    counter: 4
-
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 10
+  - colorType: 1
+    count: 10
+  - colorType: 2
+    count: 8
+  - colorType: 3
+    count: 8
+  - colorType: 4
+    count: 8
+  cardPlanVersion: 1

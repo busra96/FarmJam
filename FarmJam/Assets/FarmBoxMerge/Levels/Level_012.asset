@@ -13,40 +13,40 @@ MonoBehaviour:
   m_Name: Level_012
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000c
-  levelName: "12 - Hizli Degisim"
-  designerNotes: "Orta. Dort renk surekli degisir; ilk uc kutu secimi onemlidir."
+  levelName: 12 - Hizli Degisim
+  designerNotes: Orta. Dort renk surekli degisir; ilk uc kutu secimi onemlidir.
   itemSequence:
   - colorType: 0
     count: 1
-  - colorType: 1
-    count: 1
   - colorType: 2
+    count: 1
+  - colorType: 0
     count: 1
   - colorType: 3
     count: 1
   - colorType: 0
     count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
+  - colorType: 1
+    count: 1
   - colorType: 3
     count: 1
+  - colorType: 1
+    count: 1
+  cardSpawnPlan:
   - colorType: 0
-    count: 1
+    count: 4
   - colorType: 1
-    count: 1
+    count: 4
   - colorType: 2
-    count: 1
+    count: 4
   - colorType: 3
-    count: 1
-  startingCards:
-  - colorType: 0
-    counter: 3
-  - colorType: 1
-    counter: 3
-  - colorType: 2
-    counter: 3
-  - colorType: 3
-    counter: 3
-
+    count: 4
+  cardPlanVersion: 1

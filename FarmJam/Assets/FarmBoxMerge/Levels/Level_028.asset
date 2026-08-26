@@ -13,48 +13,64 @@ MonoBehaviour:
   m_Name: Level_028
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001c
-  levelName: "28 - Dort Renk Ustaligi"
-  designerNotes: "Zor. Dort renk icin ikiser uclu kutu ve degisen blok sirasi."
+  levelName: 28 - Dort Renk Ustaligi
+  designerNotes: Zor. Dort renk icin ikiser uclu kutu ve degisen blok sirasi.
   itemSequence:
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 0
-    count: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
   - colorType: 3
     count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
-    count: 2
+    count: 1
   - colorType: 2
-    count: 2
+    count: 1
   - colorType: 3
-    count: 2
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 2
-    count: 3
+    count: 1
   - colorType: 3
-    count: 3
+    count: 1
   - colorType: 0
-    count: 3
+    count: 1
   - colorType: 1
-    count: 3
-  startingCards:
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  cardSpawnPlan:
   - colorType: 0
-    counter: 3
-  - colorType: 0
-    counter: 3
+    count: 8
   - colorType: 1
-    counter: 3
-  - colorType: 1
-    counter: 3
+    count: 8
   - colorType: 2
-    counter: 3
-  - colorType: 2
-    counter: 3
+    count: 8
   - colorType: 3
-    counter: 3
-  - colorType: 3
-    counter: 3
-
+    count: 8
+  cardPlanVersion: 1

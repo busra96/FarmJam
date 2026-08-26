@@ -13,44 +13,62 @@ MonoBehaviour:
   m_Name: Level_031
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001f
-  levelName: "31 - Usta Uclu"
-  designerNotes: "Cok zor. Uc rengin sekizer itemini parcali dortlu kutularla yonet."
+  levelName: 31 - Usta Uclu
+  designerNotes: Cok zor. Uc rengin sekizer itemini parcali dortlu kutularla yonet.
   itemSequence:
+  - colorType: 2
+    count: 1
   - colorType: 0
-    count: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
   - colorType: 1
-    count: 3
+    count: 1
   - colorType: 2
-    count: 2
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 2
-    count: 3
-  - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
+    count: 1
   - colorType: 0
-    count: 2
+    count: 1
   - colorType: 2
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
-  startingCards:
+    count: 1
   - colorType: 0
-    counter: 4
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
-    counter: 4
-  - colorType: 1
-    counter: 4
-  - colorType: 1
-    counter: 4
+    count: 1
   - colorType: 2
-    counter: 4
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 2
-    counter: 4
-
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 16
+  - colorType: 1
+    count: 16
+  - colorType: 2
+    count: 16
+  cardPlanVersion: 1

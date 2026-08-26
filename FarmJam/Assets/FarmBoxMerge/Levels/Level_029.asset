@@ -13,58 +13,73 @@ MonoBehaviour:
   m_Name: Level_029
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001d
-  levelName: "29 - Sik Renk Degisimi"
-  designerNotes: "Cok zor. Yedi yesil ve diger renklerde beser item ile hizli slot rotasyonu."
+  levelName: 29 - Sik Renk Degisimi
+  designerNotes: Cok zor. Yedi yesil ve diger renklerde beser item ile hizli slot
+    rotasyonu.
   itemSequence:
+  - colorType: 2
+    count: 1
   - colorType: 0
-    count: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 3
     count: 1
   - colorType: 4
     count: 1
   - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
+    count: 1
   - colorType: 4
-    count: 2
-  - colorType: 0
-    count: 2
+    count: 1
   - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
-  - colorType: 4
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
-  - colorType: 0
-    count: 2
-  startingCards:
-  - colorType: 0
-    counter: 4
-  - colorType: 0
-    counter: 3
-  - colorType: 1
-    counter: 3
-  - colorType: 1
-    counter: 2
-  - colorType: 2
-    counter: 3
-  - colorType: 2
-    counter: 2
+    count: 1
   - colorType: 3
-    counter: 3
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 12
+  - colorType: 1
+    count: 6
+  - colorType: 2
+    count: 6
   - colorType: 3
-    counter: 2
+    count: 6
   - colorType: 4
-    counter: 3
-  - colorType: 4
-    counter: 2
-
+    count: 6
+  cardPlanVersion: 1

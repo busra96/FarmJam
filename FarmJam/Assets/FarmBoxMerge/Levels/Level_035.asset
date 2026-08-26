@@ -13,82 +13,99 @@ MonoBehaviour:
   m_Name: Level_035
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000023
-  levelName: "35 - Buyuk Final"
-  designerNotes: "Uzman finali. Kirk item, bes renk ve on iki kartla tum mekanikleri birlikte kullan."
+  levelName: 35 - Buyuk Final
+  designerNotes: Uzman finali. Kirk item, bes renk ve on iki kartla tum mekanikleri
+    birlikte kullan.
   itemSequence:
   - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 1
-  - colorType: 2
     count: 1
   - colorType: 3
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 1
-    count: 2
   - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 4
-    count: 2
+    count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
+    count: 1
   - colorType: 4
-    count: 2
-  - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
+    count: 1
   - colorType: 3
-    count: 2
-  - colorType: 4
-    count: 2
-  - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
+    count: 1
   - colorType: 2
-    count: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 4
     count: 1
   - colorType: 0
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 2
+  - colorType: 4
     count: 1
-  - colorType: 3
+  - colorType: 1
     count: 1
-  startingCards:
+  - colorType: 4
+    count: 1
   - colorType: 0
-    counter: 4
+    count: 1
+  - colorType: 4
+    count: 1
+  cardSpawnPlan:
   - colorType: 0
-    counter: 4
+    count: 16
   - colorType: 1
-    counter: 4
-  - colorType: 1
-    counter: 4
+    count: 16
   - colorType: 2
-    counter: 4
-  - colorType: 2
-    counter: 2
-  - colorType: 2
-    counter: 2
+    count: 12
   - colorType: 3
-    counter: 4
-  - colorType: 3
-    counter: 4
+    count: 16
   - colorType: 4
-    counter: 4
-  - colorType: 4
-    counter: 2
-  - colorType: 4
-    counter: 2
-
+    count: 12
+  cardPlanVersion: 1

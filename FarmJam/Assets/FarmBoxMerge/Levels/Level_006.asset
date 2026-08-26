@@ -13,26 +13,26 @@ MonoBehaviour:
   m_Name: Level_006
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000006
-  levelName: "06 - Pazar Aciliyor"
-  designerNotes: "Kolay. Uc renk icin ikili kartlar hazirla ve kuyrugu temizle."
+  levelName: 06 - Pazar Aciliyor
+  designerNotes: Kolay. Uc renk icin ikili kartlar hazirla ve kuyrugu temizle.
   itemSequence:
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  cardSpawnPlan:
   - colorType: 0
     count: 2
   - colorType: 1
     count: 2
   - colorType: 2
     count: 2
-  startingCards:
-  - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
-  - colorType: 1
-    counter: 1
-  - colorType: 1
-    counter: 1
-  - colorType: 2
-    counter: 1
-  - colorType: 2
-    counter: 1
-
+  cardPlanVersion: 1

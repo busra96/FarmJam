@@ -13,44 +13,53 @@ MonoBehaviour:
   m_Name: Level_021
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000015
-  levelName: "21 - Dort Renk Plani"
-  designerNotes: "Orta zor. On sekiz item boyunca dort rengin geri donuslerini takip et."
+  levelName: 21 - Dort Renk Plani
+  designerNotes: Orta zor. On sekiz item boyunca dort rengin geri donuslerini takip
+    et.
   itemSequence:
-  - colorType: 0
-    count: 2
+  - colorType: 3
+    count: 1
   - colorType: 1
+    count: 1
+  - colorType: 3
     count: 1
   - colorType: 2
     count: 1
   - colorType: 3
     count: 1
   - colorType: 0
-    count: 2
+    count: 1
   - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
-  - colorType: 3
-    count: 2
+    count: 1
   - colorType: 0
-    count: 2
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 3
-    count: 1
-  startingCards:
-  - colorType: 0
-    counter: 3
-  - colorType: 0
-    counter: 3
   - colorType: 1
-    counter: 4
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 2
-    counter: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 8
+  - colorType: 1
+    count: 8
+  - colorType: 2
+    count: 8
   - colorType: 3
-    counter: 2
-  - colorType: 3
-    counter: 2
-
+    count: 4
+  cardPlanVersion: 1

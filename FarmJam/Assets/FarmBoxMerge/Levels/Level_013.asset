@@ -13,40 +13,32 @@ MonoBehaviour:
   m_Name: Level_013
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000d
-  levelName: "13 - Birleri Birlestir"
-  designerNotes: "Orta. Sekiz seviye bir kartla renk bazli merge kararlarini uygula."
+  levelName: 13 - Birleri Birlestir
+  designerNotes: Orta. Sekiz seviye bir kartla renk bazli merge kararlarini uygula.
   itemSequence:
   - colorType: 0
     count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
-    count: 1
-  - colorType: 3
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
-    count: 1
   - colorType: 2
     count: 1
-  - colorType: 3
-    count: 1
-  startingCards:
+  cardSpawnPlan:
   - colorType: 0
-    counter: 1
-  - colorType: 0
-    counter: 1
+    count: 2
   - colorType: 1
-    counter: 1
-  - colorType: 1
-    counter: 1
+    count: 2
   - colorType: 2
-    counter: 1
-  - colorType: 2
-    counter: 1
+    count: 2
   - colorType: 3
-    counter: 1
-  - colorType: 3
-    counter: 1
-
+    count: 2
+  cardPlanVersion: 1

@@ -13,42 +13,50 @@ MonoBehaviour:
   m_Name: Level_018
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000012
-  levelName: "18 - Renk Koridoru"
-  designerNotes: "Orta zor. Bes renk iki dalga halinde gelir ve slot secimi daralir."
+  levelName: 18 - Renk Koridoru
+  designerNotes: Orta zor. Bes renk iki dalga halinde gelir ve slot secimi daralir.
   itemSequence:
-  - colorType: 0
-    count: 2
-  - colorType: 2
-    count: 2
+  - colorType: 3
+    count: 1
   - colorType: 4
-    count: 2
-  - colorType: 1
     count: 1
   - colorType: 3
     count: 1
   - colorType: 0
-    count: 2
-  - colorType: 2
-    count: 2
+    count: 1
   - colorType: 4
-    count: 2
-  - colorType: 1
     count: 1
-  - colorType: 3
-    count: 1
-  startingCards:
   - colorType: 0
-    counter: 4
-  - colorType: 1
-    counter: 1
-  - colorType: 1
-    counter: 1
+    count: 1
   - colorType: 2
-    counter: 2
-  - colorType: 2
-    counter: 2
-  - colorType: 3
-    counter: 2
+    count: 1
   - colorType: 4
-    counter: 4
-
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  cardSpawnPlan:
+  - colorType: 0
+    count: 8
+  - colorType: 1
+    count: 2
+  - colorType: 2
+    count: 4
+  - colorType: 3
+    count: 2
+  - colorType: 4
+    count: 8
+  cardPlanVersion: 1
