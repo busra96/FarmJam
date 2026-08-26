@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VContainer;
 
 [DisallowMultipleComponent]
 public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
@@ -59,6 +60,13 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     private RectTransform _placeholderRect;
     private Coroutine _motionRoutine;
     private Coroutine _scaleEffectRoutine;
+    private IFarmBoxMergeFeedbackService _feedback;
+
+    [Inject]
+    public void Construct(IFarmBoxMergeFeedbackService feedback)
+    {
+        _feedback = feedback;
+    }
 
     public int CounterValue => _counterValue;
     public ColorType CardColorType => colorType;
@@ -257,7 +265,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         RectTransform.SetAsLastSibling();
 
         _targetScaleMultiplier = dragScale;
-        FarmBoxMergeFeedbackController.PlayCardPicked(RectTransform);
+        _feedback?.PlayCardPicked(RectTransform);
     }
 
     public void UpdateDragPosition(Vector2 localPointerPosition)
@@ -652,7 +660,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
         targetCard.SetCounter(targetCard.CounterValue + 1);
         targetCard.PlayMergePop();
-        FarmBoxMergeFeedbackController.PlayCardMerge(targetCard.RectTransform, targetCard.ResolveVisualColor());
+        _feedback?.PlayCardMerge(targetCard.RectTransform, targetCard.ResolveVisualColor());
         DestroyPlaceholder();
 
         if (_originalParent is RectTransform parentRect)
@@ -691,7 +699,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
             yield return null;
         }
 
-        FarmBoxMergeFeedbackController.PlayCardDiscard(trashTarget);
+        _feedback?.PlayCardDiscard(trashTarget);
         DestroyPlaceholder();
         if (_originalParent is RectTransform parentRect)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 public class Box : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class Box : MonoBehaviour
     [SerializeField] private MergeItem assignedItem;
     [SerializeField] private Vector2Int gridCell;
     [SerializeField] private List<Box> neighborBoxes = new List<Box>();
+
+    private IFarmBoxMergeBoxRegistry _registry;
 
     public Transform CollectableRoot => collectableRoot != null ? collectableRoot : EnsureCollectableRoot();
     public MergeBoxParent ParentBoxGroup => parentBoxGroup;
@@ -25,14 +28,26 @@ public class Box : MonoBehaviour
     public List<MeshRenderer> MeshRenderers = new List<MeshRenderer>();
     public List<BoxColorEntry> BoxColorEntryList = new List<BoxColorEntry>();
 
+    [Inject]
+    public void Construct(IFarmBoxMergeBoxRegistry registry)
+    {
+        _registry?.Unregister(this);
+        _registry = registry;
+
+        if (isActiveAndEnabled)
+        {
+            _registry.Register(this);
+        }
+    }
+
     private void OnEnable()
     {
-        BoxRegistry.Register(this);
+        _registry?.Register(this);
     }
 
     private void OnDisable()
     {
-        BoxRegistry.Unregister(this);
+        _registry?.Unregister(this);
     }
 
     private void Reset()

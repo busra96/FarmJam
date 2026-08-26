@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0623b46c25126104f99eb7107626589d, type: 3}
+  m_Name: FarmBoxMergeSettings
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeSettings
+  <SoundEnabled>k__BackingField: 1
+  <MusicEnabled>k__BackingField: 1
+  <ParticlesEnabled>k__BackingField: 1
+  <HapticsEnabled>k__BackingField: 1
+  <CameraFeedbackEnabled>k__BackingField: 1
+  <SfxVolume>k__BackingField: 0.72
+  <MusicVolume>k__BackingField: 0.075
+  <AddCardUses>k__BackingField: 3
+  <TrashUses>k__BackingField: 3
+  <PlayerPrefsPrefix>k__BackingField: FarmBoxMerge.Settings

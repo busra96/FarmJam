@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 [DefaultExecutionOrder(-200)]
 [DisallowMultipleComponent]
@@ -16,14 +17,28 @@ public class FarmBoxMergeLevelRuntime : MonoBehaviour
     [SerializeField] private MergeItemSpawner itemSpawner;
 
     private int _currentLevelIndex;
+    private bool _initialized;
 
     public FarmBoxMergeLevelCatalog Catalog => catalog;
     public bool HasLevels => catalog != null && catalog.Count > 0;
     public int CurrentLevelIndex => _currentLevelIndex;
     public FarmBoxMergeLevelDefinition CurrentLevel => HasLevels ? catalog.GetLevel(_currentLevelIndex) : null;
 
-    private void Awake()
+    [Inject]
+    public void Construct(CardSpawner injectedCardSpawner, MergeItemSpawner injectedItemSpawner)
     {
+        cardSpawner = injectedCardSpawner;
+        itemSpawner = injectedItemSpawner;
+    }
+
+    public void Initialize()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
         ResolveReferences();
         InitializeLevelIndex();
 

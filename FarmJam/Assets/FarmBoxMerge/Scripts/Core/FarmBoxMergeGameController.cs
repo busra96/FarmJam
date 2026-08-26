@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 [DisallowMultipleComponent]
 public class FarmBoxMergeGameController : MonoBehaviour
@@ -27,6 +28,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     private Coroutine _resetRoutine;
     private bool _gameplayInputEnabled = true;
+    private bool _initialized;
 
     public bool IsResetting => _resetRoutine != null;
     public bool GameplayInputEnabled => _gameplayInputEnabled && !IsResetting;
@@ -34,8 +36,29 @@ public class FarmBoxMergeGameController : MonoBehaviour
     public event Action AttemptReady;
     public event Action<bool> GameplayInputChanged;
 
-    private void Awake()
+    [Inject]
+    public void Construct(
+        CardSpawner injectedCardSpawner,
+        CardMergeBoard injectedCardMergeBoard,
+        MergeItemSpawner injectedItemSpawner,
+        FarmBoxMergeActionBudget injectedActionBudget,
+        FarmBoxMergeLevelRuntime injectedLevelRuntime)
     {
+        cardSpawner = injectedCardSpawner;
+        cardMergeBoard = injectedCardMergeBoard;
+        itemSpawner = injectedItemSpawner;
+        actionBudget = injectedActionBudget;
+        levelRuntime = injectedLevelRuntime;
+    }
+
+    public void Initialize()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
         ResolveReferences();
         ConfigureButton(refreshButton, RefreshGame, refreshLabel, buttonColor, "refresh");
         ConfigureButton(retryButton, RetryLevel, retryLabel, retryButtonColor, "retry");
@@ -52,10 +75,6 @@ public class FarmBoxMergeGameController : MonoBehaviour
         }
 
         RefreshAddCardButtonState();
-    }
-
-    private void Start()
-    {
         if (levelRuntime != null && levelRuntime.HasLevels)
         {
             levelRuntime.SpawnCurrentLevel();

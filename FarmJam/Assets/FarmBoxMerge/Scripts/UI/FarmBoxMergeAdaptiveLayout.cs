@@ -30,20 +30,22 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
     private int _lastScreenHeight = -1;
     private Rect _lastSafeArea;
     private bool _hasCachedLayout;
+    private bool _initialized;
 
-    private void Awake()
+    public void Initialize()
     {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
         ResolveReferences();
         CacheBaseLayout();
         ApplyLayout(true);
     }
 
-    private void OnEnable()
-    {
-        ApplyLayout(true);
-    }
-
-    private void Update()
+    public void Tick()
     {
         ApplyLayout(false);
     }

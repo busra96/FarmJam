@@ -1,15 +1,13 @@
 using System;
 using UnityEngine;
+using VContainer;
 
 [DisallowMultipleComponent]
 public class FarmBoxMergeActionBudget : MonoBehaviour
 {
-    [Header("Uses Per Attempt")]
-    [SerializeField, Min(0)] private int addCardUsesPerAttempt = 3;
-    [SerializeField, Min(0)] private int trashUsesPerAttempt = 3;
-
     private int _remainingAddCardUses;
     private int _remainingTrashUses;
+    private IFarmBoxMergeSettingsService _settings;
 
     public int RemainingAddCardUses => _remainingAddCardUses;
     public int RemainingTrashUses => _remainingTrashUses;
@@ -18,21 +16,17 @@ public class FarmBoxMergeActionBudget : MonoBehaviour
 
     public event Action Changed;
 
-    private void Awake()
+    [Inject]
+    public void Construct(IFarmBoxMergeSettingsService settings)
     {
+        _settings = settings;
         ResetForAttempt();
-    }
-
-    private void OnValidate()
-    {
-        addCardUsesPerAttempt = Mathf.Max(0, addCardUsesPerAttempt);
-        trashUsesPerAttempt = Mathf.Max(0, trashUsesPerAttempt);
     }
 
     public void ResetForAttempt()
     {
-        _remainingAddCardUses = addCardUsesPerAttempt;
-        _remainingTrashUses = trashUsesPerAttempt;
+        _remainingAddCardUses = Mathf.Max(0, _settings != null ? _settings.AddCardUses : 3);
+        _remainingTrashUses = Mathf.Max(0, _settings != null ? _settings.TrashUses : 3);
         Changed?.Invoke();
     }
 

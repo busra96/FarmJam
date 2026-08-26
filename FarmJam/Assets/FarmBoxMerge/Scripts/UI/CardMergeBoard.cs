@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using VContainer;
 
 [DisallowMultipleComponent]
 public class CardMergeBoard : MonoBehaviour
@@ -45,7 +46,6 @@ public class CardMergeBoard : MonoBehaviour
 
     [Header("World Drop")]
     [SerializeField] private bool spawnBoxesOnCenterDrop = true;
-    [SerializeField] private Box boxPrefab;
     [SerializeField] private Camera worldDropCamera;
     [SerializeField] private Transform spawnSurface;
     [FormerlySerializedAs("spawnedBoxParent")]
@@ -129,14 +129,36 @@ public class CardMergeBoard : MonoBehaviour
 
     public event Action CardCountChanged;
 
+    private IBoxFactory _boxFactory;
+    private IFarmBoxMergeFeedbackService _feedback;
+    private MergeItemSpawner _itemSpawner;
+    private bool _initialized;
+
+    [Inject]
+    public void Construct(
+        IBoxFactory boxFactory,
+        IFarmBoxMergeFeedbackService feedback,
+        MergeItemSpawner itemSpawner)
+    {
+        _boxFactory = boxFactory;
+        _feedback = feedback;
+        _itemSpawner = itemSpawner;
+    }
+
     private void Reset()
     {
         ResolveReferences();
         EnsureDefaultPalette();
     }
 
-    private void Awake()
+    public void Initialize()
     {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
         ResolveReferences();
         EnsureDefaultPalette();
         EnsureDragLayer();
@@ -502,7 +524,7 @@ public class CardMergeBoard : MonoBehaviour
 
     private bool TrySpawnBoxesFromCard(Card card, PointerEventData eventData)
     {
-        if (!spawnBoxesOnCenterDrop || card == null || boxPrefab == null)
+        if (!spawnBoxesOnCenterDrop || card == null || _boxFactory == null)
         {
             return false;
         }
@@ -568,15 +590,21 @@ public class CardMergeBoard : MonoBehaviour
 
         for (int i = 0; i < localPositions.Length; i++)
         {
-            Box spawnedBox = Instantiate(boxPrefab, groupTransform);
+            Box spawnedBox = _boxFactory?.Create(groupTransform);
+            if (spawnedBox == null)
+            {
+                FarmBoxMergeObjectUtility.Destroy(groupObject);
+                return null;
+            }
+
             spawnedBox.transform.localPosition = localPositions[i];
             spawnedBox.transform.localRotation = Quaternion.identity;
             spawnedBoxes.Add(spawnedBox);
         }
 
-        boxParent.Initialize(clampedBoxCount, colorType, pattern.PatternType, spawnedBoxes, pattern.Cells);
-        FarmBoxMergeFeedbackController.PlayBoxCreated(groupTransform, colorType);
-        MergeItemSpawner.Instance?.TryProcessQueue();
+        boxParent.Initialize(clampedBoxCount, colorType, pattern.PatternType, spawnedBoxes, pattern.Cells, _feedback);
+        _feedback?.PlayBoxCreated(groupTransform, colorType);
+        _itemSpawner?.TryProcessQueue();
         return boxParent;
     }
 

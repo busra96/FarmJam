@@ -14,6 +14,12 @@ public sealed class FarmBoxMergeButtonFeedback : MonoBehaviour, IPointerDownHand
     private RectTransform _rectTransform;
     private Vector3 _baseScale;
     private Coroutine _releaseRoutine;
+    private IFarmBoxMergeFeedbackService _feedback;
+
+    public void Initialize(IFarmBoxMergeFeedbackService feedback)
+    {
+        _feedback = feedback;
+    }
 
     private void Awake()
     {
@@ -58,7 +64,7 @@ public sealed class FarmBoxMergeButtonFeedback : MonoBehaviour, IPointerDownHand
     {
         if (_button != null && _button.interactable)
         {
-            FarmBoxMergeFeedbackController.PlayButtonClick();
+            _feedback?.PlayButtonClick();
         }
     }
 

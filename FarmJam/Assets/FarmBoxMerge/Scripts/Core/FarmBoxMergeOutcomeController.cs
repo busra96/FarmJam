@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using VContainer;
 
 [DisallowMultipleComponent]
 public class FarmBoxMergeOutcomeController : MonoBehaviour
@@ -33,21 +34,40 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
     private bool _monitoring;
     private bool _outcomeShown;
     private Coroutine _enableMonitoringRoutine;
+    private IFarmBoxMergeFeedbackService _feedback;
+    private bool _initialized;
 
-    private void Awake()
+    [Inject]
+    public void Construct(
+        IFarmBoxMergeFeedbackService feedback,
+        FarmBoxMergeGameController injectedGameController,
+        CardMergeBoard injectedCardMergeBoard,
+        MergeItemSpawner injectedItemSpawner,
+        FarmBoxMergeActionBudget injectedActionBudget)
     {
+        _feedback = feedback;
+        gameController = injectedGameController;
+        cardMergeBoard = injectedCardMergeBoard;
+        itemSpawner = injectedItemSpawner;
+        actionBudget = injectedActionBudget;
+    }
+
+    public void Initialize()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
         ResolveReferences();
         SetPanelState(showWin: false, showFail: false);
         ConfigureButtons();
         SubscribeToGameEvents();
-    }
-
-    private void Start()
-    {
         RestartMonitoringAfterSetup();
     }
 
-    private void Update()
+    public void Tick()
     {
         if (!_monitoring || _outcomeShown || gameController == null || gameController.IsResetting)
         {
@@ -190,7 +210,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         gameController?.SetGameplayInputEnabled(false);
         bool won = outcome == PendingOutcome.Win;
         SetPanelState(won, outcome == PendingOutcome.Fail);
-        FarmBoxMergeFeedbackController.PlayOutcome(won ? winPanel : failPanel, won);
+        _feedback?.PlayOutcome(won ? winPanel : failPanel, won);
     }
 
     private void HandleGameplayActivity()

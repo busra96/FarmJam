@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 [DisallowMultipleComponent]
-public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
+public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMergeFeedbackService
 {
     private enum HapticStrength
     {
@@ -13,28 +14,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         Strong
     }
 
-    [Header("Features")]
-    [SerializeField] private bool enableSound = true;
-    [SerializeField] private bool enableMusic = true;
-    [SerializeField] private bool enableParticles = true;
-    [SerializeField] private bool enableHaptics = true;
-    [SerializeField] private bool enableCameraFeedback = true;
-
-    [Header("Audio Clips")]
-    [SerializeField] private AudioClip buttonClip;
-    [SerializeField] private AudioClip mergeClip;
-    [SerializeField] private AudioClip spawnClip;
-    [SerializeField] private AudioClip itemLandClip;
-    [SerializeField] private AudioClip trashClip;
-    [SerializeField] private AudioClip boxClearClip;
-    [SerializeField] private AudioClip winClip;
-    [SerializeField] private AudioClip confettiClip;
-    [SerializeField] private AudioClip failClip;
-    [SerializeField] private AudioClip gameplayMusic;
-
     [Header("Audio Mix")]
-    [SerializeField, Range(0f, 1f)] private float masterSfxVolume = 0.72f;
-    [SerializeField, Range(0f, 1f)] private float musicVolume = 0.075f;
     [SerializeField, Range(0f, 0.3f)] private float pitchVariation = 0.055f;
 
     [Header("Visual Feel")]
@@ -44,7 +24,6 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
     [SerializeField] private Color creamSparkle = new Color(1f, 0.92f, 0.58f, 1f);
     [SerializeField] private Color leafSparkle = new Color(0.48f, 0.78f, 0.37f, 1f);
 
-    private static FarmBoxMergeFeedbackController _instance;
     private readonly Dictionary<AudioClip, float> _lastPlayedAt = new Dictionary<AudioClip, float>();
     private readonly Stack<Image> _uiParticlePool = new Stack<Image>();
 
@@ -59,24 +38,36 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
     private Transform _cameraTarget;
     private Vector3 _cameraBaseLocalPosition;
     private float _lastHapticAt = -10f;
+    private IFarmBoxMergeSettingsService _settings;
+    private FarmBoxMergeAudioCatalog _audioCatalog;
+    private bool _initialized;
 
-    public static FarmBoxMergeFeedbackController Instance => _instance;
-
-    private void Awake()
+    [Inject]
+    public void Construct(
+        IFarmBoxMergeSettingsService settings,
+        FarmBoxMergeAudioCatalog audioCatalog)
     {
-        if (_instance != null && _instance != this)
+        if (_settings != null)
         {
-            Destroy(gameObject);
+            _settings.Changed -= HandleSettingsChanged;
+        }
+
+        _settings = settings;
+        _audioCatalog = audioCatalog;
+        _settings.Changed += HandleSettingsChanged;
+        HandleSettingsChanged();
+    }
+
+    public void Initialize()
+    {
+        if (_initialized)
+        {
             return;
         }
 
-        _instance = this;
+        _initialized = true;
         ResolveRuntimeObjects();
         InstallButtonFeedback();
-    }
-
-    private void Start()
-    {
         StartMusic();
     }
 
@@ -84,9 +75,9 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
     {
         RestoreCameraPosition();
 
-        if (_instance == this)
+        if (_settings != null)
         {
-            _instance = null;
+            _settings.Changed -= HandleSettingsChanged;
         }
 
         if (_particleMaterial != null)
@@ -105,7 +96,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         }
     }
 
-    public static Color ColorFor(ColorType colorType)
+    public Color ColorFor(ColorType colorType)
     {
         return colorType switch
         {
@@ -118,136 +109,116 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         };
     }
 
-    public static void PlayButtonClick()
+    public void PlayButtonClick()
     {
-        _instance?.PlaySfx(_instance.buttonClip, 0.42f, 0.035f, 0.035f);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Button : null, 0.42f, 0.035f, 0.035f);
     }
 
-    public static void PlayCardPicked(RectTransform card)
+    public void PlayCardPicked(RectTransform card)
     {
-        if (_instance == null)
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Button : null, 0.22f, 0.06f, 0.055f);
+    }
+
+    public void PlayCardSpawn(RectTransform card, Color color)
+    {
+        if (card == null)
         {
             return;
         }
 
-        _instance.PlaySfx(_instance.buttonClip, 0.22f, 0.06f, 0.055f);
+        SpawnUiBurst(card, color, 5, 42f);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Spawn : null, 0.34f, 0.09f, 0.08f);
     }
 
-    public static void PlayCardSpawn(RectTransform card, Color color)
+    public void PlayCardMerge(RectTransform card, Color color)
     {
-        if (_instance == null || card == null)
+        if (card == null)
         {
             return;
         }
 
-        _instance.SpawnUiBurst(card, color, 5, 42f);
-        _instance.PlaySfx(_instance.spawnClip, 0.34f, 0.09f, 0.08f);
+        SpawnUiBurst(card, color, 11, 76f);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Merge : null, 0.72f, 0.10f, 0.035f);
+        PlayHaptic(HapticStrength.Light);
     }
 
-    public static void PlayCardMerge(RectTransform card, Color color)
+    public void PlayCardDiscard(RectTransform trashTarget)
     {
-        if (_instance == null || card == null)
-        {
-            return;
-        }
-
-        _instance.SpawnUiBurst(card, color, 11, 76f);
-        _instance.PlaySfx(_instance.mergeClip, 0.72f, 0.10f, 0.035f);
-        _instance.PlayHaptic(HapticStrength.Light);
-    }
-
-    public static void PlayCardDiscard(RectTransform trashTarget)
-    {
-        if (_instance == null)
-        {
-            return;
-        }
-
         if (trashTarget != null)
         {
-            _instance.SpawnUiBurst(trashTarget, new Color(1f, 0.43f, 0.30f), 7, 54f);
+            SpawnUiBurst(trashTarget, new Color(1f, 0.43f, 0.30f), 7, 54f);
         }
 
-        _instance.PlaySfx(_instance.trashClip, 0.55f, 0.05f, 0.05f);
-        _instance.PlayHaptic(HapticStrength.Medium);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Trash : null, 0.55f, 0.05f, 0.05f);
+        PlayHaptic(HapticStrength.Medium);
     }
 
-    public static void PlayItemSpawn(Transform item, ColorType colorType)
+    public void PlayItemSpawn(Transform item, ColorType colorType)
     {
-        if (_instance == null || item == null)
+        if (item == null)
         {
             return;
         }
 
-        _instance.EmitWorldBurst(item.position + (Vector3.up * 0.12f), ColorFor(colorType), 4, 0.75f);
-        _instance.StartCoroutine(_instance.AnimateWorldPop(item, 0.72f, 1.08f, 0.20f));
-        _instance.PlaySfx(_instance.spawnClip, 0.24f, 0.12f, 0.09f);
+        EmitWorldBurst(item.position + (Vector3.up * 0.12f), ColorFor(colorType), 4, 0.75f);
+        StartCoroutine(AnimateWorldPop(item, 0.72f, 1.08f, 0.20f));
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Spawn : null, 0.24f, 0.12f, 0.09f);
     }
 
-    public static void PlayItemLanded(Transform item, ColorType colorType)
+    public void PlayItemLanded(Transform item, ColorType colorType)
     {
-        if (_instance == null || item == null)
+        if (item == null)
         {
             return;
         }
 
-        _instance.EmitWorldBurst(item.position, ColorFor(colorType), 7, 1.05f);
-        _instance.PlaySfx(_instance.itemLandClip, 0.46f, 0.08f, 0.055f);
-        _instance.PlayHaptic(HapticStrength.Light);
+        EmitWorldBurst(item.position, ColorFor(colorType), 7, 1.05f);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.ItemLand : null, 0.46f, 0.08f, 0.055f);
+        PlayHaptic(HapticStrength.Light);
     }
 
-    public static void PlayBoxCreated(Transform boxGroup, ColorType colorType)
+    public void PlayBoxCreated(Transform boxGroup, ColorType colorType)
     {
-        if (_instance == null || boxGroup == null)
+        if (boxGroup == null)
         {
             return;
         }
 
-        _instance.EmitWorldBurst(boxGroup.position + (Vector3.up * 0.16f), ColorFor(colorType), 10, 1.25f);
-        _instance.StartCoroutine(_instance.AnimateWorldPop(boxGroup, 0.12f, 1.10f, 0.28f));
-        _instance.PlaySfx(_instance.spawnClip, 0.52f, 0.08f, 0.08f);
-        _instance.PlayHaptic(HapticStrength.Light);
+        EmitWorldBurst(boxGroup.position + (Vector3.up * 0.16f), ColorFor(colorType), 10, 1.25f);
+        StartCoroutine(AnimateWorldPop(boxGroup, 0.12f, 1.10f, 0.28f));
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Spawn : null, 0.52f, 0.08f, 0.08f);
+        PlayHaptic(HapticStrength.Light);
     }
 
-    public static void PlayBoxCleared(Vector3 position, ColorType colorType, int boxCount)
+    public void PlayBoxCleared(Vector3 position, ColorType colorType, int boxCount)
     {
-        if (_instance == null)
-        {
-            return;
-        }
-
         int particleCount = Mathf.Clamp(10 + (boxCount * 4), 14, 28);
-        _instance.EmitWorldBurst(position + (Vector3.up * 0.22f), ColorFor(colorType), particleCount, 1.65f);
-        _instance.PlaySfx(_instance.boxClearClip, 0.78f, 0.08f, 0.07f);
-        _instance.PlayHaptic(boxCount >= 3 ? HapticStrength.Medium : HapticStrength.Light);
-        _instance.PunchCamera(boxCount >= 3 ? 0.055f : 0.032f, 0.16f);
+        EmitWorldBurst(position + (Vector3.up * 0.22f), ColorFor(colorType), particleCount, 1.65f);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.BoxClear : null, 0.78f, 0.08f, 0.07f);
+        PlayHaptic(boxCount >= 3 ? HapticStrength.Medium : HapticStrength.Light);
+        PunchCamera(boxCount >= 3 ? 0.055f : 0.032f, 0.16f);
     }
 
-    public static void PlayOutcome(GameObject panel, bool won)
+    public void PlayOutcome(GameObject panel, bool won)
     {
-        if (_instance == null)
-        {
-            return;
-        }
-
         if (panel != null)
         {
-            _instance.StartCoroutine(_instance.AnimatePanelEntrance(panel));
+            StartCoroutine(AnimatePanelEntrance(panel));
         }
 
         if (won)
         {
-            _instance.PlaySfx(_instance.winClip, 0.92f, 0f, 0f);
-            _instance.PlaySfx(_instance.confettiClip, 0.52f, 0f, 0f);
-            _instance.SpawnConfetti();
-            _instance.PlayHaptic(HapticStrength.Strong);
-            _instance.PunchCamera(0.045f, 0.22f);
+            PlaySfx(_audioCatalog != null ? _audioCatalog.Win : null, 0.92f, 0f, 0f);
+            PlaySfx(_audioCatalog != null ? _audioCatalog.Confetti : null, 0.52f, 0f, 0f);
+            SpawnConfetti();
+            PlayHaptic(HapticStrength.Strong);
+            PunchCamera(0.045f, 0.22f);
             return;
         }
 
-        _instance.PlaySfx(_instance.failClip, 0.72f, 0f, 0f);
-        _instance.PlayHaptic(HapticStrength.Medium);
-        _instance.PunchCamera(0.065f, 0.28f);
+        PlaySfx(_audioCatalog != null ? _audioCatalog.Fail : null, 0.72f, 0f, 0f);
+        PlayHaptic(HapticStrength.Medium);
+        PunchCamera(0.065f, 0.28f);
     }
 
     private void ResolveRuntimeObjects()
@@ -272,24 +243,28 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         _musicSource.playOnAwake = false;
         _musicSource.loop = true;
         _musicSource.spatialBlend = 0f;
-        _musicSource.volume = musicVolume;
+        _musicSource.volume = _settings != null ? _settings.MusicVolume : 0f;
     }
 
     private void StartMusic()
     {
-        if (!enableSound || !enableMusic || gameplayMusic == null || _musicSource == null)
+        AudioClip musicClip = _audioCatalog != null ? _audioCatalog.GameplayMusic : null;
+        if (_settings == null || !_settings.MusicEnabled || musicClip == null || _musicSource == null)
         {
             return;
         }
 
-        _musicSource.clip = gameplayMusic;
-        _musicSource.volume = musicVolume;
-        _musicSource.Play();
+        _musicSource.clip = musicClip;
+        _musicSource.volume = _settings.MusicVolume;
+        if (!_musicSource.isPlaying)
+        {
+            _musicSource.Play();
+        }
     }
 
     private void PlaySfx(AudioClip clip, float relativeVolume, float pitchRange, float cooldown)
     {
-        if (!enableSound || clip == null || _sfxSource == null)
+        if (_settings == null || !_settings.SoundEnabled || clip == null || _sfxSource == null)
         {
             return;
         }
@@ -303,7 +278,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         _lastPlayedAt[clip] = now;
         float effectivePitchRange = Mathf.Min(Mathf.Abs(pitchRange), pitchVariation);
         _sfxSource.pitch = 1f + Random.Range(-effectivePitchRange, effectivePitchRange);
-        _sfxSource.PlayOneShot(clip, masterSfxVolume * relativeVolume);
+        _sfxSource.PlayOneShot(clip, _settings.SfxVolume * relativeVolume);
     }
 
     private void EnsureParticleSprite()
@@ -429,7 +404,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
 
     private void EmitWorldBurst(Vector3 position, Color color, int count, float speed)
     {
-        if (!enableParticles || _worldParticles == null)
+        if (_settings == null || !_settings.ParticlesEnabled || _worldParticles == null)
         {
             return;
         }
@@ -484,7 +459,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
 
     private void SpawnUiBurst(RectTransform target, Color color, int count, float radius)
     {
-        if (!enableParticles || target == null)
+        if (_settings == null || !_settings.ParticlesEnabled || target == null)
         {
             return;
         }
@@ -570,7 +545,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
 
     private void SpawnConfetti()
     {
-        if (!enableParticles)
+        if (_settings == null || !_settings.ParticlesEnabled)
         {
             return;
         }
@@ -710,16 +685,44 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
         Button[] buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         for (int i = 0; i < buttons.Length; i++)
         {
-            if (buttons[i] != null && !buttons[i].TryGetComponent(out FarmBoxMergeButtonFeedback _))
+            if (buttons[i] == null)
             {
-                buttons[i].gameObject.AddComponent<FarmBoxMergeButtonFeedback>();
+                continue;
             }
+
+            FarmBoxMergeButtonFeedback feedback = buttons[i].GetComponent<FarmBoxMergeButtonFeedback>();
+            if (feedback == null)
+            {
+                feedback = buttons[i].gameObject.AddComponent<FarmBoxMergeButtonFeedback>();
+            }
+
+            feedback.Initialize(this);
         }
+    }
+
+    private void HandleSettingsChanged()
+    {
+        if (_musicSource != null)
+        {
+            _musicSource.volume = _settings != null ? _settings.MusicVolume : 0f;
+        }
+
+        if (_settings == null || !_settings.MusicEnabled)
+        {
+            if (_musicSource != null && _musicSource.isPlaying)
+            {
+                _musicSource.Stop();
+            }
+
+            return;
+        }
+
+        StartMusic();
     }
 
     private void PunchCamera(float strength, float duration)
     {
-        if (!enableCameraFeedback || Camera.main == null)
+        if (_settings == null || !_settings.CameraFeedbackEnabled || Camera.main == null)
         {
             return;
         }
@@ -764,7 +767,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour
 
     private void PlayHaptic(HapticStrength strength)
     {
-        if (!enableHaptics || Time.unscaledTime - _lastHapticAt < 0.11f)
+        if (_settings == null || !_settings.HapticsEnabled || Time.unscaledTime - _lastHapticAt < 0.11f)
         {
             return;
         }

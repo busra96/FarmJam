@@ -31,6 +31,7 @@ public class MergeBoxParent : MonoBehaviour
     [SerializeField] private float collapseLift = 0.18f;
 
     private bool _isCollapsing;
+    private IFarmBoxMergeFeedbackService _feedback;
 
     public int CounterValue => counterValue;
     public ColorType ColorType => colorType;
@@ -54,8 +55,15 @@ public class MergeBoxParent : MonoBehaviour
         }
     }
 
-    public void Initialize(int newCounterValue, ColorType newColorType, MergeBoxPatternType newPatternType, IList<Box> spawnedBoxes, IList<Vector2Int> boxCells)
+    public void Initialize(
+        int newCounterValue,
+        ColorType newColorType,
+        MergeBoxPatternType newPatternType,
+        IList<Box> spawnedBoxes,
+        IList<Vector2Int> boxCells,
+        IFarmBoxMergeFeedbackService feedback)
     {
+        _feedback = feedback;
         counterValue = FarmBoxMergeRules.ClampCardCounter(newCounterValue);
         colorType = newColorType;
         patternType = newPatternType;
@@ -262,7 +270,7 @@ public class MergeBoxParent : MonoBehaviour
             yield return null;
         }
 
-        FarmBoxMergeFeedbackController.PlayBoxCleared(feedbackPosition, colorType, validBoxes.Count);
+        _feedback?.PlayBoxCleared(feedbackPosition, colorType, validBoxes.Count);
 
         for (int i = 0; i < validBoxes.Count; i++)
         {

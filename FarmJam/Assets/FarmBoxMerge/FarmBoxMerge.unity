@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0.9529412, g: 0.6039216, b: 0.24705882, a: 1}
@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
   m_IgnoreLayout: 0
   m_MinWidth: -1
@@ -2402,6 +2402,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 746635380}
   m_CullTransparentMesh: 1
+--- !u!1 &788312602
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 788312604}
+  - component: {fileID: 788312603}
+  m_Layer: 0
+  m_Name: FarmBoxMergeLifetimeScope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &788312603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788312602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4383380a4770f924b86e6e7a9f7ab820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLifetimeScope
+  parentReference:
+    TypeName:
+  autoRun: 1
+  autoInjectGameObjects: []
+  audioCatalog: {fileID: 11400000, guid: 0846e812ea2382b48bb614d709d86b4c, type: 2}
+  prefabCatalog: {fileID: 11400000, guid: 20b0ccd7fb577fb4cb1b5dc6ea531789, type: 2}
+  settings: {fileID: 11400000, guid: d3649b8becde09149a25abf4ac0d0c28, type: 2}
+--- !u!4 &788312604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788312602}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &791694490
 GameObject:
   m_ObjectHideFlags: 0
@@ -2554,8 +2605,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e351c384b4854973a58a7dd6d5e60b78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeActionBudget
-  addCardUsesPerAttempt: 3
-  trashUsesPerAttempt: 3
 --- !u!114 &791694497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2747,23 +2796,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c558d59d7c44150926ba557ff15d614, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeFeedbackController
-  enableSound: 1
-  enableMusic: 1
-  enableParticles: 1
-  enableHaptics: 1
-  enableCameraFeedback: 1
-  buttonClip: {fileID: 8300000, guid: 5da706e14d53f4947a1221e707b7b7d8, type: 3}
-  mergeClip: {fileID: 8300000, guid: 146bb3e22763e9a4c9bc89bfbaaca14c, type: 3}
-  spawnClip: {fileID: 8300000, guid: d989ec9a93b4ad347a236e525b5105e2, type: 3}
-  itemLandClip: {fileID: 8300000, guid: 71ad62a3c6293c44ca8417a6b6c34621, type: 3}
-  trashClip: {fileID: 8300000, guid: c6c152fd5aadffc4eb33fc785103e75c, type: 3}
-  boxClearClip: {fileID: 8300000, guid: ca2b08866178f234b81cceaf62a0af68, type: 3}
-  winClip: {fileID: 8300000, guid: 5849e59340829194eb6429256ac38feb, type: 3}
-  confettiClip: {fileID: 8300000, guid: f47aa13c32ff68f43a6288b43f3c72ae, type: 3}
-  failClip: {fileID: 8300000, guid: 88b6eab0a534b504ab7fce5a77c37bd6, type: 3}
-  gameplayMusic: {fileID: 8300000, guid: 8856c977a29db0e42b629005272636e9, type: 3}
-  masterSfxVolume: 0.72
-  musicVolume: 0.075
   pitchVariation: 0.055
   worldParticleMaterial: {fileID: 2100000, guid: 8e809618f83f0af458d489169f826415, type: 2}
   worldParticleSize: 0.16
@@ -3195,7 +3227,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42276a1fe409492281529f5651935a4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MergeItemSpawner
-  itemPrefab: {fileID: 6167625694498507813, guid: 09c7352766d72634db28fd91c751cb47, type: 3}
   itemsRoot: {fileID: 900174068}
   queuePointRoot: {fileID: 2055928399}
   queuePoints:
@@ -4929,7 +4960,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbe1154b5c2549d495fb8fa2770db419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardSpawner
-  cardPrefab: {fileID: 7977972393316634556, guid: bf98a10f157bb5448abd8c7294ee5076, type: 3}
   spawnParent: {fileID: 1402966113}
   board: {fileID: 1402966117}
   spawnOnStart: 1
@@ -4983,7 +5013,6 @@ MonoBehaviour:
   - colorType: 4
     color: {r: 0.9490196, g: 0.7882353, b: 0.29803923, a: 1}
   spawnBoxesOnCenterDrop: 1
-  boxPrefab: {fileID: 4773569901659318698, guid: a912fd7d81876954680522aea6f7f495, type: 3}
   worldDropCamera: {fileID: 1764329549}
   spawnSurface: {fileID: 1521352926}
   spawnSlotRoot: {fileID: 1893135461}
@@ -8079,3 +8108,4 @@ SceneRoots:
   - {fileID: 978142775}
   - {fileID: 1893135461}
   - {fileID: 910000002}
+  - {fileID: 788312604}

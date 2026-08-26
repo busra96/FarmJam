@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 public class CardSpawner : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class CardSpawner : MonoBehaviour
     }
 
     [Header("References")]
-    [SerializeField] private Card cardPrefab;
     [SerializeField] private RectTransform spawnParent;
     [SerializeField] private CardMergeBoard board;
 
@@ -32,6 +32,23 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private List<CardSpawnEntry> manualCards = new List<CardSpawnEntry>();
 
     private readonly List<CardSpawnEntry> _lastSpawnedCards = new List<CardSpawnEntry>();
+    private ICardFactory _cardFactory;
+    private IFarmBoxMergeBoxRegistry _boxRegistry;
+    private IFarmBoxMergeFeedbackService _feedback;
+    private bool _initialized;
+
+    [Inject]
+    public void Construct(
+        ICardFactory cardFactory,
+        IFarmBoxMergeBoxRegistry boxRegistry,
+        IFarmBoxMergeFeedbackService feedback,
+        CardMergeBoard injectedBoard)
+    {
+        _cardFactory = cardFactory;
+        _boxRegistry = boxRegistry;
+        _feedback = feedback;
+        board = injectedBoard;
+    }
 
     private void Reset()
     {
@@ -43,15 +60,18 @@ public class CardSpawner : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public void Initialize()
     {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
         AutoAssignReferences();
         EnsureBoardReference();
         SyncPaletteWithBoard();
-    }
 
-    private void Start()
-    {
         if (spawnOnStart)
         {
             SpawnConfiguredCards();
@@ -93,9 +113,9 @@ public class CardSpawner : MonoBehaviour
     [ContextMenu("Spawn Configured Cards")]
     public void SpawnConfiguredCards()
     {
-        if (cardPrefab == null)
+        if (_cardFactory == null)
         {
-            Debug.LogWarning("CardSpawner icin Card prefab referansi eksik.", this);
+            Debug.LogWarning("Card factory is not available. Check FarmBoxMergeLifetimeScope.", this);
             return;
         }
 
@@ -155,16 +175,21 @@ public class CardSpawner : MonoBehaviour
         RectTransform targetParent = ResolveSpawnParent();
         CardMergeBoard resolvedBoard = EnsureBoardReference();
 
-        if (cardPrefab == null || targetParent == null || !CanSpawnCard())
+        if (_cardFactory == null || targetParent == null || !CanSpawnCard())
         {
             return null;
         }
 
-        Card spawnedCard = Instantiate(cardPrefab, targetParent);
+        Card spawnedCard = _cardFactory.Create(targetParent);
+        if (spawnedCard == null)
+        {
+            return null;
+        }
+
         spawnedCard.Initialize(resolvedBoard, FarmBoxMergeRules.ClampCardCounter(counter), colorType);
         resolvedBoard?.RegisterCard(spawnedCard);
         spawnedCard.PlayMergePop();
-        FarmBoxMergeFeedbackController.PlayCardSpawn(spawnedCard.RectTransform, FarmBoxMergeFeedbackController.ColorFor(colorType));
+        _feedback?.PlayCardSpawn(spawnedCard.RectTransform, _feedback.ColorFor(colorType));
         return spawnedCard;
     }
 
@@ -395,7 +420,7 @@ public class CardSpawner : MonoBehaviour
                 if (!remainingCapacityByColor.TryGetValue(colorType, out int remainingCapacity))
                 {
                     int cardCapacity = resolvedBoard != null ? resolvedBoard.GetCardCapacity(colorType) : 0;
-                    remainingCapacity = cardCapacity + BoxRegistry.CountAvailable(colorType);
+                    remainingCapacity = cardCapacity + (_boxRegistry?.CountAvailable(colorType) ?? 0);
                 }
 
                 if (!queueOrder.Contains(colorType))

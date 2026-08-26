@@ -2,14 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 [DisallowMultipleComponent]
 public class MergeItemSpawner : MonoBehaviour
 {
-    public static MergeItemSpawner Instance { get; private set; }
-
     [Header("References")]
-    [SerializeField] private MergeItem itemPrefab;
     [SerializeField] private Transform itemsRoot;
     [SerializeField] private Transform queuePointRoot;
 
@@ -70,7 +68,7 @@ public class MergeItemSpawner : MonoBehaviour
                 return false;
             }
 
-            return !BoxRegistry.TryFindAvailable(spawnedItems[0].ColorType, out _);
+            return _boxRegistry == null || !_boxRegistry.TryFindAvailable(spawnedItems[0].ColorType, out _);
         }
     }
 
@@ -82,6 +80,21 @@ public class MergeItemSpawner : MonoBehaviour
     private readonly HashSet<MergeItem> _activeItems = new HashSet<MergeItem>();
     private readonly Queue<ColorType> _pendingColors = new Queue<ColorType>();
     private readonly Dictionary<ColorType, int> _remainingUnplacedByColor = new Dictionary<ColorType, int>();
+    private IMergeItemFactory _itemFactory;
+    private IFarmBoxMergeBoxRegistry _boxRegistry;
+    private IFarmBoxMergeFeedbackService _feedback;
+    private bool _initialized;
+
+    [Inject]
+    public void Construct(
+        IMergeItemFactory itemFactory,
+        IFarmBoxMergeBoxRegistry boxRegistry,
+        IFarmBoxMergeFeedbackService feedback)
+    {
+        _itemFactory = itemFactory;
+        _boxRegistry = boxRegistry;
+        _feedback = feedback;
+    }
 
     private void Reset()
     {
@@ -90,30 +103,19 @@ public class MergeItemSpawner : MonoBehaviour
         EnsureQueuePoints();
     }
 
-    private void Awake()
+    public void Initialize()
     {
-        if (Instance != null && Instance != this)
+        if (_initialized)
         {
-            Debug.LogWarning("Birden fazla MergeItemSpawner bulundu. Son bulunan instance kullanilacak.", this);
+            return;
         }
 
-        Instance = this;
+        _initialized = true;
         ResolveReferences();
         EnsureRoots();
         EnsureQueuePoints();
         RegisterExistingItems();
-    }
 
-    private void OnDestroy()
-    {
-        if (Instance == this)
-        {
-            Instance = null;
-        }
-    }
-
-    private void Start()
-    {
         if (spawnOnStart)
         {
             SpawnInitialItems();
@@ -290,9 +292,9 @@ public class MergeItemSpawner : MonoBehaviour
         EnsureQueuePoints();
         CleanupNullItems();
 
-        if (itemPrefab == null)
+        if (_itemFactory == null)
         {
-            Debug.LogWarning("MergeItemSpawner icin item prefab referansi eksik.", this);
+            Debug.LogWarning("Merge item factory is not available. Check FarmBoxMergeLifetimeScope.", this);
             return null;
         }
 
@@ -308,8 +310,13 @@ public class MergeItemSpawner : MonoBehaviour
             return null;
         }
 
-        MergeItem spawnedItem = Instantiate(itemPrefab, itemsRoot != null ? itemsRoot : transform);
-        spawnedItem.name = $"{itemPrefab.name}_{spawnedItems.Count + 1:00}";
+        MergeItem spawnedItem = _itemFactory.Create(itemsRoot != null ? itemsRoot : transform);
+        if (spawnedItem == null)
+        {
+            return null;
+        }
+
+        spawnedItem.name = $"MergeItem_{spawnedItems.Count + 1:00}";
         RegisterActiveItem(spawnedItem);
         spawnedItem.Initialize(colorType);
 
@@ -323,7 +330,7 @@ public class MergeItemSpawner : MonoBehaviour
         }
 
         spawnedItems.Add(spawnedItem);
-        FarmBoxMergeFeedbackController.PlayItemSpawn(spawnedItem.transform, colorType);
+        _feedback?.PlayItemSpawn(spawnedItem.transform, colorType);
         return spawnedItem;
     }
 
@@ -428,7 +435,7 @@ public class MergeItemSpawner : MonoBehaviour
         item.transform.localPosition = targetLocalPosition;
         item.transform.localRotation = targetLocalRotation;
         NotifyItemPlaced(item.ColorType);
-        FarmBoxMergeFeedbackController.PlayItemLanded(item.transform, item.ColorType);
+        _feedback?.PlayItemLanded(item.transform, item.ColorType);
         targetBox.NotifyItemSettled();
     }
 
@@ -516,7 +523,9 @@ public class MergeItemSpawner : MonoBehaviour
 
     private Box FindMatchingBox(ColorType colorType)
     {
-        return BoxRegistry.TryFindAvailable(colorType, out Box matchingBox) ? matchingBox : null;
+        return _boxRegistry != null && _boxRegistry.TryFindAvailable(colorType, out Box matchingBox)
+            ? matchingBox
+            : null;
     }
 
     private void RegisterExistingItems()
@@ -706,7 +715,7 @@ public class MergeItemSpawner : MonoBehaviour
         EnsureRoots();
         EnsureQueuePoints();
         CleanupNullItems();
-        return itemPrefab != null && QueueCapacity > 0 && spawnedItems.Count < QueueCapacity;
+        return _itemFactory != null && QueueCapacity > 0 && spawnedItems.Count < QueueCapacity;
     }
 
     private void FillQueueToCapacity()
