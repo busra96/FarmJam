@@ -8,6 +8,7 @@
         <activity
             android:name="com.unity3d.player.UnityPlayerGameActivity"
             android:theme="@style/BaseUnityGameActivityTheme"
+            android:resizeableActivity="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
