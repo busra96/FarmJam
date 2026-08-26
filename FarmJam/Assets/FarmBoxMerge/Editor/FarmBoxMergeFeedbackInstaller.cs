@@ -31,16 +31,17 @@ public static class FarmBoxMergeFeedbackInstaller
         }
 
         SerializedObject serializedFeedback = new SerializedObject(feedback);
-        AssignClip(serializedFeedback, "buttonClip", "Assets/FarmJam/SFX/Click/SFX_UI_Click_Generic_Cute.wav");
-        AssignClip(serializedFeedback, "mergeClip", "Assets/FarmJam/SFX/Pop/SFX_Match_Pop_1.wav");
-        AssignClip(serializedFeedback, "spawnClip", "Assets/FarmJam/SFX/Pop/SFX_Item_Spawn_Pop_2.wav");
-        AssignClip(serializedFeedback, "itemLandClip", "Assets/FarmJam/SFX/Collect/Boxy/SFX_Player_Collect_Boxy_1.wav");
-        AssignClip(serializedFeedback, "trashClip", "Assets/FarmJam/SFX/Click/SFX_UI_Click_Close_Cute.wav");
-        AssignClip(serializedFeedback, "boxClearClip", "Assets/FarmJam/SFX/Collect/Bright/SFX_Player_Collect_Bright_2.wav");
-        AssignClip(serializedFeedback, "winClip", "Assets/FarmJam/SFX/Success/SFX_UI_Success_Magical_2.wav");
-        AssignClip(serializedFeedback, "confettiClip", "Assets/FarmJam/SFX/Confetti/SFX_Confetti_Explosion_Bright_1.wav");
-        AssignClip(serializedFeedback, "failClip", "Assets/FarmJam/SFX/Fail/SFX_Fail_Cartoon_1.wav");
-        AssignClip(serializedFeedback, "gameplayMusic", "Assets/FarmJam/SFX/Happy Fun Casual/MUSC_Life_Is_Simple_GameplayTheme_CMajor_123BPM.wav");
+        const string audioRoot = "Assets/FarmBoxMerge/Dependencies/FarmJam/SFX/";
+        AssignClip(serializedFeedback, "buttonClip", audioRoot + "Click/SFX_UI_Click_Generic_Cute.wav");
+        AssignClip(serializedFeedback, "mergeClip", audioRoot + "Pop/SFX_Match_Pop_1.wav");
+        AssignClip(serializedFeedback, "spawnClip", audioRoot + "Pop/SFX_Item_Spawn_Pop_2.wav");
+        AssignClip(serializedFeedback, "itemLandClip", audioRoot + "Collect/Boxy/SFX_Player_Collect_Boxy_1.wav");
+        AssignClip(serializedFeedback, "trashClip", audioRoot + "Click/SFX_UI_Click_Close_Cute.wav");
+        AssignClip(serializedFeedback, "boxClearClip", audioRoot + "Collect/Bright/SFX_Player_Collect_Bright_2.wav");
+        AssignClip(serializedFeedback, "winClip", audioRoot + "Success/SFX_UI_Success_Magical_2.wav");
+        AssignClip(serializedFeedback, "confettiClip", audioRoot + "Confetti/SFX_Confetti_Explosion_Bright_1.wav");
+        AssignClip(serializedFeedback, "failClip", audioRoot + "Fail/SFX_Fail_Cartoon_1.wav");
+        AssignClip(serializedFeedback, "gameplayMusic", audioRoot + "Happy Fun Casual/MUSC_Life_Is_Simple_GameplayTheme_CMajor_123BPM.wav");
         serializedFeedback.ApplyModifiedPropertiesWithoutUndo();
 
         EditorUtility.SetDirty(feedback);

@@ -6,7 +6,10 @@
 - `Levels`: Stores editable level definitions, their ordered catalog and the runtime level loader.
 - `UI`: Contains card presentation/interaction and the UI-to-world board coordinator.
 - `Helpers`: Stateless shared utilities for easing, random values and object lifecycle operations.
+- `Shared`: Contains the shared enums required by FarmBoxMerge, including `ColorType`.
 - `Editor`: Contains the FarmBoxMerge level authoring window and is excluded from player builds.
+
+Project assets migrated from the old `Assets/FarmJam` root live under `Assets/FarmBoxMerge/Dependencies/FarmJam`. This includes only the fonts, button sprites, materials, textures and audio clips referenced by FarmBoxMerge; the game no longer depends on the old root folder.
 
 Runtime references stay serialized in the scene. Components may resolve a missing reference once during startup, but gameplay code does not create hidden manager components. Level data lives in configuration assets rather than branching logic inside gameplay components.
 
@@ -44,7 +47,7 @@ Queued collectables use the serialized `queueItemEulerAngles` presentation rotat
 
 ## Game feel
 
-`Tools > FarmBoxMerge > Apply Game Feel Polish` adds the centralized sound, particle, haptic and animation controller and assigns the existing FarmJam SFX library.
+`Tools > FarmBoxMerge > Apply Game Feel Polish` adds the centralized sound, particle, haptic and animation controller and assigns the migrated local SFX library.
 
 - `FarmBoxMergeFeedbackController` owns SFX/music levels, pooled world/UI particles, mobile haptics, panel entrances and restrained camera punches.
 - `FarmBoxMergeButtonFeedback` is added to scene buttons at runtime for consistent press/release animation and click sound.
