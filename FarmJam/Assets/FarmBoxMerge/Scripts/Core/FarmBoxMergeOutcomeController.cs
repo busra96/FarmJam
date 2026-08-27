@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using VContainer;
 
 [DisallowMultipleComponent]
-public class FarmBoxMergeOutcomeController : MonoBehaviour
+public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcomeMonitor
 {
     private enum PendingOutcome
     {
@@ -28,9 +28,11 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
     [SerializeField, Min(0f)] private float winDelay = 3f;
     [FormerlySerializedAs("outcomeDelay")]
     [SerializeField, Min(0f)] private float failDelay = 5f;
+    [SerializeField, Min(0.02f)] private float evaluationInterval = 0.1f;
 
     private PendingOutcome _pendingOutcome;
     private float _pendingElapsed;
+    private float _evaluationElapsed;
     private bool _monitoring;
     private bool _outcomeShown;
     private Coroutine _enableMonitoringRoutine;
@@ -74,6 +76,15 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
             return;
         }
 
+        _evaluationElapsed += Time.unscaledDeltaTime;
+        if (_evaluationElapsed < Mathf.Max(0.02f, evaluationInterval))
+        {
+            return;
+        }
+
+        float evaluationDelta = _evaluationElapsed;
+        _evaluationElapsed = 0f;
+
         bool hasActiveBoxGroups = cardMergeBoard != null && cardMergeBoard.HasActiveBoxGroups;
         bool collectableItemsFinished = itemSpawner != null && !itemSpawner.HasRemainingItems;
         if (collectableItemsFinished)
@@ -83,7 +94,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
 
         if (collectableItemsFinished && !hasActiveBoxGroups)
         {
-            AdvancePendingOutcome(PendingOutcome.Win);
+            AdvancePendingOutcome(PendingOutcome.Win, evaluationDelta);
             return;
         }
 
@@ -100,7 +111,9 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
             && ((allBoxSlotsOccupied && (cardBoardIsFull || nextItemCannotJump))
                 || noStandardCardMove));
 
-        AdvancePendingOutcome(boardIsBlocked ? PendingOutcome.Fail : PendingOutcome.None);
+        AdvancePendingOutcome(
+            boardIsBlocked ? PendingOutcome.Fail : PendingOutcome.None,
+            evaluationDelta);
     }
 
     private void OnDestroy()
@@ -183,7 +196,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         }
     }
 
-    private void AdvancePendingOutcome(PendingOutcome outcome)
+    private void AdvancePendingOutcome(PendingOutcome outcome, float elapsed)
     {
         if (outcome == PendingOutcome.None)
         {
@@ -197,7 +210,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
             _pendingElapsed = 0f;
         }
 
-        _pendingElapsed += Time.unscaledDeltaTime;
+        _pendingElapsed += Mathf.Max(0f, elapsed);
         float requiredDelay = outcome == PendingOutcome.Win ? winDelay : failDelay;
         if (_pendingElapsed < Mathf.Max(0f, requiredDelay))
         {
@@ -236,6 +249,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         gameController?.SetGameplayInputEnabled(false);
         _monitoring = false;
         _outcomeShown = false;
+        _evaluationElapsed = 0f;
         CancelPendingOutcome();
         SetPanelState(showWin: false, showFail: false);
     }
@@ -245,6 +259,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         StopMonitoringRoutine();
         bool hasCollectableItems = itemSpawner == null || itemSpawner.HasRemainingItems;
         gameController?.SetGameplayInputEnabled(hasCollectableItems);
+        _evaluationElapsed = 0f;
         _enableMonitoringRoutine = StartCoroutine(EnableMonitoringAfterSetup());
     }
 

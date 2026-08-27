@@ -15,6 +15,7 @@ public sealed class FarmBoxMergeRemainingItemsView : MonoBehaviour
         public RectTransform root;
         public Image background;
         public TextMeshProUGUI countLabel;
+        [NonSerialized] public CanvasGroup canvasGroup;
         [NonSerialized] public int lastCount = -1;
     }
 
@@ -118,18 +119,18 @@ public sealed class FarmBoxMergeRemainingItemsView : MonoBehaviour
             int count = itemSpawner.GetRemainingUnplacedCount(entry.colorType);
             if (entry.countLabel != null)
             {
-                entry.countLabel.text = count.ToString();
+                entry.countLabel.SetText("{0}", count);
             }
 
             if (entry.root != null)
             {
-                CanvasGroup canvasGroup = entry.root.GetComponent<CanvasGroup>();
-                if (canvasGroup == null)
+                if (entry.canvasGroup == null
+                    && !entry.root.TryGetComponent(out entry.canvasGroup))
                 {
-                    canvasGroup = entry.root.gameObject.AddComponent<CanvasGroup>();
+                    entry.canvasGroup = entry.root.gameObject.AddComponent<CanvasGroup>();
                 }
 
-                canvasGroup.alpha = count > 0 ? 1f : emptyAlpha;
+                entry.canvasGroup.alpha = count > 0 ? 1f : emptyAlpha;
                 if (animateDecrease && entry.lastCount >= 0 && count < entry.lastCount)
                 {
                     PlayCountPulse(entry.root);

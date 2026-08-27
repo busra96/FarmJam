@@ -13,13 +13,12 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        if (audioCatalog == null || prefabCatalog == null || settings == null)
+        if (prefabCatalog == null || settings == null)
         {
-            Debug.LogError("FarmBoxMerge VContainer configuration assets are missing.", this);
+            Debug.LogError("FarmBoxMerge prefab catalog or settings asset is missing.", this);
             return;
         }
 
-        builder.RegisterInstance(audioCatalog);
         builder.RegisterInstance(prefabCatalog);
         builder.RegisterInstance(settings);
 
@@ -34,19 +33,68 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
         builder.Register<FarmBoxMergeItemFactory>(Lifetime.Singleton)
             .As<IMergeItemFactory>();
 
-        builder.RegisterComponentInHierarchy<FarmBoxMergeFeedbackController>()
-            .AsSelf()
-            .As<IFarmBoxMergeFeedbackService>();
+        RegisterOptionalFeatures(builder);
         builder.RegisterComponentInHierarchy<CardSpawner>();
         builder.RegisterComponentInHierarchy<CardMergeBoard>();
         builder.RegisterComponentInHierarchy<MergeItemSpawner>();
         builder.RegisterComponentInHierarchy<FarmBoxMergeActionBudget>();
-        builder.RegisterComponentInHierarchy<FarmBoxMergeOutcomeController>();
-        builder.RegisterComponentInHierarchy<FarmBoxMergeAdaptiveLayout>();
         builder.RegisterComponentInHierarchy<FarmBoxMergeLevelRuntime>();
         builder.RegisterComponentInHierarchy<FarmBoxMergeGameController>();
 
         builder.RegisterEntryPoint<FarmBoxMergeBootstrapper>();
         builder.RegisterEntryPoint<FarmBoxMergeRuntimeTicker>();
+    }
+
+    private void RegisterOptionalFeatures(IContainerBuilder builder)
+    {
+        FarmBoxMergeFeedbackController feedbackController =
+            Object.FindFirstObjectByType<FarmBoxMergeFeedbackController>(FindObjectsInactive.Include);
+        if (feedbackController != null && audioCatalog != null)
+        {
+            builder.RegisterInstance(audioCatalog);
+            builder.RegisterComponent(feedbackController)
+                .AsSelf()
+                .As<IFarmBoxMergeFeedbackService>();
+        }
+        else
+        {
+            if (feedbackController != null && audioCatalog == null)
+            {
+                Debug.LogWarning(
+                    "FarmBoxMerge audio catalog is missing; feedback feature will stay disabled.",
+                    this);
+            }
+
+            builder.Register<FarmBoxMergeNullFeedbackService>(Lifetime.Singleton)
+                .As<IFarmBoxMergeFeedbackService>();
+        }
+
+        FarmBoxMergeOutcomeController outcomeController =
+            Object.FindFirstObjectByType<FarmBoxMergeOutcomeController>(FindObjectsInactive.Include);
+        if (outcomeController != null)
+        {
+            builder.RegisterComponent(outcomeController)
+                .AsSelf()
+                .As<IFarmBoxMergeOutcomeMonitor>();
+        }
+        else
+        {
+            builder.Register<FarmBoxMergeNullOutcomeMonitor>(Lifetime.Singleton)
+                .As<IFarmBoxMergeOutcomeMonitor>();
+        }
+
+        FarmBoxMergeAdaptiveLayout adaptiveLayout =
+            Object.FindFirstObjectByType<FarmBoxMergeAdaptiveLayout>(FindObjectsInactive.Include);
+        if (adaptiveLayout != null)
+        {
+            builder.RegisterComponent(adaptiveLayout)
+                .AsSelf()
+                .As<IFarmBoxMergeLayoutController>();
+        }
+        else
+        {
+            builder.Register<FarmBoxMergeNullLayoutController>(Lifetime.Singleton)
+                .As<IFarmBoxMergeLayoutController>();
+        }
     }
 }

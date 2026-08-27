@@ -7,6 +7,15 @@ using VContainer;
 [DisallowMultipleComponent]
 public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMergeFeedbackService
 {
+    private static readonly Color[] ConfettiPalette =
+    {
+        new Color(0.98f, 0.40f, 0.33f),
+        new Color(1f, 0.78f, 0.22f),
+        new Color(0.43f, 0.78f, 0.45f),
+        new Color(0.40f, 0.70f, 0.93f),
+        new Color(0.72f, 0.46f, 0.88f)
+    };
+
     private enum HapticStrength
     {
         Light,
@@ -32,6 +41,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
     private ParticleSystem _worldParticles;
     private RectTransform _uiParticleLayer;
     private Canvas _canvas;
+    private Camera _gameplayCamera;
     private Sprite _particleSprite;
     private Material _particleMaterial;
     private Coroutine _cameraRoutine;
@@ -224,6 +234,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
     private void ResolveRuntimeObjects()
     {
         _canvas = FarmBoxMergeObjectUtility.FindSceneComponent<Canvas>();
+        _gameplayCamera = Camera.main;
         EnsureAudioSources();
         EnsureParticleSprite();
         EnsureWorldParticles();
@@ -556,15 +567,6 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
             return;
         }
 
-        Color[] palette =
-        {
-            new Color(0.98f, 0.40f, 0.33f),
-            new Color(1f, 0.78f, 0.22f),
-            new Color(0.43f, 0.78f, 0.45f),
-            new Color(0.40f, 0.70f, 0.93f),
-            new Color(0.72f, 0.46f, 0.88f)
-        };
-
         float halfWidth = _uiParticleLayer.rect.width * 0.48f;
         float top = _uiParticleLayer.rect.height * 0.46f;
         for (int i = 0; i < 34; i++)
@@ -573,7 +575,12 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
             particle.rectTransform.sizeDelta = new Vector2(uiSparkleSize * 0.45f, uiSparkleSize * 1.15f);
             Vector2 start = new Vector2(Random.Range(-halfWidth, halfWidth), top + Random.Range(-20f, 90f));
             Vector2 drift = new Vector2(Random.Range(-90f, 90f), -Random.Range(280f, 520f));
-            StartCoroutine(AnimateConfettiParticle(particle, start, drift, palette[i % palette.Length], Random.Range(0f, 0.42f)));
+            StartCoroutine(AnimateConfettiParticle(
+                particle,
+                start,
+                drift,
+                ConfettiPalette[i % ConfettiPalette.Length],
+                Random.Range(0f, 0.42f)));
         }
     }
 
@@ -582,9 +589,11 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
         image.color = color;
         image.rectTransform.anchoredPosition = start;
         image.gameObject.SetActive(false);
-        if (delay > 0f)
+        float delayElapsed = 0f;
+        while (delayElapsed < delay)
         {
-            yield return new WaitForSecondsRealtime(delay);
+            delayElapsed += Time.unscaledDeltaTime;
+            yield return null;
         }
 
         image.gameObject.SetActive(true);
@@ -722,7 +731,13 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
 
     private void PunchCamera(float strength, float duration)
     {
-        if (_settings == null || !_settings.CameraFeedbackEnabled || Camera.main == null)
+        if (_settings == null || !_settings.CameraFeedbackEnabled)
+        {
+            return;
+        }
+
+        _gameplayCamera ??= Camera.main;
+        if (_gameplayCamera == null)
         {
             return;
         }
@@ -733,7 +748,7 @@ public sealed class FarmBoxMergeFeedbackController : MonoBehaviour, IFarmBoxMerg
             RestoreCameraPosition();
         }
 
-        _cameraTarget = Camera.main.transform;
+        _cameraTarget = _gameplayCamera.transform;
         _cameraBaseLocalPosition = _cameraTarget.localPosition;
         _cameraRoutine = StartCoroutine(CameraPunchRoutine(strength, duration));
     }

@@ -1,21 +1,45 @@
 using VContainer.Unity;
 
+public interface IFarmBoxMergeOutcomeMonitor
+{
+    void Initialize();
+    void Tick();
+}
+
+public interface IFarmBoxMergeLayoutController
+{
+    void Initialize();
+    void Tick();
+}
+
+public sealed class FarmBoxMergeNullOutcomeMonitor : IFarmBoxMergeOutcomeMonitor
+{
+    public void Initialize() { }
+    public void Tick() { }
+}
+
+public sealed class FarmBoxMergeNullLayoutController : IFarmBoxMergeLayoutController
+{
+    public void Initialize() { }
+    public void Tick() { }
+}
+
 public sealed class FarmBoxMergeRuntimeTicker : ITickable
 {
-    private readonly FarmBoxMergeOutcomeController _outcomeController;
-    private readonly FarmBoxMergeAdaptiveLayout _adaptiveLayout;
+    private readonly IFarmBoxMergeOutcomeMonitor _outcomeMonitor;
+    private readonly IFarmBoxMergeLayoutController _layoutController;
 
     public FarmBoxMergeRuntimeTicker(
-        FarmBoxMergeOutcomeController outcomeController,
-        FarmBoxMergeAdaptiveLayout adaptiveLayout)
+        IFarmBoxMergeOutcomeMonitor outcomeMonitor,
+        IFarmBoxMergeLayoutController layoutController)
     {
-        _outcomeController = outcomeController;
-        _adaptiveLayout = adaptiveLayout;
+        _outcomeMonitor = outcomeMonitor;
+        _layoutController = layoutController;
     }
 
     public void Tick()
     {
-        _outcomeController.Tick();
-        _adaptiveLayout.Tick();
+        _outcomeMonitor.Tick();
+        _layoutController.Tick();
     }
 }

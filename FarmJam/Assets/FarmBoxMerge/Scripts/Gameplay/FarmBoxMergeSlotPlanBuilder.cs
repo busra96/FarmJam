@@ -97,6 +97,12 @@ public static class FarmBoxMergeSlotPlanBuilder
             return false;
         }
 
+        List<ColorType> cardDeck = new List<ColorType>();
+        if (!FarmBoxMergeCardDeckBuilder.TryBuild(level, cardDeck, out error))
+        {
+            return false;
+        }
+
         error = string.Empty;
         return true;
     }
@@ -391,5 +397,82 @@ public static class FarmBoxMergeSlotPlanBuilder
             activeColors.Add(entry.intendedColor);
             activeRemaining.Add(FarmBoxMergeRules.ClampCardCounter(entry.boxSize));
         }
+    }
+}
+
+/// <summary>
+/// Converts authored level data into a deterministic level-one card deck.
+/// Keeping this pure makes the same rule reusable by runtime, editor validation
+/// and future automated level tests without depending on CardSpawner state.
+/// </summary>
+public static class FarmBoxMergeCardDeckBuilder
+{
+    private const int ColorCount = 5;
+
+    public static bool TryBuild(
+        FarmBoxMergeLevelDefinition level,
+        List<ColorType> output,
+        out string error)
+    {
+        output?.Clear();
+        if (level == null || output == null || !level.HasAuthoredBoxSlotPlan)
+        {
+            error = "Sabit şeffaf kutu planı bulunamadı.";
+            return false;
+        }
+
+        int[] expectedCards = new int[ColorCount];
+        IReadOnlyList<FarmBoxMergeCardSpawnGroup> cardPlan = level.CardSpawnPlan;
+        for (int i = 0; i < cardPlan.Count; i++)
+        {
+            FarmBoxMergeCardSpawnGroup group = cardPlan[i];
+            if (group == null || !TryGetColorIndex(group.colorType, out int colorIndex))
+            {
+                continue;
+            }
+
+            expectedCards[colorIndex] += Mathf.Max(1, group.count);
+        }
+
+        int[] authoredCards = new int[ColorCount];
+        IReadOnlyList<FarmBoxMergeBoxSlotPlanEntry> slotPlan = level.BoxSlotPlan;
+        for (int i = 0; i < slotPlan.Count; i++)
+        {
+            FarmBoxMergeBoxSlotPlanEntry entry = slotPlan[i];
+            if (entry == null || !TryGetColorIndex(entry.intendedColor, out int colorIndex))
+            {
+                output.Clear();
+                error = $"Şeffaf kutu akışının {i + 1}. kart adımı geçersiz.";
+                return false;
+            }
+
+            int cardCount = FarmBoxMergeSlotPlanBuilder.GetRequiredLevelOneCardCount(entry.boxSize);
+            authoredCards[colorIndex] += cardCount;
+            for (int cardIndex = 0; cardIndex < cardCount; cardIndex++)
+            {
+                output.Add(entry.intendedColor);
+            }
+        }
+
+        for (int colorIndex = 0; colorIndex < ColorCount; colorIndex++)
+        {
+            if (expectedCards[colorIndex] == authoredCards[colorIndex])
+            {
+                continue;
+            }
+
+            output.Clear();
+            error = $"{(ColorType)colorIndex}: kart planı ile sabit kutu çözüm maliyeti eşleşmiyor.";
+            return false;
+        }
+
+        error = output.Count > 0 ? string.Empty : "Level kart destesi boş.";
+        return output.Count > 0;
+    }
+
+    private static bool TryGetColorIndex(ColorType colorType, out int index)
+    {
+        index = (int)colorType;
+        return index >= 0 && index < ColorCount;
     }
 }

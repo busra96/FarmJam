@@ -16,6 +16,7 @@ public sealed class FarmBoxMergeBoxSlotView : MonoBehaviour
     [SerializeField, Range(0.01f, 0.3f)] private float incompatibleAlpha = 0.07f;
 
     private readonly List<Renderer> _previewRenderers = new List<Renderer>();
+    private readonly List<Box> _previewBoxes = new List<Box>(FarmBoxMergeRules.MaxCardCounter);
     private MaterialPropertyBlock _propertyBlock;
 
     private MergeBoxPatternType _patternType;
@@ -154,57 +155,96 @@ public sealed class FarmBoxMergeBoxSlotView : MonoBehaviour
         IBoxFactory boxFactory,
         Material previewMaterial)
     {
-        if (boxFactory == null || localPositions == null)
+        if (localPositions == null)
         {
             return;
         }
 
         _isBuildingPreview = true;
-        _previewRenderers.Clear();
-        if (previewRoot != null)
+        if (previewRoot == null)
         {
-            FarmBoxMergeObjectUtility.Destroy(previewRoot.gameObject);
+            GameObject previewObject = new GameObject("BoxSlotPreview");
+            previewRoot = previewObject.transform;
+            previewRoot.SetParent(transform, false);
         }
 
-        GameObject previewObject = new GameObject($"BoxSlotPreview_{acceptedCardValue}");
-        previewRoot = previewObject.transform;
-        previewRoot.SetParent(transform, false);
+        previewRoot.name = $"BoxSlotPreview_{acceptedCardValue}";
         previewRoot.localPosition = Vector3.up * heightOffset;
         previewRoot.localRotation = Quaternion.identity;
         previewRoot.localScale = Vector3.one;
 
         for (int i = 0; i < localPositions.Length; i++)
         {
-            Box previewBox = boxFactory.Create(previewRoot);
+            Box previewBox = GetOrCreatePreviewBox(i, boxFactory, previewMaterial);
             if (previewBox == null)
             {
                 continue;
             }
 
             previewBox.name = $"GhostBox_{i + 1:00}";
+            previewBox.gameObject.SetActive(true);
             previewBox.transform.localPosition = localPositions[i];
             previewBox.transform.localRotation = Quaternion.identity;
-            previewBox.enabled = false;
-            SetLayerRecursively(previewBox.gameObject, LayerMask.NameToLayer("Ignore Raycast"));
+        }
 
-            Collider[] colliders = previewBox.GetComponentsInChildren<Collider>(true);
-            for (int colliderIndex = 0; colliderIndex < colliders.Length; colliderIndex++)
+        for (int i = localPositions.Length; i < _previewBoxes.Count; i++)
+        {
+            if (_previewBoxes[i] != null)
             {
-                colliders[colliderIndex].enabled = false;
-            }
-
-            Renderer[] renderers = previewBox.GetComponentsInChildren<Renderer>(true);
-            for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
-            {
-                Renderer previewRenderer = renderers[rendererIndex];
-                previewRenderer.sharedMaterial = previewMaterial;
-                previewRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                previewRenderer.receiveShadows = false;
-                _previewRenderers.Add(previewRenderer);
+                _previewBoxes[i].gameObject.SetActive(false);
             }
         }
 
         _isBuildingPreview = false;
+    }
+
+    private Box GetOrCreatePreviewBox(
+        int index,
+        IBoxFactory boxFactory,
+        Material previewMaterial)
+    {
+        if (index < _previewBoxes.Count && _previewBoxes[index] != null)
+        {
+            return _previewBoxes[index];
+        }
+
+        if (boxFactory == null)
+        {
+            return null;
+        }
+
+        Box previewBox = boxFactory.Create(previewRoot);
+        if (previewBox == null)
+        {
+            return null;
+        }
+
+        previewBox.enabled = false;
+        SetLayerRecursively(previewBox.gameObject, LayerMask.NameToLayer("Ignore Raycast"));
+
+        Collider[] colliders = previewBox.GetComponentsInChildren<Collider>(true);
+        for (int colliderIndex = 0; colliderIndex < colliders.Length; colliderIndex++)
+        {
+            colliders[colliderIndex].enabled = false;
+        }
+
+        Renderer[] renderers = previewBox.GetComponentsInChildren<Renderer>(true);
+        for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
+        {
+            Renderer previewRenderer = renderers[rendererIndex];
+            previewRenderer.sharedMaterial = previewMaterial;
+            previewRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            previewRenderer.receiveShadows = false;
+            _previewRenderers.Add(previewRenderer);
+        }
+
+        while (_previewBoxes.Count <= index)
+        {
+            _previewBoxes.Add(null);
+        }
+
+        _previewBoxes[index] = previewBox;
+        return previewBox;
     }
 
     private MergeBoxParent FindActiveBoxGroup()

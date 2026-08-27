@@ -13,6 +13,10 @@ Project assets migrated from the old `Assets/FarmJam` root live under `Assets/Fa
 
 Runtime references stay serialized in the scene. Components may resolve a missing reference once during startup, but gameplay code does not create hidden manager components. Level data lives in configuration assets rather than branching logic inside gameplay components.
 
+The VContainer composition root treats feedback, outcome monitoring and adaptive layout as optional features. Removing one of those components registers a zero-cost null implementation, so core level, card, item and box systems can still run. Prefab configuration and settings remain required core dependencies. Runtime initialization stays in `FarmBoxMergeBootstrapper`, while the single VContainer ticker owns the throttled outcome and responsive-layout checks.
+
+Hot-path allocations are intentionally bounded: card transforms are only written while their visual state is changing, outcome checks run at a configurable 10 Hz by default, screen/safe-area checks run four times per second, item queue animations reuse their movement buffers, remaining-item UI caches its `CanvasGroup` references, and each world slot keeps four reusable ghost boxes instead of rebuilding preview prefabs for every shape change.
+
 ## Level authoring
 
 Open `Tools > FarmBoxMerge > Level Editor`. Each `FarmBoxMergeLevelDefinition` asset contains:
@@ -25,6 +29,8 @@ Open `Tools > FarmBoxMerge > Level Editor`. Each `FarmBoxMergeLevelDefinition` a
 `FarmBoxMergeLevelCatalog` owns the playable level order. Drag levels in the editor window to reorder them. `FarmBoxMergeLevelRuntime` reads the catalog assigned in the scene, disables legacy automatic spawning and loads the selected level. Item sequences longer than the visible queue are retained in a pending queue and fed into the scene without dropping entries.
 
 `Tools > FarmBoxMerge > Rebuild All Deterministic Slot Flows` rebuilds item and transparent-box flows together with a deterministic three-slot schedule. Colors remain mixed, but a new target group enters the item flow only after an active group can finish. The command preserves color totals, card totals and catalog order while preventing an unavoidable fourth-color queue lock. The legacy `Mix All Level Item Flows` menu item now runs the same safe rebuild so item and slot plans cannot drift apart.
+
+`FarmBoxMergeCardDeckBuilder` is the shared pure rule for turning a validated transparent-box solution into its deterministic level-one card deck. Runtime spawning and editor validation both use this builder, keeping new deck strategies independent from `CardSpawner` lifecycle code.
 
 The default catalog contains 35 authored levels in difficulty order. Levels 1-5 teach merge sizes, levels 6-15 introduce all five colors, levels 16-25 focus on queue and three-slot planning, and levels 26-35 provide longer expert layouts. Every authored card enters play at counter `1`. For levels with a fixed transparent-box flow, the card deck is derived deterministically from that solution order: each target receives exactly the level-one resources required to build its value before later colors can flood the 12-card board. A merge or box placement still deals the next pending card whenever a board slot opens. Legacy levels without a fixed flow retain shuffled card totals as a compatibility fallback.
 

@@ -80,6 +80,11 @@ public class MergeItemSpawner : MonoBehaviour
     private readonly HashSet<MergeItem> _activeItems = new HashSet<MergeItem>();
     private readonly Queue<ColorType> _pendingColors = new Queue<ColorType>();
     private readonly Dictionary<ColorType, int> _remainingUnplacedByColor = new Dictionary<ColorType, int>();
+    private readonly List<MergeItem> _queueMoveItems = new List<MergeItem>(20);
+    private readonly List<Vector3> _queueMoveStartPositions = new List<Vector3>(20);
+    private readonly List<Quaternion> _queueMoveStartRotations = new List<Quaternion>(20);
+    private readonly List<Vector3> _queueMoveTargetPositions = new List<Vector3>(20);
+    private readonly List<Quaternion> _queueMoveTargetRotations = new List<Quaternion>(20);
     private IMergeItemFactory _itemFactory;
     private IFarmBoxMergeBoxRegistry _boxRegistry;
     private IFarmBoxMergeFeedbackService _feedback;
@@ -447,11 +452,11 @@ public class MergeItemSpawner : MonoBehaviour
             yield break;
         }
 
-        List<MergeItem> itemsToMove = new List<MergeItem>();
-        List<Vector3> startPositions = new List<Vector3>();
-        List<Quaternion> startRotations = new List<Quaternion>();
-        List<Vector3> targetPositions = new List<Vector3>();
-        List<Quaternion> targetRotations = new List<Quaternion>();
+        _queueMoveItems.Clear();
+        _queueMoveStartPositions.Clear();
+        _queueMoveStartRotations.Clear();
+        _queueMoveTargetPositions.Clear();
+        _queueMoveTargetRotations.Clear();
 
         for (int i = 0; i < spawnedItems.Count; i++)
         {
@@ -472,14 +477,14 @@ public class MergeItemSpawner : MonoBehaviour
                 item.transform.SetParent(itemsRoot, true);
             }
 
-            itemsToMove.Add(item);
-            startPositions.Add(item.transform.position);
-            startRotations.Add(item.transform.rotation);
-            targetPositions.Add(targetPoint.position);
-            targetRotations.Add(GetQueueItemRotation(targetPoint));
+            _queueMoveItems.Add(item);
+            _queueMoveStartPositions.Add(item.transform.position);
+            _queueMoveStartRotations.Add(item.transform.rotation);
+            _queueMoveTargetPositions.Add(targetPoint.position);
+            _queueMoveTargetRotations.Add(GetQueueItemRotation(targetPoint));
         }
 
-        if (itemsToMove.Count == 0)
+        if (_queueMoveItems.Count == 0)
         {
             yield break;
         }
@@ -493,31 +498,37 @@ public class MergeItemSpawner : MonoBehaviour
             float progress = Mathf.Clamp01(elapsed / duration);
             float easedProgress = FarmBoxMergeMath.SmoothStep(progress);
 
-            for (int i = 0; i < itemsToMove.Count; i++)
+            for (int i = 0; i < _queueMoveItems.Count; i++)
             {
-                MergeItem item = itemsToMove[i];
+                MergeItem item = _queueMoveItems[i];
                 if (item == null)
                 {
                     continue;
                 }
 
-                item.transform.position = Vector3.LerpUnclamped(startPositions[i], targetPositions[i], easedProgress);
-                item.transform.rotation = Quaternion.Slerp(startRotations[i], targetRotations[i], easedProgress);
+                item.transform.position = Vector3.LerpUnclamped(
+                    _queueMoveStartPositions[i],
+                    _queueMoveTargetPositions[i],
+                    easedProgress);
+                item.transform.rotation = Quaternion.Slerp(
+                    _queueMoveStartRotations[i],
+                    _queueMoveTargetRotations[i],
+                    easedProgress);
             }
 
             yield return null;
         }
 
-        for (int i = 0; i < itemsToMove.Count; i++)
+        for (int i = 0; i < _queueMoveItems.Count; i++)
         {
-            MergeItem item = itemsToMove[i];
+            MergeItem item = _queueMoveItems[i];
             if (item == null)
             {
                 continue;
             }
 
-            item.transform.position = targetPositions[i];
-            item.transform.rotation = targetRotations[i];
+            item.transform.position = _queueMoveTargetPositions[i];
+            item.transform.rotation = _queueMoveTargetRotations[i];
         }
     }
 

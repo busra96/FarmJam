@@ -34,6 +34,7 @@ public class CardSpawner : MonoBehaviour
     private readonly List<CardSpawnEntry> _lastSpawnedCards = new List<CardSpawnEntry>();
     private readonly Queue<ColorType> _pendingLevelCards = new Queue<ColorType>();
     private readonly List<ColorType> _lastLevelCardDeck = new List<ColorType>();
+    private readonly List<ColorType> _levelDeckBuffer = new List<ColorType>(64);
     private ICardFactory _cardFactory;
     private IFarmBoxMergeBoxRegistry _boxRegistry;
     private IFarmBoxMergeFeedbackService _feedback;
@@ -129,7 +130,7 @@ public class CardSpawner : MonoBehaviour
             return;
         }
 
-        List<ColorType> deck = new List<ColorType>();
+        _levelDeckBuffer.Clear();
         for (int i = 0; i < cardSpawnPlan.Count; i++)
         {
             FarmBoxMergeCardSpawnGroup group = cardSpawnPlan[i];
@@ -141,12 +142,12 @@ public class CardSpawner : MonoBehaviour
             int count = Mathf.Max(1, group.count);
             for (int cardIndex = 0; cardIndex < count; cardIndex++)
             {
-                deck.Add(group.colorType);
+                _levelDeckBuffer.Add(group.colorType);
             }
         }
 
-        ShuffleLevelDeck(deck);
-        BeginLevelCardFlow(deck);
+        ShuffleLevelDeck(_levelDeckBuffer);
+        BeginLevelCardFlow(_levelDeckBuffer);
     }
 
     public void SpawnLevelCards(FarmBoxMergeLevelDefinition level)
@@ -157,9 +158,9 @@ public class CardSpawner : MonoBehaviour
             return;
         }
 
-        if (TryBuildAuthoredLevelDeck(level, out List<ColorType> authoredDeck))
+        if (FarmBoxMergeCardDeckBuilder.TryBuild(level, _levelDeckBuffer, out _))
         {
-            BeginLevelCardFlow(authoredDeck);
+            BeginLevelCardFlow(_levelDeckBuffer);
             return;
         }
 
@@ -190,75 +191,6 @@ public class CardSpawner : MonoBehaviour
 
         _levelCardFlowActive = _pendingLevelCards.Count > 0;
         FillAvailableLevelCardSlots();
-    }
-
-    private static bool TryBuildAuthoredLevelDeck(
-        FarmBoxMergeLevelDefinition level,
-        out List<ColorType> deck)
-    {
-        deck = new List<ColorType>();
-        if (level == null || !level.HasAuthoredBoxSlotPlan)
-        {
-            return false;
-        }
-
-        Dictionary<ColorType, int> expectedCards = new Dictionary<ColorType, int>();
-        IReadOnlyList<FarmBoxMergeCardSpawnGroup> cardPlan = level.CardSpawnPlan;
-        for (int i = 0; i < cardPlan.Count; i++)
-        {
-            FarmBoxMergeCardSpawnGroup group = cardPlan[i];
-            if (group == null)
-            {
-                continue;
-            }
-
-            AddCardCount(expectedCards, group.colorType, Mathf.Max(1, group.count));
-        }
-
-        Dictionary<ColorType, int> authoredCards = new Dictionary<ColorType, int>();
-        IReadOnlyList<FarmBoxMergeBoxSlotPlanEntry> slotPlan = level.BoxSlotPlan;
-        for (int i = 0; i < slotPlan.Count; i++)
-        {
-            FarmBoxMergeBoxSlotPlanEntry entry = slotPlan[i];
-            if (entry == null)
-            {
-                deck.Clear();
-                return false;
-            }
-
-            int cardCount = FarmBoxMergeSlotPlanBuilder.GetRequiredLevelOneCardCount(entry.boxSize);
-            AddCardCount(authoredCards, entry.intendedColor, cardCount);
-            for (int cardIndex = 0; cardIndex < cardCount; cardIndex++)
-            {
-                deck.Add(entry.intendedColor);
-            }
-        }
-
-        foreach (ColorType colorType in Enum.GetValues(typeof(ColorType)))
-        {
-            int expected = expectedCards.TryGetValue(colorType, out int expectedCount)
-                ? expectedCount
-                : 0;
-            int authored = authoredCards.TryGetValue(colorType, out int authoredCount)
-                ? authoredCount
-                : 0;
-            if (expected != authored)
-            {
-                deck.Clear();
-                return false;
-            }
-        }
-
-        return deck.Count > 0;
-    }
-
-    private static void AddCardCount(
-        Dictionary<ColorType, int> totals,
-        ColorType colorType,
-        int amount)
-    {
-        totals.TryGetValue(colorType, out int current);
-        totals[colorType] = current + amount;
     }
 
     public void CancelLevelCardFlow()

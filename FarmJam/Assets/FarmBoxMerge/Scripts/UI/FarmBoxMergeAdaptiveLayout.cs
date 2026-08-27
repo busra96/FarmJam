@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 [DefaultExecutionOrder(-1000)]
 [DisallowMultipleComponent]
-public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
+public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour, IFarmBoxMergeLayoutController
 {
     [Header("References")]
     [SerializeField] private Camera gameplayCamera;
@@ -14,6 +14,7 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
     [SerializeField] private Vector2 referenceResolution = new Vector2(1080f, 1920f);
     [SerializeField, Range(1f, 179f)] private float referenceVerticalFieldOfView = 50f;
     [SerializeField, Range(1f, 179f)] private float maximumVerticalFieldOfView = 88f;
+    [SerializeField, Min(0.05f)] private float layoutCheckInterval = 0.25f;
 
     [Header("Safe Area")]
     [SerializeField] private bool respectSafeArea = true;
@@ -31,6 +32,7 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
     private Rect _lastSafeArea;
     private bool _hasCachedLayout;
     private bool _initialized;
+    private float _nextLayoutCheckAt;
 
     public void Initialize()
     {
@@ -43,10 +45,17 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
         ResolveReferences();
         CacheBaseLayout();
         ApplyLayout(true);
+        _nextLayoutCheckAt = Time.unscaledTime + Mathf.Max(0.05f, layoutCheckInterval);
     }
 
     public void Tick()
     {
+        if (Time.unscaledTime < _nextLayoutCheckAt)
+        {
+            return;
+        }
+
+        _nextLayoutCheckAt = Time.unscaledTime + Mathf.Max(0.05f, layoutCheckInterval);
         ApplyLayout(false);
     }
 
@@ -54,6 +63,7 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
     {
         if (hasFocus)
         {
+            _nextLayoutCheckAt = 0f;
             ApplyLayout(true);
         }
     }
@@ -64,6 +74,7 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
         ResolveReferences();
         CacheBaseLayout();
         ApplyLayout(true);
+        _nextLayoutCheckAt = Time.unscaledTime + Mathf.Max(0.05f, layoutCheckInterval);
     }
 
     public static float CalculateVerticalFieldOfView(
@@ -334,6 +345,7 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour
         referenceResolution.x = Mathf.Max(1f, referenceResolution.x);
         referenceResolution.y = Mathf.Max(1f, referenceResolution.y);
         maximumVerticalFieldOfView = Mathf.Max(referenceVerticalFieldOfView, maximumVerticalFieldOfView);
+        layoutCheckInterval = Mathf.Max(0.05f, layoutCheckInterval);
     }
 #endif
 }

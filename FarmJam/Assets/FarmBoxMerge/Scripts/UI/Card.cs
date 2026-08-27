@@ -9,6 +9,9 @@ using VContainer;
 [DisallowMultipleComponent]
 public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
+    private const float TransformSnapSqrDistance = 0.000001f;
+    private const float RotationSnapThreshold = 0.02f;
+
     [Header("View")]
     public Image BackgroundColorImg;
     public TextMeshProUGUI CounterTxt;
@@ -125,9 +128,31 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     private void Update()
     {
-        SmoothScale();
-        SmoothDragFollow();
-        SmoothRotation();
+        if (_isDragging)
+        {
+            SmoothDragFollow();
+        }
+        else
+        {
+            _targetRotationOffset = 0f;
+        }
+
+        Vector3 targetScale = _baseScale * (_targetScaleMultiplier * _scaleEffectMultiplier);
+        if ((RectTransform.localScale - targetScale).sqrMagnitude > TransformSnapSqrDistance)
+        {
+            SmoothScale(targetScale);
+        }
+        else if (RectTransform.localScale != targetScale)
+        {
+            RectTransform.localScale = targetScale;
+        }
+
+        float targetRotation = _baseRotationZ + _targetRotationOffset;
+        float currentRotation = NormalizeAngle(RectTransform.localEulerAngles.z);
+        if (_isDragging || Mathf.Abs(Mathf.DeltaAngle(currentRotation, targetRotation)) > RotationSnapThreshold)
+        {
+            SmoothRotation(currentRotation, targetRotation);
+        }
     }
 
     private void OnDestroy()
@@ -490,10 +515,10 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         _originalSizeDelta = RectTransform.sizeDelta;
     }
 
-    private void SmoothScale()
+    private void SmoothScale(Vector3 targetScale)
     {
         float interpolation = FarmBoxMergeMath.DampFactor(scaleSharpness, Time.unscaledDeltaTime);
-        RectTransform.localScale = Vector3.Lerp(RectTransform.localScale, _baseScale * (_targetScaleMultiplier * _scaleEffectMultiplier), interpolation);
+        RectTransform.localScale = Vector3.Lerp(RectTransform.localScale, targetScale, interpolation);
     }
 
     private void SmoothDragFollow()
@@ -515,11 +540,9 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         _targetRotationOffset = movementTilt + wobble;
     }
 
-    private void SmoothRotation()
+    private void SmoothRotation(float currentZ, float targetZ)
     {
         float interpolation = FarmBoxMergeMath.DampFactor(rotationSharpness, Time.unscaledDeltaTime);
-        float currentZ = NormalizeAngle(RectTransform.localEulerAngles.z);
-        float targetZ = _baseRotationZ + _targetRotationOffset;
         float nextZ = Mathf.LerpAngle(currentZ, targetZ, interpolation);
         RectTransform.localRotation = Quaternion.Euler(0f, 0f, nextZ);
     }
