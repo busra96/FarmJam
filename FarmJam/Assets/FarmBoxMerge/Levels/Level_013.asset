@@ -16,15 +16,15 @@ MonoBehaviour:
   levelName: 13 - Birleri Birlestir
   designerNotes: Orta. Sekiz seviye bir kartla renk bazli merge kararlarini uygula.
   itemSequence:
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
     count: 1
   - colorType: 2
     count: 1
@@ -41,4 +41,17 @@ MonoBehaviour:
     count: 2
   - colorType: 3
     count: 2
+  boxSlotPlan:
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

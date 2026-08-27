@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer;
 
@@ -23,6 +24,8 @@ public class FarmBoxMergeLevelRuntime : MonoBehaviour
     public bool HasLevels => catalog != null && catalog.Count > 0;
     public int CurrentLevelIndex => _currentLevelIndex;
     public FarmBoxMergeLevelDefinition CurrentLevel => HasLevels ? catalog.GetLevel(_currentLevelIndex) : null;
+
+    public event Action<FarmBoxMergeLevelDefinition> CurrentLevelSpawned;
 
     [Inject]
     public void Construct(CardSpawner injectedCardSpawner, MergeItemSpawner injectedItemSpawner)
@@ -63,8 +66,9 @@ public class FarmBoxMergeLevelRuntime : MonoBehaviour
             return;
         }
 
-        cardSpawner?.SpawnLevelCards(level.CardSpawnPlan);
+        cardSpawner?.SpawnLevelCards(level);
         itemSpawner?.SpawnLevelItems(level.ItemSequence);
+        CurrentLevelSpawned?.Invoke(level);
     }
 
     public bool MoveNext()

@@ -28,9 +28,9 @@ MonoBehaviour:
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 0
-    count: 1
   - colorType: 1
+    count: 1
+  - colorType: 0
     count: 1
   - colorType: 2
     count: 1
@@ -43,4 +43,17 @@ MonoBehaviour:
     count: 4
   - colorType: 2
     count: 8
+  boxSlotPlan:
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 1
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

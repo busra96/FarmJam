@@ -16,33 +16,7 @@ MonoBehaviour:
   levelName: 24 - Dortlu Maraton
   designerNotes: Zor. Dort rengin beser itemi icin ikili ve uclu kutulari planla.
   itemSequence:
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
   - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
     count: 1
   - colorType: 0
     count: 1
@@ -52,10 +26,34 @@ MonoBehaviour:
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 3
+  - colorType: 1
+    count: 1
+  - colorType: 0
     count: 1
   - colorType: 1
     count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 2
   cardSpawnPlan:
   - colorType: 0
     count: 6
@@ -65,4 +63,29 @@ MonoBehaviour:
     count: 6
   - colorType: 3
     count: 6
+  boxSlotPlan:
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

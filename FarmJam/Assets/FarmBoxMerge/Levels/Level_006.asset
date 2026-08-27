@@ -16,18 +16,16 @@ MonoBehaviour:
   levelName: 06 - Pazar Aciliyor
   designerNotes: Kolay. Uc renk icin ikili kartlar hazirla ve kuyrugu temizle.
   itemSequence:
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
   - colorType: 0
     count: 1
   - colorType: 1
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 2
+  - colorType: 1
     count: 1
+  - colorType: 2
+    count: 2
   cardSpawnPlan:
   - colorType: 0
     count: 2
@@ -35,4 +33,14 @@ MonoBehaviour:
     count: 2
   - colorType: 2
     count: 2
+  boxSlotPlan:
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

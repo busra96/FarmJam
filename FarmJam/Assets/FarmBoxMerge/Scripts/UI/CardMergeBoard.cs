@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using VContainer;
@@ -21,6 +22,11 @@ public class CardMergeBoard : MonoBehaviour
 
     private readonly List<RaycastResult> _uiRaycastResults = new List<RaycastResult>();
     private readonly HashSet<Card> _registeredCards = new HashSet<Card>();
+    private readonly List<FarmBoxMergeBoxRequirement> _pendingSlotRequirements = new List<FarmBoxMergeBoxRequirement>();
+    private readonly List<FarmBoxMergeBoxSlotView> _slotViews = new List<FarmBoxMergeBoxSlotView>();
+    private readonly List<FarmBoxMergeBoxSlotView> _missingSlotViews = new List<FarmBoxMergeBoxSlotView>();
+    private readonly Dictionary<ColorType, int> _remainingItemDemand = new Dictionary<ColorType, int>();
+    private readonly Dictionary<ColorType, int> _remainingCardUnits = new Dictionary<ColorType, int>();
 
     [Serializable]
     public class ColorPaletteEntry
@@ -36,6 +42,8 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private RectTransform trashDropLayer;
     [SerializeField] private FarmBoxMergeActionBudget actionBudget;
     [SerializeField] private FarmBoxMergeGameController gameController;
+    [SerializeField] private FarmBoxMergeLevelRuntime levelRuntime;
+    [SerializeField] private CardSpawner cardSpawner;
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private bool createRuntimeDragLayer = true;
     [SerializeField] private bool createRuntimeSpawnDropLayer = true;
@@ -58,6 +66,11 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private bool createRuntimeSpawnPoints = true;
     [SerializeField] private int runtimeSpawnPointCount = 3;
     [SerializeField] private float runtimeSpawnPointSpacing = 3.4f;
+
+    [Header("Box Slot Previews")]
+    [SerializeField] private bool shuffleSlotRequirements = true;
+    [SerializeField, Min(1)] private int mergeChallengeStartLevel = 11;
+    [SerializeField] private Color slotPreviewBaseColor = new Color(1f, 1f, 1f, 0.28f);
 
     [Header("Trash Feedback")]
     [SerializeField] private string trashLabel = "TRASH";
@@ -132,6 +145,10 @@ public class CardMergeBoard : MonoBehaviour
     private IBoxFactory _boxFactory;
     private IFarmBoxMergeFeedbackService _feedback;
     private MergeItemSpawner _itemSpawner;
+    private Material _slotPreviewMaterial;
+    private FarmBoxMergeLevelDefinition _activeSlotPlanLevel;
+    private int _authoredSlotPlanCursor;
+    private bool _slotPlanSuspended = true;
     private bool _initialized;
 
     [Inject]
@@ -164,7 +181,13 @@ public class CardMergeBoard : MonoBehaviour
         EnsureDragLayer();
         EnsureSpawnDropLayer();
         EnsureSpawnPoints();
+        EnsureSlotViews();
         RegisterExistingCards();
+
+        if (levelRuntime != null)
+        {
+            levelRuntime.CurrentLevelSpawned += HandleCurrentLevelSpawned;
+        }
 
         if (actionBudget != null)
         {
@@ -189,6 +212,31 @@ public class CardMergeBoard : MonoBehaviour
         if (gameController != null)
         {
             gameController.GameplayInputChanged -= HandleGameplayInputChanged;
+        }
+
+        if (levelRuntime != null)
+        {
+            levelRuntime.CurrentLevelSpawned -= HandleCurrentLevelSpawned;
+        }
+
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            if (_slotViews[i] != null)
+            {
+                _slotViews[i].BecameAvailable -= HandleSlotBecameAvailable;
+            }
+        }
+
+        if (_slotPreviewMaterial != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(_slotPreviewMaterial);
+            }
+            else
+            {
+                DestroyImmediate(_slotPreviewMaterial);
+            }
         }
     }
 
@@ -302,6 +350,7 @@ public class CardMergeBoard : MonoBehaviour
         EnsureDragLayer();
         EnsureSpawnDropLayer();
         card.PrepareForDrag(dragLayer != null ? dragLayer : CardContainer, eventData);
+        RefreshSlotPreviews(card.CounterValue, true);
         UpdateDrag(card, eventData);
     }
 
@@ -315,6 +364,7 @@ public class CardMergeBoard : MonoBehaviour
         if (!CanAcceptGameplayInput)
         {
             card.ReturnToOriginalSlot();
+            RefreshSlotPreviews();
             return;
         }
 
@@ -329,8 +379,14 @@ public class CardMergeBoard : MonoBehaviour
 
     public void EndDrag(Card card, PointerEventData eventData)
     {
-        if (card == null || card.MergeCompleted)
+        if (card == null)
         {
+            return;
+        }
+
+        if (card.MergeCompleted)
+        {
+            RefreshSlotPreviews();
             return;
         }
 
@@ -341,10 +397,13 @@ public class CardMergeBoard : MonoBehaviour
                 card.ReturnToOriginalSlot();
             }
 
+            RefreshSlotPreviews();
             return;
         }
 
-        if (TryDiscardCard(card, eventData) || TrySpawnBoxesFromCard(card, eventData))
+        bool handled = TryDiscardCard(card, eventData) || TrySpawnBoxesFromCard(card, eventData);
+        RefreshSlotPreviews();
+        if (handled)
         {
             return;
         }
@@ -383,6 +442,7 @@ public class CardMergeBoard : MonoBehaviour
         {
             card.SyncDataFromView();
             CardCountChanged?.Invoke();
+            FillMissingSlotRequirements();
         }
     }
 
@@ -391,6 +451,7 @@ public class CardMergeBoard : MonoBehaviour
         if (_registeredCards.Remove(card))
         {
             CardCountChanged?.Invoke();
+            FillMissingSlotRequirements();
         }
     }
 
@@ -473,8 +534,40 @@ public class CardMergeBoard : MonoBehaviour
         return false;
     }
 
+    public bool HasAnyStandardCardMove()
+    {
+        if (HasAnyCardMergeMove())
+        {
+            return true;
+        }
+
+        EnsureSlotViews();
+        _registeredCards.RemoveWhere(card => card == null);
+        foreach (Card card in _registeredCards)
+        {
+            for (int slotIndex = 0; slotIndex < _slotViews.Count; slotIndex++)
+            {
+                FarmBoxMergeBoxSlotView slotView = _slotViews[slotIndex];
+                if (slotView != null && slotView.CanAccept(card.CounterValue))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public void ClearSpawnedBoxGroups()
     {
+        _slotPlanSuspended = true;
+        _pendingSlotRequirements.Clear();
+        EnsureSlotViews();
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            _slotViews[i]?.ClearRequirement();
+        }
+
         EnsureSpawnSlotRoot();
         if (spawnSlotRoot == null)
         {
@@ -540,12 +633,22 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
-        if (!TryGetAvailableSpawnPoint(out Transform availableSpawnPoint))
+        if (!TryGetAvailableSpawnPoint(card.CounterValue, out Transform availableSpawnPoint))
         {
             return false;
         }
 
-        SpawnBoxGroup(card.CounterValue, card.CardColorType, availableSpawnPoint);
+        FarmBoxMergeBoxSlotView slotView = availableSpawnPoint.GetComponent<FarmBoxMergeBoxSlotView>();
+        MergeBoxParent spawnedGroup = SpawnBoxGroup(
+            card.CounterValue,
+            card.CardColorType,
+            availableSpawnPoint,
+            slotView);
+        if (spawnedGroup == null)
+        {
+            return false;
+        }
+
         card.ConsumeForWorldSpawn();
         return true;
     }
@@ -566,7 +669,11 @@ public class CardMergeBoard : MonoBehaviour
         return true;
     }
 
-    private MergeBoxParent SpawnBoxGroup(int boxCount, ColorType colorType, Transform targetSpawnPoint)
+    private MergeBoxParent SpawnBoxGroup(
+        int boxCount,
+        ColorType colorType,
+        Transform targetSpawnPoint,
+        FarmBoxMergeBoxSlotView slotView)
     {
         EnsureSpawnPoints();
 
@@ -584,7 +691,9 @@ public class CardMergeBoard : MonoBehaviour
         groupTransform.localScale = Vector3.one;
 
         MergeBoxParent boxParent = groupObject.GetComponent<MergeBoxParent>();
-        BoxPatternDefinition pattern = ResolvePattern(clampedBoxCount);
+        BoxPatternDefinition pattern = slotView != null
+            ? slotView.Pattern
+            : ResolvePattern(clampedBoxCount);
         Vector3[] localPositions = GetCenteredLocalPositions(pattern.Cells);
         List<Box> spawnedBoxes = new List<Box>(localPositions.Length);
 
@@ -649,6 +758,8 @@ public class CardMergeBoard : MonoBehaviour
 
         actionBudget ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeActionBudget>();
         gameController ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeGameController>();
+        levelRuntime ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeLevelRuntime>();
+        cardSpawner ??= FarmBoxMergeObjectUtility.FindSceneComponent<CardSpawner>();
 
         if (spawnSurface == null)
         {
@@ -670,6 +781,8 @@ public class CardMergeBoard : MonoBehaviour
         {
             return;
         }
+
+        RefreshSlotPreviews();
 
         _registeredCards.RemoveWhere(card => card == null);
         foreach (Card card in _registeredCards)
@@ -887,24 +1000,1028 @@ public class CardMergeBoard : MonoBehaviour
         }
     }
 
-    private bool TryGetAvailableSpawnPoint(out Transform availableSpawnPoint)
+    private bool TryGetAvailableSpawnPoint(
+        int cardValue,
+        out Transform availableSpawnPoint)
     {
-        EnsureSpawnPoints();
+        EnsureSlotViews();
 
-        for (int i = 0; i < spawnPoints.Count; i++)
+        for (int i = 0; i < _slotViews.Count; i++)
         {
-            Transform candidate = spawnPoints[i];
-            if (candidate == null || IsSpawnPointOccupied(candidate))
+            FarmBoxMergeBoxSlotView slotView = _slotViews[i];
+            if (slotView == null || !slotView.CanAccept(cardValue))
             {
                 continue;
             }
 
-            availableSpawnPoint = candidate;
+            availableSpawnPoint = slotView.transform;
             return true;
         }
 
         availableSpawnPoint = null;
         return false;
+    }
+
+    private void EnsureSlotViews()
+    {
+        EnsureSpawnPoints();
+        _slotViews.RemoveAll(slotView => slotView == null);
+
+        for (int i = 0; i < spawnPoints.Count; i++)
+        {
+            Transform spawnPoint = spawnPoints[i];
+            if (spawnPoint == null)
+            {
+                continue;
+            }
+
+            FarmBoxMergeBoxSlotView slotView = spawnPoint.GetComponent<FarmBoxMergeBoxSlotView>();
+            if (slotView == null)
+            {
+                slotView = spawnPoint.gameObject.AddComponent<FarmBoxMergeBoxSlotView>();
+            }
+
+            if (_slotViews.Contains(slotView))
+            {
+                continue;
+            }
+
+            _slotViews.Add(slotView);
+            slotView.BecameAvailable -= HandleSlotBecameAvailable;
+            slotView.BecameAvailable += HandleSlotBecameAvailable;
+        }
+    }
+
+    private void HandleCurrentLevelSpawned(FarmBoxMergeLevelDefinition level)
+    {
+        EnsureSlotViews();
+        _slotPlanSuspended = true;
+        _activeSlotPlanLevel = level;
+        _authoredSlotPlanCursor = 0;
+        _pendingSlotRequirements.Clear();
+
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            _slotViews[i]?.ClearRequirement();
+        }
+
+        _slotPlanSuspended = false;
+        FillMissingSlotRequirements();
+    }
+
+    private void HandleSlotBecameAvailable(FarmBoxMergeBoxSlotView slotView)
+    {
+        if (!_slotPlanSuspended)
+        {
+            FillMissingSlotRequirements();
+        }
+    }
+
+    private void FillMissingSlotRequirements()
+    {
+        if (!_initialized || _slotPlanSuspended || _itemSpawner == null)
+        {
+            return;
+        }
+
+        _slotPlanSuspended = true;
+        EnsureSlotViews();
+        if (TryFillAuthoredSlotRequirements())
+        {
+            _slotPlanSuspended = false;
+            return;
+        }
+
+        BuildRemainingItemAndCardTotals();
+        bool hasValidPlan = FarmBoxMergeSlotPlanBuilder.TryBuildRemainingPlan(
+            _remainingItemDemand,
+            _remainingCardUnits,
+            _pendingSlotRequirements,
+            out _);
+
+        if (hasValidPlan)
+        {
+            ReserveExistingSlotRequirements();
+            if (shuffleSlotRequirements)
+            {
+                ShuffleRequirements(_pendingSlotRequirements);
+            }
+        }
+
+        CollectMissingSlotViews();
+        ShuffleSlotViews(_missingSlotViews);
+        for (int i = 0; i < _missingSlotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _missingSlotViews[i];
+            bool needsUnlockSingle = NeedsUnlockSingleRequirement();
+            if (hasValidPlan)
+            {
+                AssignNextRequirement(slotView, needsUnlockSingle);
+            }
+
+            if (!slotView.HasRequirement)
+            {
+                AssignFallbackRequirement(slotView, needsUnlockSingle);
+            }
+        }
+
+        EnsureVisibleMergeRequirement();
+        EnsureQueueScheduleSafety();
+
+        _slotPlanSuspended = false;
+    }
+
+    private bool TryFillAuthoredSlotRequirements()
+    {
+        IReadOnlyList<FarmBoxMergeBoxSlotPlanEntry> authoredPlan =
+            _activeSlotPlanLevel != null ? _activeSlotPlanLevel.BoxSlotPlan : null;
+        if (authoredPlan == null || authoredPlan.Count == 0)
+        {
+            return false;
+        }
+
+        // Spawn point order is stable: the first entries fill the initial slots
+        // from left to right. Afterwards only the slot that became empty consumes
+        // the next entry. Replaying the level therefore produces the same flow.
+        CollectMissingSlotViews();
+        for (int i = 0; i < _missingSlotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _missingSlotViews[i];
+            FarmBoxMergeBoxSlotPlanEntry entry =
+                authoredPlan[_authoredSlotPlanCursor % authoredPlan.Count];
+            _authoredSlotPlanCursor++;
+
+            if (slotView == null || entry == null)
+            {
+                continue;
+            }
+
+            ApplyAuthoredRequirement(slotView, entry);
+        }
+
+        return true;
+    }
+
+    private void EnsureVisibleMergeRequirement()
+    {
+        if (_missingSlotViews.Count == 0 || HasVisibleBuildableNonSingleRequirement())
+        {
+            return;
+        }
+
+        int fallbackSize = GetMostBuildableFallbackSize(false);
+        if (fallbackSize <= FarmBoxMergeRules.MinCardCounter
+            || !CanAnyRemainingColorBuildCard(fallbackSize))
+        {
+            return;
+        }
+
+        List<FarmBoxMergeBoxSlotView> replaceableSlots = new List<FarmBoxMergeBoxSlotView>();
+        for (int i = 0; i < _missingSlotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _missingSlotViews[i];
+            if (slotView != null
+                && !slotView.IsOccupied
+                && slotView.HasRequirement
+                && slotView.AcceptedCardValue != fallbackSize)
+            {
+                replaceableSlots.Add(slotView);
+            }
+        }
+
+        if (replaceableSlots.Count == 0)
+        {
+            return;
+        }
+
+        FarmBoxMergeBoxSlotView buildableSlot = replaceableSlots[
+            UnityEngine.Random.Range(0, replaceableSlots.Count)];
+        ApplyRequirement(
+            buildableSlot,
+            new FarmBoxMergeBoxRequirement(GetHighestDemandColor(), fallbackSize));
+    }
+
+    private bool CanAnyRemainingColorBuildCard(int boxSize)
+    {
+        for (int i = 0; i < AllColorTypes.Length; i++)
+        {
+            ColorType colorType = AllColorTypes[i];
+            int remainingDemand = _remainingItemDemand.TryGetValue(colorType, out int demand)
+                ? demand
+                : 0;
+            if (remainingDemand >= boxSize
+                && CanBuildCard(GetVisibleCardsByValue(colorType), boxSize))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasVisibleBuildableNonSingleRequirement()
+    {
+        for (int colorIndex = 0; colorIndex < AllColorTypes.Length; colorIndex++)
+        {
+            ColorType colorType = AllColorTypes[colorIndex];
+            int remainingDemand = _remainingItemDemand.TryGetValue(colorType, out int demand)
+                ? demand
+                : 0;
+            if (remainingDemand <= 0)
+            {
+                continue;
+            }
+
+            int[] visibleCards = GetVisibleCardsByValue(colorType);
+            for (int slotIndex = 0; slotIndex < _slotViews.Count; slotIndex++)
+            {
+                FarmBoxMergeBoxSlotView slotView = _slotViews[slotIndex];
+                if (slotView != null
+                    && !slotView.IsOccupied
+                    && slotView.HasRequirement
+                    && slotView.AcceptedCardValue > FarmBoxMergeRules.MinCardCounter
+                    && slotView.AcceptedCardValue <= remainingDemand
+                    && CanBuildCard(visibleCards, slotView.AcceptedCardValue))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void EnsureQueueScheduleSafety()
+    {
+        if (_missingSlotViews.Count == 0 || HasSafeVisibleQueueSchedule())
+        {
+            return;
+        }
+
+        List<FarmBoxMergeBoxSlotView> replaceableSlots = new List<FarmBoxMergeBoxSlotView>();
+        for (int i = 0; i < _missingSlotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _missingSlotViews[i];
+            if (slotView != null
+                && !slotView.IsOccupied
+                && slotView.HasRequirement
+                && slotView.AcceptedCardValue > FarmBoxMergeRules.MinCardCounter)
+            {
+                replaceableSlots.Add(slotView);
+            }
+        }
+
+        if (replaceableSlots.Count == 0 || !HasLevelOneResourceForRemainingItems())
+        {
+            return;
+        }
+
+        FarmBoxMergeBoxSlotView safetySlot = replaceableSlots[
+            UnityEngine.Random.Range(0, replaceableSlots.Count)];
+        ApplyRequirement(
+            safetySlot,
+            new FarmBoxMergeBoxRequirement(
+                GetHighestDemandColor(),
+                FarmBoxMergeRules.MinCardCounter));
+    }
+
+    private bool HasSafeVisibleQueueSchedule()
+    {
+        IReadOnlyList<MergeItem> queuedItems = _itemSpawner != null
+            ? _itemSpawner.SpawnedItems
+            : null;
+        if (queuedItems == null || queuedItems.Count == 0)
+        {
+            return true;
+        }
+
+        int slotCapacity = Mathf.Max(1, _slotViews.Count);
+        List<ColorType> boxColors = new List<ColorType>(slotCapacity);
+        List<int> boxRemainingCapacity = new List<int>(slotCapacity);
+        List<int> availableShapes = new List<int>(slotCapacity);
+
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _slotViews[i];
+            if (slotView == null)
+            {
+                continue;
+            }
+
+            bool foundActiveGroup = false;
+            for (int childIndex = 0; childIndex < slotView.transform.childCount; childIndex++)
+            {
+                if (!slotView.transform.GetChild(childIndex).TryGetComponent(out MergeBoxParent group)
+                    || group == null
+                    || group.IsCollapsing)
+                {
+                    continue;
+                }
+
+                boxColors.Add(group.ColorType);
+                boxRemainingCapacity.Add(group.EmptyBoxCount);
+                foundActiveGroup = true;
+                break;
+            }
+
+            if (!foundActiveGroup && slotView.HasRequirement)
+            {
+                availableShapes.Add(slotView.AcceptedCardValue);
+            }
+        }
+
+        int[] unreservedDemand = new int[AllColorTypes.Length];
+        for (int i = 0; i < AllColorTypes.Length; i++)
+        {
+            unreservedDemand[i] = _remainingItemDemand.TryGetValue(AllColorTypes[i], out int demand)
+                ? demand
+                : 0;
+        }
+
+        return CanReachQueueRelease(
+            queuedItems,
+            0,
+            boxColors,
+            boxRemainingCapacity,
+            availableShapes,
+            unreservedDemand);
+    }
+
+    private bool CanReachQueueRelease(
+        IReadOnlyList<MergeItem> queuedItems,
+        int itemIndex,
+        List<ColorType> boxColors,
+        List<int> boxRemainingCapacity,
+        List<int> availableShapes,
+        int[] unreservedDemand)
+    {
+        if (itemIndex >= queuedItems.Count)
+        {
+            return true;
+        }
+
+        if (queuedItems[itemIndex] == null)
+        {
+            return CanReachQueueRelease(
+                queuedItems,
+                itemIndex + 1,
+                boxColors,
+                boxRemainingCapacity,
+                availableShapes,
+                unreservedDemand);
+        }
+
+        ColorType itemColor = queuedItems[itemIndex].ColorType;
+        bool hasMatchingBox = false;
+        for (int boxIndex = 0; boxIndex < boxColors.Count; boxIndex++)
+        {
+            if (boxColors[boxIndex] != itemColor || boxRemainingCapacity[boxIndex] <= 0)
+            {
+                continue;
+            }
+
+            hasMatchingBox = true;
+            boxRemainingCapacity[boxIndex]--;
+            bool releasesSlot = boxRemainingCapacity[boxIndex] == 0;
+            bool succeeds = releasesSlot || CanReachQueueRelease(
+                queuedItems,
+                itemIndex + 1,
+                boxColors,
+                boxRemainingCapacity,
+                availableShapes,
+                unreservedDemand);
+            boxRemainingCapacity[boxIndex]++;
+            if (succeeds)
+            {
+                return true;
+            }
+        }
+
+        if (hasMatchingBox)
+        {
+            return false;
+        }
+
+        int colorIndex = Array.IndexOf(AllColorTypes, itemColor);
+        if (colorIndex < 0)
+        {
+            return false;
+        }
+
+        for (int shapeIndex = 0; shapeIndex < availableShapes.Count; shapeIndex++)
+        {
+            int boxSize = availableShapes[shapeIndex];
+            if (boxSize > unreservedDemand[colorIndex])
+            {
+                continue;
+            }
+
+            availableShapes.RemoveAt(shapeIndex);
+            unreservedDemand[colorIndex] -= boxSize;
+            boxColors.Add(itemColor);
+            boxRemainingCapacity.Add(boxSize - 1);
+
+            bool succeeds = boxSize == FarmBoxMergeRules.MinCardCounter || CanReachQueueRelease(
+                queuedItems,
+                itemIndex + 1,
+                boxColors,
+                boxRemainingCapacity,
+                availableShapes,
+                unreservedDemand);
+
+            boxColors.RemoveAt(boxColors.Count - 1);
+            boxRemainingCapacity.RemoveAt(boxRemainingCapacity.Count - 1);
+            unreservedDemand[colorIndex] += boxSize;
+            availableShapes.Insert(shapeIndex, boxSize);
+            if (succeeds)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasLevelOneResourceForRemainingItems()
+    {
+        for (int i = 0; i < AllColorTypes.Length; i++)
+        {
+            ColorType colorType = AllColorTypes[i];
+            if (!_remainingItemDemand.TryGetValue(colorType, out int demand) || demand <= 0)
+            {
+                continue;
+            }
+
+            if (HasLevelOneCard(colorType)
+                || (cardSpawner != null && cardSpawner.GetPendingLevelOneCardCount(colorType) > 0))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void CollectMissingSlotViews()
+    {
+        _missingSlotViews.Clear();
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _slotViews[i];
+            if (slotView != null && !slotView.IsOccupied && !slotView.HasRequirement)
+            {
+                _missingSlotViews.Add(slotView);
+            }
+        }
+    }
+
+    private bool NeedsUnlockSingleRequirement()
+    {
+        if (_itemSpawner == null || !_itemSpawner.IsNextQueuedItemBlocked)
+        {
+            return false;
+        }
+
+        IReadOnlyList<MergeItem> queuedItems = _itemSpawner.SpawnedItems;
+        if (queuedItems == null || queuedItems.Count == 0 || queuedItems[0] == null)
+        {
+            return false;
+        }
+
+        ColorType blockedColor = queuedItems[0].ColorType;
+        int remainingDemand = _remainingItemDemand.TryGetValue(blockedColor, out int demand)
+            ? demand
+            : 0;
+        if (remainingDemand <= 0)
+        {
+            return false;
+        }
+
+        int[] visibleCards = GetVisibleCardsByValue(blockedColor);
+        if (HasBuildableNonSingleRequirement(visibleCards, remainingDemand))
+        {
+            return false;
+        }
+
+        if (UsesMergeChallengeRules()
+            && (HasAnyBuildableNonSingleRequirement() || HasAnyCardMergeMove()))
+        {
+            return false;
+        }
+
+        bool hasLevelOneCard = visibleCards[FarmBoxMergeRules.MinCardCounter] > 0;
+        bool hasPendingLevelOneCard = cardSpawner != null
+            && cardSpawner.GetPendingLevelOneCardCount(blockedColor) > 0;
+        return hasLevelOneCard || hasPendingLevelOneCard;
+    }
+
+    private bool UsesMergeChallengeRules()
+    {
+        int currentLevelNumber = levelRuntime != null
+            ? levelRuntime.CurrentLevelIndex + 1
+            : 1;
+        return currentLevelNumber >= Mathf.Max(1, mergeChallengeStartLevel);
+    }
+
+    private bool HasAnyBuildableNonSingleRequirement()
+    {
+        for (int i = 0; i < AllColorTypes.Length; i++)
+        {
+            ColorType colorType = AllColorTypes[i];
+            int remainingDemand = _remainingItemDemand.TryGetValue(colorType, out int demand)
+                ? demand
+                : 0;
+            if (remainingDemand > 0
+                && HasBuildableNonSingleRequirement(
+                    GetVisibleCardsByValue(colorType),
+                    remainingDemand))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasAnyCardMergeMove()
+    {
+        _registeredCards.RemoveWhere(card => card == null);
+        foreach (Card firstCard in _registeredCards)
+        {
+            if (firstCard == null || firstCard.CounterValue >= FarmBoxMergeRules.MaxCardCounter)
+            {
+                continue;
+            }
+
+            foreach (Card secondCard in _registeredCards)
+            {
+                if (secondCard != null
+                    && !ReferenceEquals(firstCard, secondCard)
+                    && firstCard.CardColorType == secondCard.CardColorType
+                    && firstCard.CounterValue == secondCard.CounterValue)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasBuildableNonSingleRequirement(int[] visibleCards, int remainingDemand)
+    {
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _slotViews[i];
+            if (slotView != null
+                && !slotView.IsOccupied
+                && slotView.HasRequirement
+                && slotView.AcceptedCardValue > FarmBoxMergeRules.MinCardCounter
+                && slotView.AcceptedCardValue <= remainingDemand
+                && CanBuildCard(visibleCards, slotView.AcceptedCardValue))
+            {
+                return true;
+            }
+        }
+
+        for (int i = 0; i < _pendingSlotRequirements.Count; i++)
+        {
+            int boxSize = _pendingSlotRequirements[i].BoxSize;
+            if (boxSize > FarmBoxMergeRules.MinCardCounter
+                && boxSize <= remainingDemand
+                && CanBuildCard(visibleCards, boxSize))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void AssignFallbackRequirement(
+        FarmBoxMergeBoxSlotView slotView,
+        bool needsUnlockSingle)
+    {
+        int fallbackSize;
+        if (needsUnlockSingle)
+        {
+            fallbackSize = FarmBoxMergeRules.MinCardCounter;
+        }
+        else if (GetTotalRemainingItemDemand() > 0)
+        {
+            fallbackSize = GetMostBuildableFallbackSize(false);
+        }
+        else
+        {
+            fallbackSize = UnityEngine.Random.Range(
+                FarmBoxMergeRules.MinCardCounter + 1,
+                FarmBoxMergeRules.MaxCardCounter + 1);
+        }
+
+        ApplyRequirement(
+            slotView,
+            new FarmBoxMergeBoxRequirement(GetHighestDemandColor(), fallbackSize));
+    }
+
+    private int GetTotalRemainingItemDemand()
+    {
+        int total = 0;
+        foreach (KeyValuePair<ColorType, int> entry in _remainingItemDemand)
+        {
+            total += Mathf.Max(0, entry.Value);
+        }
+
+        return total;
+    }
+
+    private ColorType GetHighestDemandColor()
+    {
+        ColorType bestColor = AllColorTypes[0];
+        int bestDemand = -1;
+        for (int i = 0; i < AllColorTypes.Length; i++)
+        {
+            ColorType colorType = AllColorTypes[i];
+            int demand = _remainingItemDemand.TryGetValue(colorType, out int value) ? value : 0;
+            if (demand > bestDemand)
+            {
+                bestDemand = demand;
+                bestColor = colorType;
+            }
+        }
+
+        return bestColor;
+    }
+
+    private int GetMostBuildableFallbackSize(bool allowSingle)
+    {
+        int minimumSize = allowSingle
+            ? FarmBoxMergeRules.MinCardCounter
+            : FarmBoxMergeRules.MinCardCounter + 1;
+        int bestSize = minimumSize;
+        int bestScore = int.MinValue;
+
+        for (int colorIndex = 0; colorIndex < AllColorTypes.Length; colorIndex++)
+        {
+            ColorType colorType = AllColorTypes[colorIndex];
+            int demand = _remainingItemDemand.TryGetValue(colorType, out int remainingDemand)
+                ? remainingDemand
+                : 0;
+            if (demand <= 0)
+            {
+                continue;
+            }
+
+            int[] cardsByValue = GetVisibleCardsByValue(colorType);
+            int maxSize = Mathf.Min(FarmBoxMergeRules.MaxCardCounter, demand);
+            for (int boxSize = minimumSize; boxSize <= maxSize; boxSize++)
+            {
+                int score;
+                if (cardsByValue[boxSize] > 0)
+                {
+                    score = 200;
+                }
+                else if (CanBuildCard(cardsByValue, boxSize))
+                {
+                    score = 100;
+                }
+                else
+                {
+                    continue;
+                }
+
+                score += boxSize;
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestSize = boxSize;
+                }
+            }
+        }
+
+        return bestSize;
+    }
+
+    private int[] GetVisibleCardsByValue(ColorType colorType)
+    {
+        int[] cardsByValue = new int[FarmBoxMergeRules.MaxCardCounter + 1];
+        foreach (Card card in _registeredCards)
+        {
+            if (card != null && card.CardColorType == colorType)
+            {
+                cardsByValue[FarmBoxMergeRules.ClampCardCounter(card.CounterValue)]++;
+            }
+        }
+
+        return cardsByValue;
+    }
+
+    private static bool CanBuildCard(int[] cardsByValue, int targetValue)
+    {
+        int[] availableCards = (int[])cardsByValue.Clone();
+        for (int value = FarmBoxMergeRules.MinCardCounter; value < targetValue; value++)
+        {
+            availableCards[value + 1] += availableCards[value] / 2;
+        }
+
+        return availableCards[targetValue] > 0;
+    }
+
+    private void ReserveExistingSlotRequirements()
+    {
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            FarmBoxMergeBoxSlotView slotView = _slotViews[i];
+            if (slotView == null || slotView.IsOccupied || !slotView.HasRequirement)
+            {
+                continue;
+            }
+
+            ReserveRequirementCapacity(slotView.AcceptedCardValue);
+        }
+    }
+
+    private void ReserveRequirementCapacity(int requiredCapacity)
+    {
+        int clampedCapacity = FarmBoxMergeRules.ClampCardCounter(requiredCapacity);
+        for (int i = 0; i < _pendingSlotRequirements.Count; i++)
+        {
+            if (_pendingSlotRequirements[i].BoxSize == clampedCapacity)
+            {
+                _pendingSlotRequirements.RemoveAt(i);
+                return;
+            }
+        }
+
+        List<int> reservedIndices = new List<int>();
+        if (!TryFindRequirementSubset(0, clampedCapacity, reservedIndices))
+        {
+            return;
+        }
+
+        reservedIndices.Sort();
+        for (int i = reservedIndices.Count - 1; i >= 0; i--)
+        {
+            _pendingSlotRequirements.RemoveAt(reservedIndices[i]);
+        }
+    }
+
+    private bool TryFindRequirementSubset(
+        int startIndex,
+        int remainingCapacity,
+        List<int> selectedIndices)
+    {
+        if (remainingCapacity == 0)
+        {
+            return true;
+        }
+
+        for (int i = startIndex; i < _pendingSlotRequirements.Count; i++)
+        {
+            int candidateSize = _pendingSlotRequirements[i].BoxSize;
+            if (candidateSize > remainingCapacity)
+            {
+                continue;
+            }
+
+            selectedIndices.Add(i);
+            if (TryFindRequirementSubset(i + 1, remainingCapacity - candidateSize, selectedIndices))
+            {
+                return true;
+            }
+
+            selectedIndices.RemoveAt(selectedIndices.Count - 1);
+        }
+
+        return false;
+    }
+
+    private void BuildRemainingItemAndCardTotals()
+    {
+        _remainingItemDemand.Clear();
+        _remainingCardUnits.Clear();
+        _registeredCards.RemoveWhere(card => card == null);
+
+        for (int colorIndex = 0; colorIndex < AllColorTypes.Length; colorIndex++)
+        {
+            ColorType colorType = AllColorTypes[colorIndex];
+            int itemDemand = Mathf.Max(
+                0,
+                _itemSpawner.GetRemainingUnplacedCount(colorType) - GetOutstandingBoxDemand(colorType));
+            if (itemDemand > 0)
+            {
+                _remainingItemDemand[colorType] = itemDemand;
+            }
+
+            int cardUnits = cardSpawner != null
+                ? cardSpawner.GetPendingLevelOneCardCount(colorType)
+                : 0;
+            foreach (Card card in _registeredCards)
+            {
+                if (card.CardColorType == colorType)
+                {
+                    cardUnits += FarmBoxMergeSlotPlanBuilder.GetRequiredLevelOneCardCount(card.CounterValue);
+                }
+            }
+
+            if (cardUnits > 0)
+            {
+                _remainingCardUnits[colorType] = cardUnits;
+            }
+        }
+    }
+
+    private void AssignNextRequirement(
+        FarmBoxMergeBoxSlotView slotView,
+        bool needsUnlockSingle)
+    {
+        if (slotView == null || slotView.IsOccupied || slotView.HasRequirement)
+        {
+            return;
+        }
+
+        if (_pendingSlotRequirements.Count == 0)
+        {
+            slotView.ClearRequirement();
+            return;
+        }
+
+        int requirementIndex = SelectBestRequirementIndex(needsUnlockSingle);
+        if (requirementIndex < 0)
+        {
+            return;
+        }
+
+        FarmBoxMergeBoxRequirement requirement = _pendingSlotRequirements[requirementIndex];
+        _pendingSlotRequirements.RemoveAt(requirementIndex);
+
+        ApplyRequirement(slotView, requirement);
+    }
+
+    private void ApplyRequirement(
+        FarmBoxMergeBoxSlotView slotView,
+        FarmBoxMergeBoxRequirement requirement)
+    {
+        BoxPatternDefinition pattern = ResolvePattern(requirement.BoxSize);
+        ApplyRequirement(slotView, requirement, pattern);
+    }
+
+    private void ApplyAuthoredRequirement(
+        FarmBoxMergeBoxSlotView slotView,
+        FarmBoxMergeBoxSlotPlanEntry entry)
+    {
+        FarmBoxMergeBoxRequirement requirement = new FarmBoxMergeBoxRequirement(
+            entry.intendedColor,
+            entry.boxSize);
+        BoxPatternDefinition pattern = BoxPatternLibrary.ResolveAuthored(
+            requirement.BoxSize,
+            entry.fourBoxPatternVariant);
+        ApplyRequirement(slotView, requirement, pattern);
+    }
+
+    private void ApplyRequirement(
+        FarmBoxMergeBoxSlotView slotView,
+        FarmBoxMergeBoxRequirement requirement,
+        BoxPatternDefinition pattern)
+    {
+        Vector3[] localPositions = GetCenteredLocalPositions(pattern.Cells);
+        Color previewColor = Color.white;
+        previewColor.a = slotPreviewBaseColor.a;
+        slotView.SetRequirement(
+            requirement,
+            pattern,
+            localPositions,
+            spawnHeightOffset,
+            _boxFactory,
+            GetOrCreateSlotPreviewMaterial(),
+            previewColor);
+    }
+
+    private int SelectBestRequirementIndex(bool needsUnlockSingle)
+    {
+        int bestScore = int.MinValue;
+        List<int> candidates = new List<int>();
+
+        for (int i = 0; i < _pendingSlotRequirements.Count; i++)
+        {
+            FarmBoxMergeBoxRequirement requirement = _pendingSlotRequirements[i];
+            bool isSingle = requirement.BoxSize == FarmBoxMergeRules.MinCardCounter;
+            if (needsUnlockSingle != isSingle)
+            {
+                continue;
+            }
+
+            int score = (GetVisibleCardReadinessScore(requirement.BoxSize) * 10)
+                + requirement.BoxSize;
+            if (score > bestScore)
+            {
+                bestScore = score;
+                candidates.Clear();
+                candidates.Add(i);
+            }
+            else if (score == bestScore)
+            {
+                candidates.Add(i);
+            }
+        }
+
+        return candidates.Count == 0
+            ? -1
+            : candidates[UnityEngine.Random.Range(0, candidates.Count)];
+    }
+
+    private int GetVisibleCardReadinessScore(int boxSize)
+    {
+        _registeredCards.RemoveWhere(card => card == null);
+        bool canBuild = false;
+        for (int colorIndex = 0; colorIndex < AllColorTypes.Length; colorIndex++)
+        {
+            int[] cardsByValue = new int[FarmBoxMergeRules.MaxCardCounter + 1];
+            foreach (Card card in _registeredCards)
+            {
+                if (card.CardColorType == AllColorTypes[colorIndex])
+                {
+                    cardsByValue[FarmBoxMergeRules.ClampCardCounter(card.CounterValue)]++;
+                }
+            }
+
+            if (cardsByValue[boxSize] > 0)
+            {
+                return 20;
+            }
+
+            for (int value = FarmBoxMergeRules.MinCardCounter; value < boxSize; value++)
+            {
+                cardsByValue[value + 1] += cardsByValue[value] / 2;
+            }
+
+            canBuild |= cardsByValue[boxSize] > 0;
+        }
+
+        return canBuild ? 10 : 0;
+    }
+
+    private static void ShuffleRequirements(List<FarmBoxMergeBoxRequirement> requirements)
+    {
+        for (int i = requirements.Count - 1; i > 0; i--)
+        {
+            int swapIndex = UnityEngine.Random.Range(0, i + 1);
+            (requirements[i], requirements[swapIndex]) = (requirements[swapIndex], requirements[i]);
+        }
+    }
+
+    private static void ShuffleSlotViews(List<FarmBoxMergeBoxSlotView> slotViews)
+    {
+        for (int i = slotViews.Count - 1; i > 0; i--)
+        {
+            int swapIndex = UnityEngine.Random.Range(0, i + 1);
+            (slotViews[i], slotViews[swapIndex]) = (slotViews[swapIndex], slotViews[i]);
+        }
+    }
+
+    private void RefreshSlotPreviews(
+        int draggedCardValue = 0,
+        bool isDragging = false)
+    {
+        EnsureSlotViews();
+        for (int i = 0; i < _slotViews.Count; i++)
+        {
+            _slotViews[i]?.SetDragHighlight(draggedCardValue, isDragging);
+        }
+    }
+
+    private Material GetOrCreateSlotPreviewMaterial()
+    {
+        if (_slotPreviewMaterial != null)
+        {
+            return _slotPreviewMaterial;
+        }
+
+        Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (shader == null)
+        {
+            Debug.LogWarning("FarmBoxMerge: URP Lit shader bulunamadığı için kutu slot önizlemeleri oluşturulamadı.");
+            return null;
+        }
+
+        _slotPreviewMaterial = new Material(shader)
+        {
+            name = "FarmBoxMerge Slot Preview (Runtime)",
+            hideFlags = HideFlags.HideAndDontSave,
+            renderQueue = (int)RenderQueue.Transparent
+        };
+        _slotPreviewMaterial.SetOverrideTag("RenderType", "Transparent");
+        _slotPreviewMaterial.SetFloat("_Surface", 1f);
+        _slotPreviewMaterial.SetFloat("_Blend", 0f);
+        _slotPreviewMaterial.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+        _slotPreviewMaterial.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+        _slotPreviewMaterial.SetFloat("_ZWrite", 0f);
+        _slotPreviewMaterial.SetFloat("_Metallic", 0f);
+        _slotPreviewMaterial.SetFloat("_Smoothness", 0.18f);
+        _slotPreviewMaterial.SetColor("_BaseColor", slotPreviewBaseColor);
+        _slotPreviewMaterial.SetColor("_Color", slotPreviewBaseColor);
+        _slotPreviewMaterial.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        _slotPreviewMaterial.DisableKeyword("_ALPHATEST_ON");
+        return _slotPreviewMaterial;
     }
 
     private bool IsSpawnPointOccupied(Transform spawnPoint)

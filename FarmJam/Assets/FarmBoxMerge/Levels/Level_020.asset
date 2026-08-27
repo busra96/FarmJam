@@ -17,13 +17,9 @@ MonoBehaviour:
   designerNotes: Orta zor. Uc rengin farkli boyuttaki iki kutusunu dogru zamanda
     kullan.
   itemSequence:
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
   - colorType: 1
     count: 1
-  - colorType: 2
+  - colorType: 0
     count: 1
   - colorType: 1
     count: 1
@@ -35,13 +31,17 @@ MonoBehaviour:
     count: 1
   - colorType: 2
     count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 1
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
+  - colorType: 2
     count: 1
   - colorType: 0
     count: 1
@@ -52,4 +52,23 @@ MonoBehaviour:
     count: 9
   - colorType: 2
     count: 4
+  boxSlotPlan:
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 1
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

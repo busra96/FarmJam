@@ -7,6 +7,14 @@ public static class FarmBoxMergeLevelSequenceMixer
 {
     private const string LevelFolder = "Assets/FarmBoxMerge/Levels";
     private const int DefaultSeed = 20260826;
+    private const int WorldSlotCount = 3;
+
+    private sealed class ScheduledBoxGroup
+    {
+        public ColorType ColorType;
+        public int BoxSize;
+        public int RemainingItems;
+    }
 
     [MenuItem("Tools/FarmBoxMerge/Upgrade Level-One Card Spawn Plans")]
     public static void UpgradeLevelOneCardSpawnPlans()
@@ -38,13 +46,24 @@ public static class FarmBoxMergeLevelSequenceMixer
     [MenuItem("Tools/FarmBoxMerge/Mix All Level Item Flows")]
     public static void MixAllLevelItemFlows()
     {
+        RebuildAllLevelDesigns();
+    }
+
+    [MenuItem("Tools/FarmBoxMerge/Rebuild All Deterministic Slot Flows")]
+    public static void RebuildAllDeterministicSlotFlows()
+    {
+        RebuildAllLevelDesigns();
+    }
+
+    private static void RebuildAllLevelDesigns()
+    {
         string[] levelGuids = AssetDatabase.FindAssets(
             "t:FarmBoxMergeLevelDefinition",
             new[] { LevelFolder });
         Array.Sort(levelGuids, CompareAssetPaths);
 
         int changedLevelCount = 0;
-        int singleColorLevelCount = 0;
+        int invalidLevelCount = 0;
         for (int i = 0; i < levelGuids.Length; i++)
         {
             string path = AssetDatabase.GUIDToAssetPath(levelGuids[i]);
@@ -55,17 +74,30 @@ public static class FarmBoxMergeLevelSequenceMixer
                 continue;
             }
 
-            if (CountDistinctColors(level.ItemSequence) < 2)
+            Undo.RecordObject(level, "Rebuild FarmBoxMerge level flow");
+            bool isValid = false;
+            string validationError = string.Empty;
+            for (int attempt = 0; attempt < 128 && !isValid; attempt++)
             {
-                singleColorLevelCount++;
+                int seed = DefaultSeed + ((i + 1) * 7919) + (attempt * 104729);
+                List<ColorType> mixedItems = BuildPlayableLevelDesign(
+                    level,
+                    seed,
+                    out List<FarmBoxMergeBoxSlotPlanEntry> slotPlan);
+                WriteSequence(level, mixedItems);
+                WriteSlotPlan(level, slotPlan);
+                isValid = FarmBoxMergeSlotPlanBuilder.TryValidateAuthoredPlan(
+                    level,
+                    out validationError);
+            }
+
+            if (!isValid)
+            {
+                Debug.LogError($"FBM_LEVEL_DESIGN_INVALID level={level.LevelName} error={validationError}", level);
+                invalidLevelCount++;
                 continue;
             }
 
-            Undo.RecordObject(level, "Mix FarmBoxMerge item flow");
-            List<ColorType> mixedItems = BuildMixedSequence(
-                level.ItemSequence,
-                DefaultSeed + ((i + 1) * 7919));
-            WriteSequence(level, mixedItems);
             EditorUtility.SetDirty(level);
             changedLevelCount++;
         }
@@ -73,8 +105,7 @@ public static class FarmBoxMergeLevelSequenceMixer
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log(
-            $"FBM_LEVEL_MIX_COMPLETE changed={changedLevelCount} " +
-            $"singleColorUnchanged={singleColorLevelCount}");
+            $"FBM_LEVEL_DESIGN_REBUILD_COMPLETE changed={changedLevelCount} invalid={invalidLevelCount}");
     }
 
     internal static List<ColorType> BuildMixedSequence(
@@ -118,6 +149,142 @@ public static class FarmBoxMergeLevelSequenceMixer
         }
 
         return result;
+    }
+
+    internal static List<ColorType> BuildPlayableMixedSequence(
+        FarmBoxMergeLevelDefinition level,
+        int seed)
+    {
+        return BuildPlayableLevelDesign(level, seed, out _);
+    }
+
+    internal static List<ColorType> BuildPlayableLevelDesign(
+        FarmBoxMergeLevelDefinition level,
+        int seed,
+        out List<FarmBoxMergeBoxSlotPlanEntry> slotPlan)
+    {
+        slotPlan = new List<FarmBoxMergeBoxSlotPlanEntry>();
+        List<FarmBoxMergeBoxRequirement> requirements = new List<FarmBoxMergeBoxRequirement>();
+        if (level == null
+            || !FarmBoxMergeSlotPlanBuilder.TryBuildPlan(level, requirements, out _)
+            || requirements.Count == 0)
+        {
+            return BuildMixedSequence(level?.ItemSequence, seed);
+        }
+
+        System.Random random = new System.Random(seed);
+        List<ScheduledBoxGroup> waitingGroups = new List<ScheduledBoxGroup>(requirements.Count);
+        for (int i = 0; i < requirements.Count; i++)
+        {
+            waitingGroups.Add(new ScheduledBoxGroup
+            {
+                ColorType = requirements[i].ColorType,
+                BoxSize = requirements[i].BoxSize,
+                RemainingItems = requirements[i].BoxSize
+            });
+        }
+
+        Shuffle(waitingGroups, random);
+        List<ScheduledBoxGroup> activeGroups = new List<ScheduledBoxGroup>(WorldSlotCount);
+        List<ColorType> result = new List<ColorType>(level.TotalItemCount);
+        ColorType previousColor = default;
+        bool hasPrevious = false;
+
+        FillActiveGroups(activeGroups, waitingGroups, random, slotPlan, seed);
+        while (activeGroups.Count > 0)
+        {
+            List<int> candidates = new List<int>();
+            for (int i = 0; i < activeGroups.Count; i++)
+            {
+                if (!hasPrevious || activeGroups[i].ColorType != previousColor)
+                {
+                    candidates.Add(i);
+                }
+            }
+
+            if (candidates.Count == 0)
+            {
+                for (int i = 0; i < activeGroups.Count; i++)
+                {
+                    candidates.Add(i);
+                }
+            }
+
+            int selectedIndex = candidates[random.Next(candidates.Count)];
+            ScheduledBoxGroup selectedGroup = activeGroups[selectedIndex];
+            result.Add(selectedGroup.ColorType);
+            previousColor = selectedGroup.ColorType;
+            hasPrevious = true;
+            selectedGroup.RemainingItems--;
+
+            if (selectedGroup.RemainingItems <= 0)
+            {
+                activeGroups.RemoveAt(selectedIndex);
+                FillActiveGroups(activeGroups, waitingGroups, random, slotPlan, seed);
+            }
+        }
+
+        return result;
+    }
+
+    private static void FillActiveGroups(
+        List<ScheduledBoxGroup> activeGroups,
+        List<ScheduledBoxGroup> waitingGroups,
+        System.Random random,
+        List<FarmBoxMergeBoxSlotPlanEntry> slotPlan,
+        int seed)
+    {
+        while (activeGroups.Count < WorldSlotCount && waitingGroups.Count > 0)
+        {
+            List<int> candidates = new List<int>();
+            for (int i = 0; i < waitingGroups.Count; i++)
+            {
+                bool colorAlreadyActive = false;
+                for (int activeIndex = 0; activeIndex < activeGroups.Count; activeIndex++)
+                {
+                    if (activeGroups[activeIndex].ColorType == waitingGroups[i].ColorType)
+                    {
+                        colorAlreadyActive = true;
+                        break;
+                    }
+                }
+
+                if (!colorAlreadyActive)
+                {
+                    candidates.Add(i);
+                }
+            }
+
+            if (candidates.Count == 0)
+            {
+                for (int i = 0; i < waitingGroups.Count; i++)
+                {
+                    candidates.Add(i);
+                }
+            }
+
+            int selectedIndex = candidates[random.Next(candidates.Count)];
+            ScheduledBoxGroup selectedGroup = waitingGroups[selectedIndex];
+            activeGroups.Add(selectedGroup);
+            waitingGroups.RemoveAt(selectedIndex);
+            slotPlan.Add(new FarmBoxMergeBoxSlotPlanEntry
+            {
+                intendedColor = selectedGroup.ColorType,
+                boxSize = selectedGroup.BoxSize,
+                fourBoxPatternVariant = selectedGroup.BoxSize == FarmBoxMergeRules.MaxCardCounter
+                    ? (seed + slotPlan.Count) & 3
+                    : 0
+            });
+        }
+    }
+
+    private static void Shuffle<T>(List<T> values, System.Random random)
+    {
+        for (int i = values.Count - 1; i > 0; i--)
+        {
+            int swapIndex = random.Next(i + 1);
+            (values[i], values[swapIndex]) = (values[swapIndex], values[i]);
+        }
     }
 
     private static List<ColorType> FindCandidates(
@@ -267,6 +434,27 @@ public static class FarmBoxMergeLevelSequenceMixer
             newRun.FindPropertyRelative("colorType").enumValueIndex = (int)color;
             newRun.FindPropertyRelative("count").intValue = 1;
             previousColor = color;
+        }
+
+        serializedLevel.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void WriteSlotPlan(
+        FarmBoxMergeLevelDefinition level,
+        IReadOnlyList<FarmBoxMergeBoxSlotPlanEntry> slotPlan)
+    {
+        SerializedObject serializedLevel = new SerializedObject(level);
+        SerializedProperty serializedPlan = serializedLevel.FindProperty("boxSlotPlan");
+        serializedPlan.ClearArray();
+
+        for (int i = 0; i < slotPlan.Count; i++)
+        {
+            FarmBoxMergeBoxSlotPlanEntry entry = slotPlan[i];
+            serializedPlan.InsertArrayElementAtIndex(i);
+            SerializedProperty serializedEntry = serializedPlan.GetArrayElementAtIndex(i);
+            serializedEntry.FindPropertyRelative("intendedColor").enumValueIndex = (int)entry.intendedColor;
+            serializedEntry.FindPropertyRelative("boxSize").intValue = entry.boxSize;
+            serializedEntry.FindPropertyRelative("fourBoxPatternVariant").intValue = entry.fourBoxPatternVariant;
         }
 
         serializedLevel.ApplyModifiedPropertiesWithoutUndo();

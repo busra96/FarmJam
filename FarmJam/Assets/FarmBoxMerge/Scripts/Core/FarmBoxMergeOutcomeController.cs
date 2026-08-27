@@ -91,10 +91,14 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour
         bool cardBoardIsFull = cardMergeBoard != null && !cardMergeBoard.HasCardCapacity;
         bool nextItemCannotJump = itemSpawner != null && itemSpawner.IsNextQueuedItemBlocked;
         bool impossibleBoxDemand = cardMergeBoard != null && cardMergeBoard.HasImpossibleBoxDemand(itemSpawner);
+        bool noStandardCardMove = cardBoardIsFull
+            && nextItemCannotJump
+            && cardMergeBoard != null
+            && !cardMergeBoard.HasAnyStandardCardMove();
         bool boardIsBlocked = impossibleBoxDemand || (itemSpawner != null
             && itemSpawner.HasRemainingItems
-            && allBoxSlotsOccupied
-            && (cardBoardIsFull || nextItemCannotJump));
+            && ((allBoxSlotsOccupied && (cardBoardIsFull || nextItemCannotJump))
+                || noStandardCardMove));
 
         AdvancePendingOutcome(boardIsBlocked ? PendingOutcome.Fail : PendingOutcome.None);
     }

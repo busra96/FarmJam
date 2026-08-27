@@ -36,4 +36,14 @@ MonoBehaviour:
     count: 4
   - colorType: 1
     count: 4
+  boxSlotPlan:
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

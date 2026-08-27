@@ -16,17 +16,21 @@ MonoBehaviour:
   levelName: 18 - Renk Koridoru
   designerNotes: Orta zor. Bes renk iki dalga halinde gelir ve slot secimi daralir.
   itemSequence:
-  - colorType: 3
-    count: 1
   - colorType: 4
     count: 1
   - colorType: 3
     count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 0
+    count: 1
+  - colorType: 2
     count: 1
   - colorType: 4
-    count: 1
-  - colorType: 0
     count: 1
   - colorType: 2
     count: 1
@@ -34,20 +38,12 @@ MonoBehaviour:
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
+  - colorType: 4
     count: 1
   - colorType: 1
     count: 1
   - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
+    count: 3
   cardSpawnPlan:
   - colorType: 0
     count: 8
@@ -59,4 +55,23 @@ MonoBehaviour:
     count: 2
   - colorType: 4
     count: 8
+  boxSlotPlan:
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

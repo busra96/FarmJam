@@ -16,39 +16,23 @@ MonoBehaviour:
   levelName: 30 - Uzun Hasat
   designerNotes: Cok zor. Otuz itemlik bes renk dongusunde hata payi azalir.
   itemSequence:
-  - colorType: 3
+  - colorType: 1
+    count: 1
+  - colorType: 2
     count: 1
   - colorType: 4
     count: 1
   - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 0
     count: 1
   - colorType: 3
     count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 3
-    count: 1
   - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
     count: 1
   - colorType: 3
     count: 1
@@ -58,24 +42,38 @@ MonoBehaviour:
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 1
+  - colorType: 3
     count: 1
   - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 0
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
   - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
+    count: 2
   cardSpawnPlan:
   - colorType: 0
     count: 10
@@ -87,4 +85,35 @@ MonoBehaviour:
     count: 10
   - colorType: 4
     count: 10
+  boxSlotPlan:
+  - intendedColor: 4
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 4
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

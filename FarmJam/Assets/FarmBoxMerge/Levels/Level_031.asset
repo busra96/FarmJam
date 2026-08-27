@@ -16,15 +16,11 @@ MonoBehaviour:
   levelName: 31 - Usta Uclu
   designerNotes: Cok zor. Uc rengin sekizer itemini parcali dortlu kutularla yonet.
   itemSequence:
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
   - colorType: 1
     count: 1
   - colorType: 0
+    count: 1
+  - colorType: 2
     count: 1
   - colorType: 1
     count: 1
@@ -36,17 +32,9 @@ MonoBehaviour:
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 2
-    count: 1
   - colorType: 1
     count: 1
-  - colorType: 0
-    count: 1
   - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
     count: 1
   - colorType: 1
     count: 1
@@ -58,12 +46,22 @@ MonoBehaviour:
     count: 1
   - colorType: 2
     count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 1
     count: 1
   - colorType: 0
     count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 2
   cardSpawnPlan:
   - colorType: 0
     count: 16
@@ -71,4 +69,23 @@ MonoBehaviour:
     count: 16
   - colorType: 2
     count: 16
+  boxSlotPlan:
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

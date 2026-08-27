@@ -19,19 +19,22 @@ Open `Tools > FarmBoxMerge > Level Editor`. Each `FarmBoxMergeLevelDefinition` a
 
 - a level name and designer notes;
 - an ordered item sequence expressed as color + consecutive count runs;
-- a card spawn plan containing each color and its total level-one card count.
+- a card spawn plan containing each color and its total level-one card count;
+- a deterministic transparent-box flow containing the intended solution color, box size and four-box shape variant.
 
 `FarmBoxMergeLevelCatalog` owns the playable level order. Drag levels in the editor window to reorder them. `FarmBoxMergeLevelRuntime` reads the catalog assigned in the scene, disables legacy automatic spawning and loads the selected level. Item sequences longer than the visible queue are retained in a pending queue and fed into the scene without dropping entries.
 
-`Tools > FarmBoxMerge > Mix All Level Item Flows` redistributes every multi-color level with a deterministic, non-repeating color order. It preserves each color's total item count, the card spawn plan and the catalog order; single-color tutorial levels remain unchanged.
+`Tools > FarmBoxMerge > Rebuild All Deterministic Slot Flows` rebuilds item and transparent-box flows together with a deterministic three-slot schedule. Colors remain mixed, but a new target group enters the item flow only after an active group can finish. The command preserves color totals, card totals and catalog order while preventing an unavoidable fourth-color queue lock. The legacy `Mix All Level Item Flows` menu item now runs the same safe rebuild so item and slot plans cannot drift apart.
 
-The default catalog contains 35 authored levels in difficulty order. Levels 1-5 teach merge sizes, levels 6-15 introduce all five colors, levels 16-25 focus on queue and three-slot planning, and levels 26-35 provide longer expert layouts. Every authored card now enters play at counter `1`. The level deck is shuffled without changing its configured per-color totals, fills at most 12 board slots and automatically deals another card whenever a merge, box creation or discard frees a slot, until the level deck is exhausted.
+The default catalog contains 35 authored levels in difficulty order. Levels 1-5 teach merge sizes, levels 6-15 introduce all five colors, levels 16-25 focus on queue and three-slot planning, and levels 26-35 provide longer expert layouts. Every authored card enters play at counter `1`. For levels with a fixed transparent-box flow, the card deck is derived deterministically from that solution order: each target receives exactly the level-one resources required to build its value before later colors can flood the 12-card board. A merge or box placement still deals the next pending card whenever a board slot opens. Legacy levels without a fixed flow retain shuffled card totals as a compatibility fallback.
 
 With a level catalog assigned, `RefreshGame` and `RetryLevel` both reload the current authored level. `NextLevel` advances through the catalog order. If no catalog is assigned, the old configured-random and replay behavior remains available as a fallback.
 
 `AddRandomCard` and the UI's `ADD CARD` action both add a recommended level-one card. Dragging a card onto `TrashDropZone` removes it with a short discard animation; cards added or removed during play do not alter the authored level data.
 
-Card counters are limited to `1-4`. A level-four card cannot merge again. Three-box groups use a compact L triomino, while four-box groups use randomized square/L/T/Z patterns whose width never exceeds two boxes.
+Card counters are limited to `1-4`. A level-four card cannot merge again. Three-box groups use a compact L triomino, while authored four-box groups use their saved square/L/T/Z variant whose width never exceeds two boxes.
+
+The three reusable world slots show transparent white box silhouettes of size `1`, `2`, `3` or `4`. A silhouette restricts only the card value; the player chooses its color and remains responsible for following a solvable distribution. The first three authored entries fill the initial slots from left to right. Each later entry is consumed only by the slot whose completed box leaves; the other visible silhouettes never change. Retry and Refresh reset the cursor, so the same actions always reveal the same saved silhouettes and four-box variants. The intended color stored in the level is editor-only solution metadata and never colors or restricts the white silhouette. After the authored flow ends it loops deterministically only to preserve the always-visible slot presentation until the outcome state locks gameplay input. Levels without an authored flow retain the old live-calculated behavior as a compatibility fallback.
 
 The card board holds at most 12 cards. `ADD CARD` always creates a level-one card and chooses its color by comparing queued item demand with the capacity already available in cards and world boxes. Queue order breaks ties; when demand is already covered, it prefers a color that can immediately merge with another level-one card.
 

@@ -16,26 +16,22 @@ MonoBehaviour:
   levelName: 14 - Dengeli Hasat
   designerNotes: Orta. Dort farkli kutu boyutu ve tekrar eden renk sirasi.
   itemSequence:
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
   - colorType: 1
     count: 1
   - colorType: 3
     count: 1
   - colorType: 0
     count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 0
-    count: 1
+    count: 3
   cardSpawnPlan:
   - colorType: 0
     count: 8
@@ -45,4 +41,17 @@ MonoBehaviour:
     count: 2
   - colorType: 3
     count: 1
+  boxSlotPlan:
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 3
+    boxSize: 1
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

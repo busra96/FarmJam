@@ -21,4 +21,8 @@ MonoBehaviour:
   cardSpawnPlan:
   - colorType: 0
     count: 4
+  boxSlotPlan:
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

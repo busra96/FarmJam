@@ -18,9 +18,19 @@ MonoBehaviour:
   itemSequence:
   - colorType: 3
     count: 1
-  - colorType: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
     count: 1
   - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
     count: 1
   - colorType: 2
     count: 1
@@ -30,32 +40,20 @@ MonoBehaviour:
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 2
+  - colorType: 1
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 0
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
   - colorType: 1
     count: 1
   - colorType: 4
     count: 1
   - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
-    count: 1
+    count: 2
   cardSpawnPlan:
   - colorType: 0
     count: 8
@@ -67,4 +65,20 @@ MonoBehaviour:
     count: 8
   - colorType: 4
     count: 8
+  boxSlotPlan:
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 4
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 3
   cardPlanVersion: 1

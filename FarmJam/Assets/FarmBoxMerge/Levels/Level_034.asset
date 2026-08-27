@@ -16,6 +16,68 @@ MonoBehaviour:
   levelName: 34 - Son Prova
   designerNotes: Uzman. Otuz alti itemlik asimetrik akis final oncesi planlama sinavi.
   itemSequence:
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
   - colorType: 0
     count: 1
   - colorType: 1
@@ -24,69 +86,7 @@ MonoBehaviour:
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
   - colorType: 3
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
     count: 1
   cardSpawnPlan:
   - colorType: 0
@@ -99,4 +99,35 @@ MonoBehaviour:
     count: 12
   - colorType: 4
     count: 12
+  boxSlotPlan:
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 4
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 3
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 4
+    fourBoxPatternVariant: 3
   cardPlanVersion: 1

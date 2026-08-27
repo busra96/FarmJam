@@ -18,6 +18,16 @@ public class FarmBoxMergeCardSpawnGroup
     [Min(1)] public int count = 1;
 }
 
+[Serializable]
+public class FarmBoxMergeBoxSlotPlanEntry
+{
+    [Tooltip("Şeffaf kutu renksizdir. Bu renk yalnızca level tasarımındaki hedef çözümü doğrulamak için kullanılır.")]
+    public ColorType intendedColor = ColorType.Green;
+    [Range(FarmBoxMergeRules.MinCardCounter, FarmBoxMergeRules.MaxCardCounter)]
+    public int boxSize = FarmBoxMergeRules.MinCardCounter;
+    [Range(0, 3)] public int fourBoxPatternVariant;
+}
+
 [CreateAssetMenu(fileName = "FarmBoxMergeLevel", menuName = "FarmBoxMerge/Level")]
 public class FarmBoxMergeLevelDefinition : ScriptableObject
 {
@@ -27,6 +37,7 @@ public class FarmBoxMergeLevelDefinition : ScriptableObject
     [SerializeField] private List<FarmBoxMergeItemRun> itemSequence = new List<FarmBoxMergeItemRun>();
     [FormerlySerializedAs("startingCards")]
     [SerializeField] private List<FarmBoxMergeCardSpawnGroup> cardSpawnPlan = new List<FarmBoxMergeCardSpawnGroup>();
+    [SerializeField] private List<FarmBoxMergeBoxSlotPlanEntry> boxSlotPlan = new List<FarmBoxMergeBoxSlotPlanEntry>();
     [SerializeField, HideInInspector] private int cardPlanVersion;
 
     public string LevelId => levelId;
@@ -34,6 +45,8 @@ public class FarmBoxMergeLevelDefinition : ScriptableObject
     public string DesignerNotes => designerNotes;
     public IReadOnlyList<FarmBoxMergeItemRun> ItemSequence => itemSequence;
     public IReadOnlyList<FarmBoxMergeCardSpawnGroup> CardSpawnPlan => cardSpawnPlan;
+    public IReadOnlyList<FarmBoxMergeBoxSlotPlanEntry> BoxSlotPlan => boxSlotPlan;
+    public bool HasAuthoredBoxSlotPlan => boxSlotPlan != null && boxSlotPlan.Count > 0;
 
     public int TotalItemCount
     {
@@ -90,6 +103,18 @@ public class FarmBoxMergeLevelDefinition : ScriptableObject
                     ? FarmBoxMergeRules.ClampCardCounter(cardSpawnPlan[i].count)
                     : Mathf.Max(1, cardSpawnPlan[i].count);
             }
+        }
+
+        for (int i = 0; i < boxSlotPlan.Count; i++)
+        {
+            FarmBoxMergeBoxSlotPlanEntry entry = boxSlotPlan[i];
+            if (entry == null)
+            {
+                continue;
+            }
+
+            entry.boxSize = FarmBoxMergeRules.ClampCardCounter(entry.boxSize);
+            entry.fourBoxPatternVariant = Mathf.Clamp(entry.fourBoxPatternVariant, 0, 3);
         }
     }
 

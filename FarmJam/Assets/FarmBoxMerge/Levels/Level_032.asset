@@ -22,33 +22,13 @@ MonoBehaviour:
     count: 1
   - colorType: 3
     count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
+  - colorType: 1
     count: 1
   - colorType: 3
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 0
-    count: 1
   - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 0
     count: 1
   - colorType: 1
     count: 1
@@ -56,22 +36,34 @@ MonoBehaviour:
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
   - colorType: 1
     count: 1
   - colorType: 2
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 0
+  - colorType: 3
     count: 1
   - colorType: 1
     count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 5
   cardSpawnPlan:
   - colorType: 0
     count: 12
@@ -81,4 +73,29 @@ MonoBehaviour:
     count: 12
   - colorType: 3
     count: 12
+  boxSlotPlan:
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 3
   cardPlanVersion: 1

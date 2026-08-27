@@ -60,6 +60,18 @@ public static class BoxPatternLibrary
         };
     }
 
+    public static BoxPatternDefinition ResolveAuthored(int boxCount, int fourBoxPatternVariant)
+    {
+        int count = FarmBoxMergeRules.ClampCardCounter(boxCount);
+        if (count != FarmBoxMergeRules.MaxCardCounter)
+        {
+            return Resolve(count, false);
+        }
+
+        int variant = Mathf.Clamp(fourBoxPatternVariant, 0, FourBoxPatterns.Length - 1);
+        return FourBoxPatterns[variant];
+    }
+
     public static Vector3[] GetCenteredPositions(Vector2Int[] cells, float spacing)
     {
         if (cells == null || cells.Length == 0)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
@@ -14,6 +15,7 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
     private ReorderableList _catalogList;
     private ReorderableList _itemRunList;
     private ReorderableList _cardSpawnPlanList;
+    private ReorderableList _boxSlotPlanList;
     private Vector2 _levelScroll;
 
     [MenuItem("Tools/FarmBoxMerge/Level Editor")]
@@ -172,9 +174,16 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
         EditorGUILayout.Space(8f);
         EditorGUILayout.LabelField("LEVEL-1 KART SPAWN PLANI", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
-            "Her kart 1 değeriyle doğar. Renk başına toplam kart adetleri karışık sırayla spawnlanır; tahta aynı anda en fazla 12 kart gösterir.",
+            "Her kart 1 değeriyle doğar. Renk toplamları burada belirlenir; oyun sırasını sabit şeffaf kutu çözüm akışından üretir. Böylece Retry aynı kart sırasını getirir ve 12 kartlık tahtada ihtiyaç duyulan merge kaynağı beş renge dağılıp kilitlenmez.",
             MessageType.None);
         _cardSpawnPlanList.DoLayoutList();
+
+        EditorGUILayout.Space(8f);
+        EditorGUILayout.LabelField("ŞEFFAF KUTU AKIŞI", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox(
+            "İlk üç satır başlangıç yuvalarına soldan sağa yerleşir. Sonraki her satır, dolup giden kutunun boşalttığı yuvaya gelir. Retry bu akışı baştan ve aynı sırada oynatır. Hedef renk yalnızca çözüm doğrulamasıdır; oyundaki şeffaf kutu beyazdır ve her rengi kabul eder.",
+            MessageType.None);
+        _boxSlotPlanList.DoLayoutList();
 
         DrawLevelSummary();
         EditorGUILayout.EndScrollView();
@@ -195,6 +204,47 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
         if (_selectedLevel.TotalCardSpawnCount == 0 || _selectedLevel.TotalItemCount == 0)
         {
             EditorGUILayout.HelpBox("Level başlamadan önce item akışı ve başlangıç kartlarını doldurun.", MessageType.Warning);
+            return;
+        }
+
+        List<FarmBoxMergeBoxRequirement> requirements = new List<FarmBoxMergeBoxRequirement>();
+        if (!FarmBoxMergeSlotPlanBuilder.TryBuildPlan(_selectedLevel, requirements, out string error))
+        {
+            EditorGUILayout.HelpBox($"Kutu planı geçersiz: {error}", MessageType.Error);
+            return;
+        }
+
+        if (!_selectedLevel.HasAuthoredBoxSlotPlan)
+        {
+            EditorGUILayout.HelpBox(
+                "Bu level için sabit şeffaf kutu akışı yok. Tools/FarmBoxMerge/Rebuild All Deterministic Slot Flows komutuyla oluşturabilirsiniz.",
+                MessageType.Warning);
+            return;
+        }
+
+        int[] countsBySize = new int[FarmBoxMergeRules.MaxCardCounter + 1];
+        IReadOnlyList<FarmBoxMergeBoxSlotPlanEntry> authoredPlan = _selectedLevel.BoxSlotPlan;
+        for (int i = 0; i < authoredPlan.Count; i++)
+        {
+            if (authoredPlan[i] != null)
+            {
+                countsBySize[FarmBoxMergeRules.ClampCardCounter(authoredPlan[i].boxSize)]++;
+            }
+        }
+
+        EditorGUILayout.LabelField("Toplam şeffaf kutu grubu", authoredPlan.Count.ToString());
+        EditorGUILayout.LabelField(
+            "Kutu şekilleri",
+            $"1'li: {countsBySize[1]}  ·  2'li: {countsBySize[2]}  ·  3'lü: {countsBySize[3]}  ·  4'lü: {countsBySize[4]}");
+        if (FarmBoxMergeSlotPlanBuilder.TryValidateAuthoredPlan(_selectedLevel, out string authoredError))
+        {
+            EditorGUILayout.HelpBox(
+                "Sabit akış doğrulandı: item sırası üç aktif kutu alanıyla tamamlanabiliyor, kart maliyetleri level planıyla eşleşiyor ve deterministik kart destesi bu çözüm sırasından üretilebiliyor.",
+                MessageType.Info);
+        }
+        else
+        {
+            EditorGUILayout.HelpBox($"Sabit akış geçersiz: {authoredError}", MessageType.Error);
         }
     }
 
@@ -279,6 +329,37 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
                     GUIContent.none);
             }
         };
+
+        SerializedProperty boxSlotPlan = _levelObject.FindProperty("boxSlotPlan");
+        _boxSlotPlanList = new ReorderableList(_levelObject, boxSlotPlan, true, true, true, true)
+        {
+            drawHeaderCallback = rect => EditorGUI.LabelField(
+                rect,
+                "Hedef Renk / Kutu Sayısı / 4'lü Varyant (0 Kare, 1 L, 2 T, 3 Z)"),
+            drawElementCallback = (rect, index, active, focused) =>
+            {
+                SerializedProperty element = boxSlotPlan.GetArrayElementAtIndex(index);
+                rect.y += 2f;
+                float colorWidth = rect.width * 0.42f;
+                float sizeWidth = rect.width * 0.25f;
+                EditorGUI.PropertyField(
+                    new Rect(rect.x, rect.y, colorWidth - 4f, EditorGUIUtility.singleLineHeight),
+                    element.FindPropertyRelative("intendedColor"),
+                    GUIContent.none);
+                EditorGUI.PropertyField(
+                    new Rect(rect.x + colorWidth, rect.y, sizeWidth - 4f, EditorGUIUtility.singleLineHeight),
+                    element.FindPropertyRelative("boxSize"),
+                    GUIContent.none);
+                EditorGUI.PropertyField(
+                    new Rect(
+                        rect.x + colorWidth + sizeWidth,
+                        rect.y,
+                        rect.width - colorWidth - sizeWidth,
+                        EditorGUIUtility.singleLineHeight),
+                    element.FindPropertyRelative("fourBoxPatternVariant"),
+                    GUIContent.none);
+            }
+        };
     }
 
     private void SelectCatalog(FarmBoxMergeLevelCatalog catalog)
@@ -294,6 +375,7 @@ public class FarmBoxMergeLevelEditorWindow : EditorWindow
         _levelObject = null;
         _itemRunList = null;
         _cardSpawnPlanList = null;
+        _boxSlotPlanList = null;
         Repaint();
     }
 
