@@ -1,9 +1,16 @@
+using System;
 using VContainer.Unity;
 
 public interface IFarmBoxMergeOutcomeMonitor
 {
+    event Action OutcomeShown;
     void Initialize();
     void Tick();
+}
+
+public interface IFarmBoxMergeSettingsPanel
+{
+    void Initialize();
 }
 
 public interface IFarmBoxMergeLayoutController
@@ -14,8 +21,19 @@ public interface IFarmBoxMergeLayoutController
 
 public sealed class FarmBoxMergeNullOutcomeMonitor : IFarmBoxMergeOutcomeMonitor
 {
+    public event Action OutcomeShown
+    {
+        add { }
+        remove { }
+    }
+
     public void Initialize() { }
     public void Tick() { }
+}
+
+public sealed class FarmBoxMergeNullSettingsPanel : IFarmBoxMergeSettingsPanel
+{
+    public void Initialize() { }
 }
 
 public sealed class FarmBoxMergeNullLayoutController : IFarmBoxMergeLayoutController

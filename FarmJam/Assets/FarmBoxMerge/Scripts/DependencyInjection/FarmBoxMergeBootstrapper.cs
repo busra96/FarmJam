@@ -10,6 +10,7 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
     private readonly FarmBoxMergeGameController _gameController;
     private readonly IFarmBoxMergeOutcomeMonitor _outcomeMonitor;
     private readonly IFarmBoxMergeLayoutController _layoutController;
+    private readonly IFarmBoxMergeSettingsPanel _settingsPanel;
 
     public FarmBoxMergeBootstrapper(
         IFarmBoxMergeFeedbackService feedback,
@@ -19,7 +20,8 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
         CardSpawner cardSpawner,
         FarmBoxMergeGameController gameController,
         IFarmBoxMergeOutcomeMonitor outcomeMonitor,
-        IFarmBoxMergeLayoutController layoutController)
+        IFarmBoxMergeLayoutController layoutController,
+        IFarmBoxMergeSettingsPanel settingsPanel)
     {
         _feedback = feedback;
         _levelRuntime = levelRuntime;
@@ -29,6 +31,7 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
         _gameController = gameController;
         _outcomeMonitor = outcomeMonitor;
         _layoutController = layoutController;
+        _settingsPanel = settingsPanel;
     }
 
     public void Start()
@@ -44,5 +47,6 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
         _gameController.Initialize();
         _outcomeMonitor.Initialize();
         _layoutController.Initialize();
+        _settingsPanel.Initialize();
     }
 }

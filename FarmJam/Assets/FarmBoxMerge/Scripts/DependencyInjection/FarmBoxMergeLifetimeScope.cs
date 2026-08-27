@@ -96,5 +96,19 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
             builder.Register<FarmBoxMergeNullLayoutController>(Lifetime.Singleton)
                 .As<IFarmBoxMergeLayoutController>();
         }
+
+        FarmBoxMergeSettingsPanelController settingsPanel =
+            Object.FindFirstObjectByType<FarmBoxMergeSettingsPanelController>(FindObjectsInactive.Include);
+        if (settingsPanel != null)
+        {
+            builder.RegisterComponent(settingsPanel)
+                .AsSelf()
+                .As<IFarmBoxMergeSettingsPanel>();
+        }
+        else
+        {
+            builder.Register<FarmBoxMergeNullSettingsPanel>(Lifetime.Singleton)
+                .As<IFarmBoxMergeSettingsPanel>();
+        }
     }
 }

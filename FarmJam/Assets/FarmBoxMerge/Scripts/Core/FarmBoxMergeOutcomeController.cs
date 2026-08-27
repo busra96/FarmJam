@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -7,6 +8,8 @@ using VContainer;
 [DisallowMultipleComponent]
 public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcomeMonitor
 {
+    public event Action OutcomeShown;
+
     private enum PendingOutcome
     {
         None,
@@ -225,6 +228,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
         _outcomeShown = true;
         _monitoring = false;
         gameController?.SetGameplayInputEnabled(false);
+        OutcomeShown?.Invoke();
         bool won = outcome == PendingOutcome.Win;
         SetPanelState(won, outcome == PendingOutcome.Fail);
         _feedback?.PlayOutcome(won ? winPanel : failPanel, won);

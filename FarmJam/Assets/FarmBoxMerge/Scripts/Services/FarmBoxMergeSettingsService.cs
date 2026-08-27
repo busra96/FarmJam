@@ -13,6 +13,7 @@ public interface IFarmBoxMergeSettingsService
     int AddCardUses { get; }
     int TrashUses { get; }
     event Action Changed;
+    void SetAudioEnabled(bool value);
     void SetSoundEnabled(bool value);
     void SetMusicEnabled(bool value);
     void SetParticlesEnabled(bool value);
@@ -65,6 +66,20 @@ public sealed class FarmBoxMergeSettingsService : IFarmBoxMergeSettingsService
     public void SetParticlesEnabled(bool value) => SetBool(nameof(ParticlesEnabled), value, ref _particlesEnabled);
     public void SetHapticsEnabled(bool value) => SetBool(nameof(HapticsEnabled), value, ref _hapticsEnabled);
     public void SetCameraFeedbackEnabled(bool value) => SetBool(nameof(CameraFeedbackEnabled), value, ref _cameraFeedbackEnabled);
+
+    public void SetAudioEnabled(bool value)
+    {
+        if (_soundEnabled == value && _musicEnabled == value)
+        {
+            return;
+        }
+
+        _soundEnabled = value;
+        _musicEnabled = value;
+        PlayerPrefs.SetInt(Key(nameof(SoundEnabled)), value ? 1 : 0);
+        PlayerPrefs.SetInt(Key(nameof(MusicEnabled)), value ? 1 : 0);
+        SaveAndNotify();
+    }
 
     public void SetSfxVolume(float value)
     {
