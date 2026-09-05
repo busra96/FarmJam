@@ -6,7 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/FarmBoxMerge/FarmBoxMerge.unity
+    path: Assets/FarmBoxMerge/Scenes/FarmBoxMergeMainMenu.unity
+    guid: c20ece4d7aa842649eceae0f813e063e
+  - enabled: 1
+    path: Assets/FarmBoxMerge/Scenes/FarmBoxMerge.unity
     guid: b1d679669489f5348bc3e4bc487b2ed9
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
