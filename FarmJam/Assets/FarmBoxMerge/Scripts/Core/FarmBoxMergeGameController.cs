@@ -27,11 +27,14 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [SerializeField] private Color addCardButtonColor = new Color(0.2f, 0.55f, 0.9f, 1f);
 
     private Coroutine _resetRoutine;
+    private IFarmBoxMergeAdsService _ads;
     private bool _gameplayInputEnabled = true;
+    private bool _levelTransitionPending;
     private bool _initialized;
 
     public bool IsResetting => _resetRoutine != null;
-    public bool GameplayInputEnabled => _gameplayInputEnabled && !IsResetting;
+    public bool GameplayInputEnabled => _gameplayInputEnabled && !IsResetting && !IsAdInProgress;
+    public bool IsAdInProgress => _ads != null && _ads.IsShowingAd;
     public event Action AttemptResetStarted;
     public event Action AttemptReady;
     public event Action<bool> GameplayInputChanged;
@@ -42,13 +45,15 @@ public class FarmBoxMergeGameController : MonoBehaviour
         CardMergeBoard injectedCardMergeBoard,
         MergeItemSpawner injectedItemSpawner,
         FarmBoxMergeActionBudget injectedActionBudget,
-        FarmBoxMergeLevelRuntime injectedLevelRuntime)
+        FarmBoxMergeLevelRuntime injectedLevelRuntime,
+        IFarmBoxMergeAdsService ads)
     {
         cardSpawner = injectedCardSpawner;
         cardMergeBoard = injectedCardMergeBoard;
         itemSpawner = injectedItemSpawner;
         actionBudget = injectedActionBudget;
         levelRuntime = injectedLevelRuntime;
+        _ads = ads;
     }
 
     public void Initialize()
@@ -60,9 +65,14 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         _initialized = true;
         ResolveReferences();
-        ConfigureButton(refreshButton, RefreshGame, refreshLabel, buttonColor, "refresh");
-        ConfigureButton(retryButton, RetryLevel, retryLabel, retryButtonColor, "retry");
+        ConfigureButton(refreshButton, RequestRefreshWithAd, refreshLabel, buttonColor, "refresh");
+        ConfigureButton(retryButton, RequestRetryWithAd, retryLabel, retryButtonColor, "retry");
         ConfigureButton(addCardButton, AddRecommendedCard, addCardLabel, addCardButtonColor, "add card");
+
+        if (_ads != null)
+        {
+            _ads.StateChanged += HandleAdsStateChanged;
+        }
 
         if (cardMergeBoard != null)
         {
@@ -86,12 +96,12 @@ public class FarmBoxMergeGameController : MonoBehaviour
     {
         if (refreshButton != null)
         {
-            refreshButton.onClick.RemoveListener(RefreshGame);
+            refreshButton.onClick.RemoveListener(RequestRefreshWithAd);
         }
 
         if (retryButton != null)
         {
-            retryButton.onClick.RemoveListener(RetryLevel);
+            retryButton.onClick.RemoveListener(RequestRetryWithAd);
         }
 
         if (addCardButton != null)
@@ -107,6 +117,11 @@ public class FarmBoxMergeGameController : MonoBehaviour
         if (actionBudget != null)
         {
             actionBudget.Changed -= RefreshAddCardButtonState;
+        }
+
+        if (_ads != null)
+        {
+            _ads.StateChanged -= HandleAdsStateChanged;
         }
     }
 
@@ -124,8 +139,19 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     public void NextLevel()
     {
-        levelRuntime?.MoveNext();
-        StartReset(replaySameLevel: false);
+        if (_levelTransitionPending || IsResetting)
+        {
+            return;
+        }
+
+        _levelTransitionPending = true;
+        int completedLevelNumber = levelRuntime != null ? levelRuntime.CurrentLevelIndex + 1 : 0;
+        bool adStarted = _ads != null
+            && _ads.ShowInterstitialAfterLevel(completedLevelNumber, CompleteLevelTransition);
+        if (!adStarted)
+        {
+            CompleteLevelTransition();
+        }
     }
 
     public void AddRecommendedCard()
@@ -135,13 +161,37 @@ public class FarmBoxMergeGameController : MonoBehaviour
             return;
         }
 
-        if (actionBudget == null || !actionBudget.TryConsumeAddCardUse())
+        if (actionBudget == null || cardSpawner == null || !cardSpawner.CanSpawnCard())
+        {
+            return;
+        }
+
+        if (actionBudget.CanAddCard)
+        {
+            ExecuteAddRecommendedCard(consumeFreeUse: true);
+            return;
+        }
+
+        _ads?.ShowRewarded(
+            _ads.AddCardPlacement,
+            () => ExecuteAddRecommendedCard(consumeFreeUse: false));
+    }
+
+    private void ExecuteAddRecommendedCard(bool consumeFreeUse)
+    {
+        if (!Application.isPlaying || !GameplayInputEnabled || actionBudget == null
+            || cardSpawner == null || !cardSpawner.CanSpawnCard())
+        {
+            return;
+        }
+
+        if (consumeFreeUse && !actionBudget.TryConsumeAddCardUse())
         {
             return;
         }
 
         Card spawnedCard = cardSpawner?.SpawnRecommendedCard(itemSpawner?.SpawnedItems);
-        if (spawnedCard == null)
+        if (spawnedCard == null && consumeFreeUse)
         {
             actionBudget.GrantAddCardUses();
         }
@@ -177,6 +227,34 @@ public class FarmBoxMergeGameController : MonoBehaviour
         actionBudget?.ResetForAttempt();
         AttemptResetStarted?.Invoke();
         _resetRoutine = StartCoroutine(ResetRoutine(replaySameLevel));
+    }
+
+    private void RequestRefreshWithAd()
+    {
+        if (CanRequestGameplayReward())
+        {
+            _ads.ShowRewarded(_ads.RefreshPlacement, RefreshGame);
+        }
+    }
+
+    private void RequestRetryWithAd()
+    {
+        if (CanRequestGameplayReward())
+        {
+            _ads.ShowRewarded(_ads.RetryPlacement, RetryLevel);
+        }
+    }
+
+    private bool CanRequestGameplayReward()
+    {
+        return Application.isPlaying && GameplayInputEnabled && _ads != null;
+    }
+
+    private void CompleteLevelTransition()
+    {
+        levelRuntime?.MoveNext();
+        _levelTransitionPending = false;
+        StartReset(replaySameLevel: false);
     }
 
     private IEnumerator ResetRoutine(bool replaySameLevel)
@@ -216,6 +294,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         }
 
         _resetRoutine = null;
+        _levelTransitionPending = false;
         SetGameplayInputEnabled(true);
         AttemptReady?.Invoke();
     }
@@ -277,25 +356,27 @@ public class FarmBoxMergeGameController : MonoBehaviour
         {
             label.text = labelText;
         }
+
+        FarmBoxMergeRewardedAdBadge.CreateOrUpdate(button.transform);
     }
 
     private void SetButtonsInteractable(bool interactable)
     {
+        bool rewardedReady = _ads != null && _ads.IsRewardedReady;
         if (refreshButton != null)
         {
-            refreshButton.interactable = interactable;
+            refreshButton.interactable = interactable && rewardedReady;
         }
 
         if (retryButton != null)
         {
-            retryButton.interactable = interactable;
+            retryButton.interactable = interactable && rewardedReady;
         }
 
         if (addCardButton != null)
         {
             addCardButton.interactable = interactable
                 && actionBudget != null
-                && actionBudget.CanAddCard
                 && cardSpawner != null
                 && cardSpawner.CanSpawnCard();
         }
@@ -309,12 +390,17 @@ public class FarmBoxMergeGameController : MonoBehaviour
         {
             addCardButton.interactable = GameplayInputEnabled
                 && actionBudget != null
-                && actionBudget.CanAddCard
                 && cardSpawner != null
                 && cardSpawner.CanSpawnCard();
         }
 
         RefreshAddCardButtonLabel();
+    }
+
+    private void HandleAdsStateChanged()
+    {
+        SetButtonsInteractable(GameplayInputEnabled);
+        GameplayInputChanged?.Invoke(GameplayInputEnabled);
     }
 
     private void RefreshAddCardButtonLabel()
@@ -324,11 +410,13 @@ public class FarmBoxMergeGameController : MonoBehaviour
             return;
         }
 
-        TextMeshProUGUI label = addCardButton.GetComponentInChildren<TextMeshProUGUI>(true);
+        int remainingUses = actionBudget != null ? actionBudget.RemainingAddCardUses : 0;
+        TextMeshProUGUI label = FarmBoxMergeRewardedAdBadge.FindPrimaryLabel(addCardButton.transform);
         if (label != null)
         {
-            int remainingUses = actionBudget != null ? actionBudget.RemainingAddCardUses : 0;
-            label.text = $"{addCardLabel} ({remainingUses})";
+            label.text = remainingUses > 0 ? $"{addCardLabel} ({remainingUses})" : addCardLabel;
         }
+
+        FarmBoxMergeRewardedAdBadge.SetVisible(addCardButton.transform, remainingUses <= 0);
     }
 }

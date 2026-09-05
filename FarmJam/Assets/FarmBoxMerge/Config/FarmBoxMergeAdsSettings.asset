@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e50610693d64d248d1607fd9a3d9e54, type: 3}
+  m_Name: FarmBoxMergeAdsSettings
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeAdsSettings
+  <AdsEnabled>k__BackingField: 1
+  <UseEditorMockAds>k__BackingField: 1
+  <EditorMockRewardDuration>k__BackingField: 5
+  <AndroidAppKey>k__BackingField: 
+  <AndroidRewardedAdUnitId>k__BackingField: 
+  <AndroidInterstitialAdUnitId>k__BackingField: 
+  <IosAppKey>k__BackingField: 
+  <IosRewardedAdUnitId>k__BackingField: 
+  <IosInterstitialAdUnitId>k__BackingField: 
+  <AddCardPlacement>k__BackingField: add_card
+  <TrashPlacement>k__BackingField: trash_card
+  <RefreshPlacement>k__BackingField: refresh_level
+  <RetryPlacement>k__BackingField: retry_level
+  <LevelCompletePlacement>k__BackingField: level_complete
+  <InterstitialEveryLevels>k__BackingField: 15

@@ -19,6 +19,6 @@ MonoBehaviour:
   <CameraFeedbackEnabled>k__BackingField: 1
   <SfxVolume>k__BackingField: 0.72
   <MusicVolume>k__BackingField: 0.075
-  <AddCardUses>k__BackingField: 3
-  <TrashUses>k__BackingField: 3
+  <AddCardUses>k__BackingField: 1
+  <TrashUses>k__BackingField: 1
   <PlayerPrefsPrefix>k__BackingField: FarmBoxMerge.Settings

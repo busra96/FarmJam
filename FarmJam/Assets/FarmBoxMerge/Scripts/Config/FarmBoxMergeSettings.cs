@@ -15,8 +15,8 @@ public sealed class FarmBoxMergeSettings : ScriptableObject
     [field: SerializeField, Range(0f, 1f)] public float MusicVolume { get; private set; } = 0.075f;
 
     [Header("Attempt Defaults")]
-    [field: SerializeField, Min(0)] public int AddCardUses { get; private set; } = 3;
-    [field: SerializeField, Min(0)] public int TrashUses { get; private set; } = 3;
+    [field: SerializeField, Min(0)] public int AddCardUses { get; private set; } = 1;
+    [field: SerializeField, Min(0)] public int TrashUses { get; private set; } = 1;
 
     [Header("Persistence")]
     [field: SerializeField] public string PlayerPrefsPrefix { get; private set; } = "FarmBoxMerge.Settings";

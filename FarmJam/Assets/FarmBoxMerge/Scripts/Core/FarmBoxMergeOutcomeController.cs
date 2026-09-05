@@ -74,7 +74,8 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
 
     public void Tick()
     {
-        if (!_monitoring || _outcomeShown || gameController == null || gameController.IsResetting)
+        if (!_monitoring || _outcomeShown || gameController == null
+            || gameController.IsResetting || gameController.IsAdInProgress)
         {
             return;
         }

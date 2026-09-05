@@ -144,6 +144,7 @@ public class CardMergeBoard : MonoBehaviour
 
     private IBoxFactory _boxFactory;
     private IFarmBoxMergeFeedbackService _feedback;
+    private IFarmBoxMergeAdsService _ads;
     private MergeItemSpawner _itemSpawner;
     private Material _slotPreviewMaterial;
     private FarmBoxMergeLevelDefinition _activeSlotPlanLevel;
@@ -155,11 +156,13 @@ public class CardMergeBoard : MonoBehaviour
     public void Construct(
         IBoxFactory boxFactory,
         IFarmBoxMergeFeedbackService feedback,
-        MergeItemSpawner itemSpawner)
+        MergeItemSpawner itemSpawner,
+        IFarmBoxMergeAdsService ads)
     {
         _boxFactory = boxFactory;
         _feedback = feedback;
         _itemSpawner = itemSpawner;
+        _ads = ads;
     }
 
     private void Reset()
@@ -183,6 +186,7 @@ public class CardMergeBoard : MonoBehaviour
         EnsureSpawnPoints();
         EnsureSlotViews();
         RegisterExistingCards();
+        FarmBoxMergeRewardedAdBadge.CreateOrUpdate(trashDropLayer);
 
         if (levelRuntime != null)
         {
@@ -197,6 +201,11 @@ public class CardMergeBoard : MonoBehaviour
         if (gameController != null)
         {
             gameController.GameplayInputChanged += HandleGameplayInputChanged;
+        }
+
+        if (_ads != null)
+        {
+            _ads.StateChanged += RefreshTrashState;
         }
 
         RefreshTrashState();
@@ -217,6 +226,11 @@ public class CardMergeBoard : MonoBehaviour
         if (levelRuntime != null)
         {
             levelRuntime.CurrentLevelSpawned -= HandleCurrentLevelSpawned;
+        }
+
+        if (_ads != null)
+        {
+            _ads.StateChanged -= RefreshTrashState;
         }
 
         for (int i = 0; i < _slotViews.Count; i++)
@@ -660,13 +674,40 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
-        if (actionBudget == null || !actionBudget.TryConsumeTrashUse())
+        if (actionBudget == null)
         {
-            return false;
+            card.ReturnToOriginalSlot();
+            return true;
+        }
+
+        if (actionBudget.CanUseTrash)
+        {
+            if (actionBudget.TryConsumeTrashUse())
+            {
+                card.DiscardInto(trashDropLayer);
+            }
+
+            return true;
+        }
+
+        card.ReturnToOriginalSlot();
+        if (_ads == null)
+        {
+            return true;
+        }
+
+        _ads.ShowRewarded(_ads.TrashPlacement, () => CompleteRewardedDiscard(card));
+        return true;
+    }
+
+    private void CompleteRewardedDiscard(Card card)
+    {
+        if (card == null || !CanAcceptGameplayInput || actionBudget == null)
+        {
+            return;
         }
 
         card.DiscardInto(trashDropLayer);
-        return true;
     }
 
     private MergeBoxParent SpawnBoxGroup(
@@ -985,19 +1026,23 @@ public class CardMergeBoard : MonoBehaviour
             return;
         }
 
-        bool canUseTrash = CanAcceptGameplayInput && actionBudget != null && actionBudget.CanUseTrash;
+        bool canUseTrash = CanAcceptGameplayInput
+            && actionBudget != null
+            && (actionBudget.CanUseTrash || _ads != null);
         if (trashDropLayer.TryGetComponent(out Image image))
         {
             image.color = canUseTrash ? trashAvailableColor : trashUnavailableColor;
             image.raycastTarget = canUseTrash;
         }
 
-        TextMeshProUGUI label = trashDropLayer.GetComponentInChildren<TextMeshProUGUI>(true);
+        int remainingUses = actionBudget != null ? actionBudget.RemainingTrashUses : 0;
+        TextMeshProUGUI label = FarmBoxMergeRewardedAdBadge.FindPrimaryLabel(trashDropLayer);
         if (label != null)
         {
-            int remainingUses = actionBudget != null ? actionBudget.RemainingTrashUses : 0;
-            label.text = $"{trashLabel} ({remainingUses})";
+            label.text = remainingUses > 0 ? $"{trashLabel} ({remainingUses})" : trashLabel;
         }
+
+        FarmBoxMergeRewardedAdBadge.SetVisible(trashDropLayer, remainingUses <= 0);
     }
 
     private bool TryGetAvailableSpawnPoint(
