@@ -3052,6 +3052,7 @@ MonoBehaviour:
   prefabCatalog: {fileID: 11400000, guid: 20b0ccd7fb577fb4cb1b5dc6ea531789, type: 2}
   settings: {fileID: 11400000, guid: d3649b8becde09149a25abf4ac0d0c28, type: 2}
   adsSettings: {fileID: 11400000, guid: 62ea605fc94a440ab41570dbc8876f95, type: 2}
+  analyticsSettings: {fileID: 11400000, guid: 9872a18d552544e19e81664bc872506a, type: 2}
 --- !u!4 &788312604
 Transform:
   m_ObjectHideFlags: 0

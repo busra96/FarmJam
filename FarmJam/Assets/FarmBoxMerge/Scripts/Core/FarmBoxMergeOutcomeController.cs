@@ -9,6 +9,7 @@ using VContainer;
 public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcomeMonitor
 {
     public event Action OutcomeShown;
+    public event Action<bool> OutcomeResolved;
 
     private enum PendingOutcome
     {
@@ -231,6 +232,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
         gameController?.SetGameplayInputEnabled(false);
         OutcomeShown?.Invoke();
         bool won = outcome == PendingOutcome.Win;
+        OutcomeResolved?.Invoke(won);
         SetPanelState(won, outcome == PendingOutcome.Fail);
         _feedback?.PlayOutcome(won ? winPanel : failPanel, won);
     }

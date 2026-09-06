@@ -3,6 +3,8 @@ using VContainer.Unity;
 public sealed class FarmBoxMergeBootstrapper : IStartable
 {
     private readonly IFarmBoxMergeFeedbackService _feedback;
+    private readonly IFarmBoxMergeAnalyticsService _analytics;
+    private readonly FarmBoxMergeAnalyticsTracker _analyticsTracker;
     private readonly IFarmBoxMergeAdsService _ads;
     private readonly FarmBoxMergeLevelRuntime _levelRuntime;
     private readonly CardMergeBoard _board;
@@ -15,6 +17,8 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
 
     public FarmBoxMergeBootstrapper(
         IFarmBoxMergeFeedbackService feedback,
+        IFarmBoxMergeAnalyticsService analytics,
+        FarmBoxMergeAnalyticsTracker analyticsTracker,
         IFarmBoxMergeAdsService ads,
         FarmBoxMergeLevelRuntime levelRuntime,
         CardMergeBoard board,
@@ -26,6 +30,8 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
         IFarmBoxMergeSettingsPanel settingsPanel)
     {
         _feedback = feedback;
+        _analytics = analytics;
+        _analyticsTracker = analyticsTracker;
         _ads = ads;
         _levelRuntime = levelRuntime;
         _board = board;
@@ -39,6 +45,8 @@ public sealed class FarmBoxMergeBootstrapper : IStartable
 
     public void Start()
     {
+        _analytics.Initialize();
+        _analyticsTracker.Initialize();
         _ads.Initialize();
 
         if (_feedback is FarmBoxMergeFeedbackController feedbackController)

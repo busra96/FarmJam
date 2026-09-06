@@ -11,23 +11,28 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
     [SerializeField] private FarmBoxMergePrefabCatalog prefabCatalog;
     [SerializeField] private FarmBoxMergeSettings settings;
     [SerializeField] private FarmBoxMergeAdsSettings adsSettings;
+    [SerializeField] private FarmBoxMergeAnalyticsSettings analyticsSettings;
 
     protected override void Configure(IContainerBuilder builder)
     {
-        if (prefabCatalog == null || settings == null || adsSettings == null)
+        if (prefabCatalog == null || settings == null || adsSettings == null || analyticsSettings == null)
         {
-            Debug.LogError("FarmBoxMerge prefab, game settings, or ads settings asset is missing.", this);
+            Debug.LogError("FarmBoxMerge prefab, game, ads, or analytics settings asset is missing.", this);
             return;
         }
 
         builder.RegisterInstance(prefabCatalog);
         builder.RegisterInstance(settings);
         builder.RegisterInstance(adsSettings);
+        builder.RegisterInstance(analyticsSettings);
 
         builder.Register<FarmBoxMergeSettingsService>(Lifetime.Singleton)
             .As<IFarmBoxMergeSettingsService>();
         builder.Register<FarmBoxMergeLevelPlayAdsService>(Lifetime.Singleton)
             .As<IFarmBoxMergeAdsService>();
+        builder.Register<FarmBoxMergeAnalyticsService>(Lifetime.Singleton)
+            .As<IFarmBoxMergeAnalyticsService>();
+        builder.Register<FarmBoxMergeAnalyticsTracker>(Lifetime.Singleton);
         builder.Register<FarmBoxMergeBoxRegistry>(Lifetime.Singleton)
             .As<IFarmBoxMergeBoxRegistry>();
         builder.Register<FarmBoxMergeCardFactory>(Lifetime.Singleton)

@@ -4,6 +4,7 @@ using VContainer.Unity;
 public interface IFarmBoxMergeOutcomeMonitor
 {
     event Action OutcomeShown;
+    event Action<bool> OutcomeResolved;
     void Initialize();
     void Tick();
 }
@@ -22,6 +23,12 @@ public interface IFarmBoxMergeLayoutController
 public sealed class FarmBoxMergeNullOutcomeMonitor : IFarmBoxMergeOutcomeMonitor
 {
     public event Action OutcomeShown
+    {
+        add { }
+        remove { }
+    }
+
+    public event Action<bool> OutcomeResolved
     {
         add { }
         remove { }
