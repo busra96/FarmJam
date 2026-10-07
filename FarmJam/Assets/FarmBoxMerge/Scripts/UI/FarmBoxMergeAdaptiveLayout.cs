@@ -68,6 +68,14 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour, IFarmBoxMergeLay
         }
     }
 
+    private void OnRectTransformDimensionsChange()
+    {
+        if (_initialized)
+        {
+            ApplyLayout(false);
+        }
+    }
+
     [ContextMenu("Apply Adaptive Layout")]
     public void ApplyNow()
     {

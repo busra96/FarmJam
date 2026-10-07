@@ -42,6 +42,16 @@ public sealed class FarmBoxMergeAdsSettings : ScriptableObject
         && !string.IsNullOrWhiteSpace(RewardedAdUnitId)
         && !string.IsNullOrWhiteSpace(InterstitialAdUnitId);
 
+    public bool HasAndroidConfiguration => HasConfiguration(
+        AndroidAppKey,
+        AndroidRewardedAdUnitId,
+        AndroidInterstitialAdUnitId);
+
+    public bool HasIosConfiguration => HasConfiguration(
+        IosAppKey,
+        IosRewardedAdUnitId,
+        IosInterstitialAdUnitId);
+
     private string ResolvePlatformValue(string androidValue, string iosValue, string editorMockValue)
     {
 #if UNITY_EDITOR
@@ -56,6 +66,13 @@ public sealed class FarmBoxMergeAdsSettings : ScriptableObject
 #else
         return androidValue != null ? androidValue.Trim() : string.Empty;
 #endif
+    }
+
+    private static bool HasConfiguration(string appKey, string rewardedAdUnitId, string interstitialAdUnitId)
+    {
+        return !string.IsNullOrWhiteSpace(appKey)
+            && !string.IsNullOrWhiteSpace(rewardedAdUnitId)
+            && !string.IsNullOrWhiteSpace(interstitialAdUnitId);
     }
 
     private void OnValidate()

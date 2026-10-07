@@ -11,6 +11,7 @@ public sealed class FarmBoxMergeMainMenuController : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button playButton;
     [SerializeField] private RectTransform gameIcon;
+    [SerializeField] private FarmBoxMergeAdaptiveLayout adaptiveLayout;
 
     [Header("Animation")]
     [SerializeField, Min(0f)] private float entranceDuration = 0.42f;
@@ -19,6 +20,7 @@ public sealed class FarmBoxMergeMainMenuController : MonoBehaviour
     {
         ResolveReferences();
         EnsureEventSystem();
+        adaptiveLayout?.Initialize();
 
         if (playButton == null)
         {
@@ -64,6 +66,15 @@ public sealed class FarmBoxMergeMainMenuController : MonoBehaviour
         if (gameIcon == null && canvasGroup != null)
         {
             gameIcon = canvasGroup.transform.Find("GameIcon") as RectTransform;
+        }
+
+        if (adaptiveLayout == null && canvasGroup != null)
+        {
+            adaptiveLayout = canvasGroup.GetComponent<FarmBoxMergeAdaptiveLayout>();
+            if (adaptiveLayout == null)
+            {
+                adaptiveLayout = canvasGroup.gameObject.AddComponent<FarmBoxMergeAdaptiveLayout>();
+            }
         }
     }
 
