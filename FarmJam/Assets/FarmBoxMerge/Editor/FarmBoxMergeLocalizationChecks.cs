@@ -105,6 +105,7 @@ public static class FarmBoxMergeLocalizationChecks
             text.font = originalFont;
             Material material = text.fontSharedMaterial;
             var alternate = TMP_Settings.defaultFontAsset;
+            foreach (var languageFont in catalog.fonts) languageFont.font = null;
             catalog.fonts[(int)FarmBoxMergeLanguage.Turkish].font = alternate;
             service.SetLanguage(FarmBoxMergeLanguage.English);
             var canvas = root.GetComponent<FarmBoxMergeCanvasLocalization>();

@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLocalizationCatalog
   fonts:
   - language: 0
-    font: {fileID: 0}
+    font: {fileID: 11400000, guid: f33c2f28c48c8d446b58f19bf621d4be, type: 2}
   - language: 1
-    font: {fileID: 0}
+    font: {fileID: 11400000, guid: f33c2f28c48c8d446b58f19bf621d4be, type: 2}
   - language: 2
-    font: {fileID: 0}
+    font: {fileID: 11400000, guid: f33c2f28c48c8d446b58f19bf621d4be, type: 2}
   - language: 3
-    font: {fileID: 0}
+    font: {fileID: 11400000, guid: f33c2f28c48c8d446b58f19bf621d4be, type: 2}
   translations:
   - key: play
     english: PLAY
