@@ -3,6 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "FarmBoxMergeSettings", menuName = "FarmBoxMerge/Settings")]
 public sealed class FarmBoxMergeSettings : ScriptableObject
 {
+    [field: SerializeField] public FarmBoxMergeLocalizationCatalog Localization { get; private set; }
+
     [Header("Feature Defaults")]
     [field: SerializeField] public bool SoundEnabled { get; private set; } = true;
     [field: SerializeField] public bool MusicEnabled { get; private set; } = true;

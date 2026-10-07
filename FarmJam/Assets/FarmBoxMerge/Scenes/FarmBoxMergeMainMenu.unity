@@ -166,6 +166,9 @@ MonoBehaviour:
   canvasGroup: {fileID: 1776804614}
   playButton: {fileID: 1529836454}
   gameIcon: {fileID: 1900715785}
+  adaptiveLayout: {fileID: 0}
+  settings: {fileID: 11400000, guid: d3649b8becde09149a25abf4ac0d0c28, type: 2}
+  localization: {fileID: 1776804619}
   entranceDuration: 0.42
 --- !u!1 &226905103
 GameObject:
@@ -271,7 +274,7 @@ MonoBehaviour:
   m_fontSizeBase: 34
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 21.08
+  m_fontSizeMin: 15.299999
   m_fontSizeMax: 34
   m_fontStyle: 0
   m_HorizontalAlignment: 2
@@ -499,7 +502,7 @@ MonoBehaviour:
   m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 16
+  m_fontSizeMin: 11.25
   m_fontSizeMax: 25
   m_fontStyle: 1
   m_HorizontalAlignment: 2
@@ -789,8 +792,8 @@ MonoBehaviour:
   m_fontSizeBase: 94
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 58.28
-  m_fontSizeMax: 94
+  m_fontSizeMin: 38.947502
+  m_fontSizeMax: 86.55
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -942,7 +945,7 @@ MonoBehaviour:
   m_fontSizeBase: 58
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 35.96
+  m_fontSizeMin: 26.099998
   m_fontSizeMax: 58
   m_fontStyle: 0
   m_HorizontalAlignment: 2
@@ -1004,6 +1007,7 @@ GameObject:
   - component: {fileID: 1776804616}
   - component: {fileID: 1776804615}
   - component: {fileID: 1776804614}
+  - component: {fileID: 1776804619}
   m_Layer: 0
   m_Name: MainMenuCanvas
   m_TagString: Untagged
@@ -1112,6 +1116,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1776804619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776804613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72d46a22bde717b49b29447b9ea1cb76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeCanvasLocalization
+  bindings:
+  - text: {fileID: 1745419256}
+    key: play
 --- !u!1 &1845602518
 GameObject:
   m_ObjectHideFlags: 0

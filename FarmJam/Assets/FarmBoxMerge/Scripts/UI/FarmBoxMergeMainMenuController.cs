@@ -12,6 +12,8 @@ public sealed class FarmBoxMergeMainMenuController : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private RectTransform gameIcon;
     [SerializeField] private FarmBoxMergeAdaptiveLayout adaptiveLayout;
+    [SerializeField] private FarmBoxMergeSettings settings;
+    [SerializeField] private FarmBoxMergeCanvasLocalization localization;
 
     [Header("Animation")]
     [SerializeField, Min(0f)] private float entranceDuration = 0.42f;
@@ -19,6 +21,8 @@ public sealed class FarmBoxMergeMainMenuController : MonoBehaviour
     private void Awake()
     {
         ResolveReferences();
+        if (settings != null && settings.Localization != null && localization != null)
+            localization.Initialize(new FarmBoxMergeLocalizationService(settings.Localization, settings));
         EnsureEventSystem();
         adaptiveLayout?.Initialize();
 

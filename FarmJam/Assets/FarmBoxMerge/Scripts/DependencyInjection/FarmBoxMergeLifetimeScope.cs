@@ -15,14 +15,17 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        if (prefabCatalog == null || settings == null || adsSettings == null || analyticsSettings == null)
+        if (prefabCatalog == null || settings == null || settings.Localization == null || adsSettings == null || analyticsSettings == null)
         {
-            Debug.LogError("FarmBoxMerge prefab, game, ads, or analytics settings asset is missing.", this);
+            Debug.LogError("FarmBoxMerge prefab, game, localization, ads, or analytics settings asset is missing.", this);
             return;
         }
 
         builder.RegisterInstance(prefabCatalog);
         builder.RegisterInstance(settings);
+        builder.RegisterInstance(settings.Localization);
+        builder.Register<FarmBoxMergeLocalizationService>(Lifetime.Singleton).As<IFarmBoxMergeLocalizationService>();
+        builder.RegisterComponentInHierarchy<FarmBoxMergeCanvasLocalization>();
         builder.RegisterInstance(adsSettings);
         builder.RegisterInstance(analyticsSettings);
         builder.Register<FarmBoxMergeTutorialProgress>(Lifetime.Singleton)

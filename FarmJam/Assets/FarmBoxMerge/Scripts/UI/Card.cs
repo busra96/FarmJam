@@ -66,6 +66,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     private Coroutine _motionRoutine;
     private Coroutine _scaleEffectRoutine;
     private IFarmBoxMergeFeedbackService _feedback;
+    private FarmBoxMergeCanvasLocalization _fontLocalization;
 
     [Inject]
     public void Construct(IFarmBoxMergeFeedbackService feedback)
@@ -120,6 +121,8 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     private void Awake()
     {
         ResolveReferences();
+        _fontLocalization = GetComponentInParent<FarmBoxMergeCanvasLocalization>();
+        _fontLocalization?.RegisterText(CounterTxt);
         CaptureBaseScale();
         _targetScaleMultiplier = 1f;
 
@@ -160,6 +163,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     private void OnDestroy()
     {
+        _fontLocalization?.UnregisterText(CounterTxt);
         ReleaseMergeTarget();
         _board?.UnregisterCard(this);
         StopScaleEffectRoutine();

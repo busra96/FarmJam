@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0623b46c25126104f99eb7107626589d, type: 3}
   m_Name: FarmBoxMergeSettings
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeSettings
+  <Localization>k__BackingField: {fileID: 11400000, guid: 1e89c7bf0d8bc2a4383eb87149ec4938, type: 2}
   <SoundEnabled>k__BackingField: 1
   <MusicEnabled>k__BackingField: 1
   <ParticlesEnabled>k__BackingField: 1

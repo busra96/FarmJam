@@ -10,21 +10,25 @@ public sealed class FarmBoxMergeSettingsPanelController : MonoBehaviour, IFarmBo
     [SerializeField] private Button cancelButton;
     [SerializeField] private FarmBoxMergeToggleView soundToggle;
     [SerializeField] private FarmBoxMergeToggleView hapticToggle;
+    [SerializeField] private FarmBoxMergeLanguageSelector languageSelector;
 
     private IFarmBoxMergeSettingsService _settings;
     private IFarmBoxMergeOutcomeMonitor _outcomeMonitor;
     private FarmBoxMergeGameController _gameController;
     private bool _initialized;
+    private IFarmBoxMergeLocalizationService _localization;
 
     [Inject]
     public void Construct(
         IFarmBoxMergeSettingsService settings,
         IFarmBoxMergeOutcomeMonitor outcomeMonitor,
-        FarmBoxMergeGameController gameController)
+        FarmBoxMergeGameController gameController,
+        IFarmBoxMergeLocalizationService localization)
     {
         _settings = settings;
         _outcomeMonitor = outcomeMonitor;
         _gameController = gameController;
+        _localization = localization;
     }
 
     public void Initialize()
@@ -35,6 +39,7 @@ public sealed class FarmBoxMergeSettingsPanelController : MonoBehaviour, IFarmBo
         }
 
         _initialized = true;
+        languageSelector?.Initialize(_localization);
         settingsPanel ??= gameObject;
 
         if (settingsButton != null)

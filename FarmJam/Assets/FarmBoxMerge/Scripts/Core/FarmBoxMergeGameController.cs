@@ -19,15 +19,13 @@ public class FarmBoxMergeGameController : MonoBehaviour
     [SerializeField] private Button refreshButton;
     [SerializeField] private Button retryButton;
     [SerializeField] private Button addCardButton;
-    [SerializeField] private string refreshLabel = "REFRESH";
-    [SerializeField] private string retryLabel = "RETRY";
-    [SerializeField] private string addCardLabel = "ADD CARD";
     [SerializeField] private Color buttonColor = new Color(0.2f, 0.67f, 0.38f, 1f);
     [SerializeField] private Color retryButtonColor = new Color(0.95f, 0.55f, 0.18f, 1f);
     [SerializeField] private Color addCardButtonColor = new Color(0.2f, 0.55f, 0.9f, 1f);
 
     private Coroutine _resetRoutine;
     private IFarmBoxMergeAdsService _ads;
+    private IFarmBoxMergeLocalizationService _localization;
     private bool _gameplayInputEnabled = true;
     private bool _settingsOpen;
     private bool _tutorialActive;
@@ -48,7 +46,8 @@ public class FarmBoxMergeGameController : MonoBehaviour
         MergeItemSpawner injectedItemSpawner,
         FarmBoxMergeActionBudget injectedActionBudget,
         FarmBoxMergeLevelRuntime injectedLevelRuntime,
-        IFarmBoxMergeAdsService ads)
+        IFarmBoxMergeAdsService ads,
+        IFarmBoxMergeLocalizationService localization)
     {
         cardSpawner = injectedCardSpawner;
         cardMergeBoard = injectedCardMergeBoard;
@@ -56,6 +55,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         actionBudget = injectedActionBudget;
         levelRuntime = injectedLevelRuntime;
         _ads = ads;
+        _localization = localization;
     }
 
     public void Initialize()
@@ -67,9 +67,10 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         _initialized = true;
         ResolveReferences();
-        ConfigureButton(refreshButton, RequestRefreshWithAd, refreshLabel, buttonColor, "refresh");
-        ConfigureButton(retryButton, RequestRetryWithAd, retryLabel, retryButtonColor, "retry");
-        ConfigureButton(addCardButton, AddRecommendedCard, addCardLabel, addCardButtonColor, "add card");
+        ConfigureButton(refreshButton, RequestRefreshWithAd, _localization.Get("refresh"), buttonColor, "refresh");
+        ConfigureButton(retryButton, RequestRetryWithAd, _localization.Get("retry"), retryButtonColor, "retry");
+        ConfigureButton(addCardButton, AddRecommendedCard, _localization.Get("add_card"), addCardButtonColor, "add card");
+        _localization.Changed += RefreshLocalizedLabels;
 
         if (_ads != null)
         {
@@ -96,6 +97,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_localization != null) _localization.Changed -= RefreshLocalizedLabels;
         if (refreshButton != null)
         {
             refreshButton.onClick.RemoveListener(RequestRefreshWithAd);
@@ -434,9 +436,24 @@ public class FarmBoxMergeGameController : MonoBehaviour
         TextMeshProUGUI label = FarmBoxMergeRewardedAdBadge.FindPrimaryLabel(addCardButton.transform);
         if (label != null)
         {
-            label.text = remainingUses > 0 ? $"{addCardLabel} ({remainingUses})" : addCardLabel;
+            string title = _localization.Get("add_card");
+            label.text = remainingUses > 0 ? $"{title} ({remainingUses})" : title;
         }
 
         FarmBoxMergeRewardedAdBadge.SetVisible(addCardButton.transform, remainingUses <= 0);
+    }
+
+    private void RefreshLocalizedLabels()
+    {
+        SetLocalizedButtonLabel(refreshButton, "refresh");
+        SetLocalizedButtonLabel(retryButton, "retry");
+        RefreshAddCardButtonLabel();
+    }
+
+    private void SetLocalizedButtonLabel(Button button, string key)
+    {
+        if (button == null) return;
+        var label = FarmBoxMergeRewardedAdBadge.FindPrimaryLabel(button.transform);
+        if (label != null) label.text = _localization.Get(key);
     }
 }

@@ -43,8 +43,9 @@ public static class FarmBoxMergeRewardedAdBadge
         label.fontStyle = FontStyles.Bold;
         label.fontSize = 18f;
         label.enableAutoSizing = true;
-        label.fontSizeMin = 11f;
+        label.fontSizeMin = 7f;
         label.fontSizeMax = 18f;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
         label.raycastTarget = false;
         label.margin = new Vector4(2f, 1f, 2f, 1f);
 
@@ -59,6 +60,13 @@ public static class FarmBoxMergeRewardedAdBadge
         labelOutline.useGraphicAlpha = true;
 
         badgeRect.SetAsLastSibling();
+        target.GetComponentInParent<FarmBoxMergeCanvasLocalization>()?.RegisterText(label, sourceLabel);
+    }
+
+    public static void ApplyLocalization(TMP_Text label, IFarmBoxMergeLocalizationService localization)
+    {
+        if (label.name == LabelObjectName && label.transform.parent.name == BadgeObjectName)
+            label.text = localization.Get("ad");
     }
 
     public static void SetVisible(Transform target, bool visible)

@@ -70,6 +70,14 @@ Use `Tools > FarmBoxMerge > Tutorial > Preview First-Time Tutorial` for a playab
 
 Queued collectables use the serialized `queueItemEulerAngles` presentation rotation (30 degrees on X and Y by default). On landing, `MergeItem.GetVisualBottomLocalY` measures the active model mesh and aligns its real bottom to `boxItemFloorHeight`, so differently pivoted produce models sit on the box floor instead of clipping through it.
 
+## Localization
+
+`Config/FarmBoxMergeLocalizationCatalog.asset` contains English, Turkish, Spanish and simplified Chinese translations plus one assignable **TMP Font Asset** per language under `Fonts`. English is always the first-install default; device language does not override it. The settings panel's four language buttons apply the selection immediately and persist it under the settings prefix's `.Language` key. The same selection is loaded in both gameplay and the authored main menu.
+
+The gameplay localization service is a VContainer singleton. `FarmBoxMergeCanvasLocalization` caches original fonts/materials, updates static text bindings and announces changes to dynamic button, level, hint and tutorial text. It scans the authored Canvas only at initialization or language changes, not every frame. New card counters and runtime ad badges register their text with the same font policy. Fonts are never assigned by mutating shared TMP font assets. If a language font is unassigned, each label retains/restores its authored font and material; blank translations fall back to English. Assign fonts with the required glyphs before publishing, especially Chinese and Turkish. Use TMP font assets with complete static atlases or included source fonts configured for dynamic glyph generation.
+
+Edit translations in the catalog and static bindings on the existing Canvas component. `Tools > FarmBoxMerge > Localization > Install or Update Scene Bindings` adds/repairs the selector and bindings without creating runtime Canvases or replacing existing translations/font assignments. `Run Checks` validates language persistence, all translations/placeholders, font/material restoration, actual settings button callbacks, dynamic labels and main-menu transitions. Reports are retained in `Logs/FarmBoxMergeTests/localization.txt`; the original language preference is restored when the checks finish or Play Mode is stopped.
+
 ## Game feel
 
 `Tools > FarmBoxMerge > Apply Game Feel Polish` adds the centralized sound, particle, haptic and animation controller and assigns the migrated local SFX library.

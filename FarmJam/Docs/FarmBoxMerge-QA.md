@@ -54,7 +54,13 @@ Ham rapor ve görüntüler: `Temp/FarmBoxMergeTests/regression.txt` ve aynı kla
 - Yalnızca başarılı kutu yerleştirmeden sonra tamamlanma kaydı; yeni kayıt servisi oluşturulduğunda kaydın okunması.
 - Tamamlanan tutorial'ın retry'da tekrar açılmaması; ilerlemiş oyuncuların ilk bölüme zorlanmaması.
 
-Rapor `Temp/FarmBoxMergeTests/tutorial.txt`, iki adımın görüntüleri `tutorial-merge.png` ve `tutorial-place.png`. `Preview First-Time Tutorial` aynı izole kayıtlarla oynanabilir önizleme açar; Play Mode'dan çıkınca asıl sahneye dönülür. Tutorial yazıları, hareket süreleri ve el görselleri mevcut Canvas üzerindeki `FarmBoxMergeTutorialController` bileşeninden değiştirilebilir.
+Rapor `Temp/FarmBoxMergeTests/tutorial.txt`, iki adımın görüntüleri `tutorial-merge.png` ve `tutorial-place.png`. `Preview First-Time Tutorial` aynı izole kayıtlarla oynanabilir önizleme açar; Play Mode'dan çıkınca asıl sahneye dönülür. Tutorial yazıları localization catalog'dan, hareket süreleri ve ortak el görseli mevcut Canvas üzerindeki `FarmBoxMergeTutorialController` bileşeninden değiştirilebilir.
+
+## Dil / localization kontrolü
+
+`Tools > FarmBoxMerge > Localization > Run Checks` dört dilin metinlerini ve format parametrelerini, İngilizce ilk açılış varsayılanını, kayıt yüklemeyi, geçersiz kayıt/boş çeviri fallback'lerini, dil başına font ve material değiştirmeyi/geri yüklemeyi test eder. Settings panelindeki gerçek dil butonları, dinamik level/kart/AD yazıları, kartların korunması ve ana menüye geçince aynı dilin yüklenmesi ayrıca doğrulanır. Rapor ve görseller `Logs/FarmBoxMergeTests` içinde tutulur. Test bitince veya Play Mode durdurulunca önceki dil tercihi geri yüklenir.
+
+Font atamaları `Assets/FarmBoxMerge/Config/FarmBoxMergeLocalizationCatalog.asset > Fonts` içindedir. Fontlar henüz kullanıcı tarafından atanmadığı için özellikle Çince glyph görünümü doğrulanmış değildir; mevcut Montserrat fontu bu karakterleri içermediğinde TMP eksik glyph uyarısı verir. Dört dilin metin/akış testinin geçmesi, font atamaları ve cihazda okunabilirlik kontrolü ihtiyacını kaldırmaz. Çince metinler basitleştirilmiş Çincedir.
 
 ## Cihazda doğrulanması gerekenler
 

@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96e4b398df402d7448819de574b7cfa8, type: 3}
+  m_Name: FarmBoxMergeLocalizationCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLocalizationCatalog
+  fonts:
+  - language: 0
+    font: {fileID: 0}
+  - language: 1
+    font: {fileID: 0}
+  - language: 2
+    font: {fileID: 0}
+  - language: 3
+    font: {fileID: 0}
+  translations:
+  - key: play
+    english: PLAY
+    turkish: OYNA
+    spanish: JUGAR
+    chinese: "\u5F00\u59CB\u6E38\u620F"
+  - key: settings
+    english: SETTINGS
+    turkish: AYARLAR
+    spanish: AJUSTES
+    chinese: "\u8BBE\u7F6E"
+  - key: sound
+    english: SOUND
+    turkish: SES
+    spanish: SONIDO
+    chinese: "\u58F0\u97F3"
+  - key: haptics
+    english: VIBRATION
+    turkish: "T\u0130TRE\u015E\u0130M"
+    spanish: "VIBRACI\xD3N"
+    chinese: "\u632F\u52A8"
+  - key: cancel
+    english: CLOSE
+    turkish: KAPAT
+    spanish: CERRAR
+    chinese: "\u5173\u95ED"
+  - key: language
+    english: LANGUAGE
+    turkish: "D\u0130L"
+    spanish: IDIOMA
+    chinese: "\u8BED\u8A00"
+  - key: add_card
+    english: ADD CARD
+    turkish: KART EKLE
+    spanish: "A\xD1ADIR CARTA"
+    chinese: "\u6DFB\u52A0\u5361\u724C"
+  - key: trash
+    english: TRASH
+    turkish: "\xC7\xD6P"
+    spanish: BASURA
+    chinese: "\u4E22\u5F03"
+  - key: refresh
+    english: REFRESH
+    turkish: "YEN\u0130LE"
+    spanish: RENOVAR
+    chinese: "\u5237\u65B0"
+  - key: retry
+    english: RETRY
+    turkish: TEKRAR
+    spanish: REINTENTAR
+    chinese: "\u91CD\u8BD5"
+  - key: retry_level
+    english: RETRY LEVEL
+    turkish: TEKRAR OYNA
+    spanish: REINTENTAR
+    chinese: "\u91CD\u73A9\u5173\u5361"
+  - key: next_level
+    english: NEXT LEVEL
+    turkish: "SONRAK\u0130 B\xD6L\xDCM"
+    spanish: SIGUIENTE NIVEL
+    chinese: "\u4E0B\u4E00\u5173"
+  - key: win
+    english: HARVEST COMPLETE!
+    turkish: HASAT TAMAMLANDI!
+    spanish: "\xA1COSECHA COMPLETA!"
+    chinese: "\u6536\u83B7\u5B8C\u6210\uFF01"
+  - key: fail
+    english: TRY AGAIN!
+    turkish: TEKRAR DENE!
+    spanish: "\xA1INT\xC9NTALO DE NUEVO!"
+    chinese: "\u518D\u8BD5\u4E00\u6B21\uFF01"
+  - key: level
+    english: LEVEL {0}
+    turkish: "B\xD6L\xDCM {0}"
+    spanish: NIVEL {0}
+    chinese: "\u7B2C {0} \u5173"
+  - key: items_left
+    english: 'ITEMS
+
+      LEFT'
+    turkish: "KALAN\n\xDCR\xDCN"
+    spanish: 'PRODUCTOS
+
+      RESTANTES'
+    chinese: "\u5269\u4F59\n\u7269\u54C1"
+  - key: green
+    english: GREEN
+    turkish: "YE\u015E\u0130L"
+    spanish: VERDE
+    chinese: "\u7EFF\u8272"
+  - key: orange
+    english: ORANGE
+    turkish: TURUNCU
+    spanish: NARANJA
+    chinese: "\u6A59\u8272"
+  - key: purple
+    english: PURPLE
+    turkish: MOR
+    spanish: MORADO
+    chinese: "\u7D2B\u8272"
+  - key: red
+    english: RED
+    turkish: KIRMIZI
+    spanish: ROJO
+    chinese: "\u7EA2\u8272"
+  - key: yellow
+    english: YELLOW
+    turkish: SARI
+    spanish: AMARILLO
+    chinese: "\u9EC4\u8272"
+  - key: ad
+    english: AD
+    turkish: REKLAM
+    spanish: ANUNCIO
+    chinese: "\u5E7F\u544A"
+  - key: merge_title
+    english: MERGE CARDS
+    turkish: "KARTLARI B\u0130RLE\u015ET\u0130R"
+    spanish: FUSIONA CARTAS
+    chinese: "\u5408\u5E76\u5361\u724C"
+  - key: merge_rules
+    english: "MERGE CARDS\n<size=58%>1 + 1 = 2   \u2022   2 + 2 = 3   \u2022   3
+      + 3 = 4</size>"
+    turkish: "KARTLARI B\u0130RLE\u015ET\u0130R\n<size=58%>1 + 1 = 2   \u2022   2
+      + 2 = 3   \u2022   3 + 3 = 4</size>"
+    spanish: "FUSIONA CARTAS\n<size=58%>1 + 1 = 2   \u2022   2 + 2 = 3   \u2022  
+      3 + 3 = 4</size>"
+    chinese: "\u5408\u5E76\u5361\u724C\n<size=58%>1 + 1 = 2   \u2022   2 + 2 = 3  
+      \u2022   3 + 3 = 4</size>"
+  - key: tutorial_merge
+    english: '1 / 2   MERGE MATCHING CARDS
+
+      <size=72%>Drag one card onto the
+      other: 1 + 1 = 2</size>'
+    turkish: "1 / 2   AYNI KARTLARI B\u0130RLE\u015ET\u0130R\n<size=72%>Bir kart\u0131
+      di\u011Ferine s\xFCr\xFCkle: 1 + 1 = 2</size>"
+    spanish: '1 / 2   FUSIONA CARTAS IGUALES
+
+      <size=72%>Arrastra una carta
+      sobre la otra: 1 + 1 = 2</size>'
+    chinese: "1 / 2   \u5408\u5E76\u76F8\u540C\u5361\u724C\n<size=72%>\u5C06\u4E00\u5F20\u5361\u724C\u62D6\u5230\u53E6\u4E00\u5F20\u4E0A\uFF1A1
+      + 1 = 2</size>"
+  - key: tutorial_place
+    english: '2 / 2   MAKE YOUR FIRST BOX
+
+      <size=72%>Drag the 2 card onto a
+      2-box shape</size>'
+    turkish: "2 / 2   \u0130LK KUTUNU YERLE\u015ET\u0130R\n<size=72%>2 kart\u0131n\u0131
+      ikili kutu alan\u0131na s\xFCr\xFCkle</size>"
+    spanish: '2 / 2   COLOCA TU PRIMERA CAJA
+
+      <size=72%>Arrastra la carta 2
+      a una forma de 2 cajas</size>'
+    chinese: "2 / 2   \u653E\u7F6E\u7B2C\u4E00\u7EC4\u7BB1\u5B50\n<size=72%>\u5C06\u6570\u5B572\u7684\u5361\u724C\u62D6\u5230\u53CC\u7BB1\u533A\u57DF</size>"
+  - key: hint_drag
+    english: DRAG {0} TO A MATCHING {0}-BOX SHAPE
+    turkish: "{0} KARTINI {0} KUTULU ALANA S\xDCR\xDCKLE"
+    spanish: ARRASTRA {0} A UNA FORMA DE {0} CAJAS
+    chinese: "\u5C06{0}\u5361\u724C\u62D6\u5230{0}\u7BB1\u533A\u57DF"
+  - key: hint_match
+    english: MATCH BOTH COLOR AND NUMBER
+    turkish: RENK VE SAYI AYNI OLMALI
+    spanish: "EL COLOR Y EL N\xDAMERO DEBEN COINCIDIR"
+    chinese: "\u989C\u8272\u548C\u6570\u5B57\u90FD\u5FC5\u987B\u76F8\u540C"
+  - key: hint_merged
+    english: MATCH! TWO {0} CARDS MAKE {1}
+    turkish: "HAR\u0130KA! \u0130K\u0130 {0} KARTI {1} OLUR"
+    spanish: "\xA1BIEN! DOS CARTAS {0} HACEN {1}"
+    chinese: "\u6210\u529F\uFF01\u4E24\u5F20{0}\u5361\u724C\u5408\u6210{1}"
+  - key: hint_next
+    english: NICE! CHECK ITEMS LEFT FOR YOUR NEXT BOX
+    turkish: "G\xDCZEL! SONRAK\u0130 KUTU \u0130\xC7\u0130N KALAN \xDCR\xDCNLERE
+      BAK"
+    spanish: "\xA1BIEN! MIRA LOS PRODUCTOS RESTANTES"
+    chinese: "\u5F88\u597D\uFF01\u6839\u636E\u5269\u4F59\u7269\u54C1\u89C4\u5212\u4E0B\u4E00\u7EC4\u7BB1\u5B50"
+  - key: hint_busy
+    english: "THAT SPACE IS BUSY \u2014 TRY AN EMPTY SHAPE"
+    turkish: "BU ALAN DOLU \u2014 BO\u015E B\u0130R ALAN DENE"
+    spanish: "ESE ESPACIO EST\xC1 OCUPADO \u2014 PRUEBA OTRO"
+    chinese: "\u8BE5\u533A\u57DF\u5DF2\u88AB\u5360\u7528\uFF0C\u8BF7\u9009\u62E9\u7A7A\u95F2\u533A\u57DF"
+  - key: hint_shape
+    english: THIS SHAPE NEEDS A {0} CARD
+    turkish: "BU ALANA {0} KARTI GEREK\u0130YOR"
+    spanish: ESTA FORMA NECESITA UNA CARTA {0}
+    chinese: "\u6B64\u533A\u57DF\u9700\u8981\u6570\u5B57{0}\u7684\u5361\u724C"

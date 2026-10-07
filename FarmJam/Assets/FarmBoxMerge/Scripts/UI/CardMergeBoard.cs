@@ -73,7 +73,6 @@ public class CardMergeBoard : MonoBehaviour
     [SerializeField] private Color slotPreviewBaseColor = new Color(1f, 1f, 1f, 0.28f);
 
     [Header("Trash Feedback")]
-    [SerializeField] private string trashLabel = "TRASH";
     [SerializeField] private Color trashAvailableColor = new Color(0.78f, 0.20f, 0.20f, 0.88f);
     [SerializeField] private Color trashUnavailableColor = new Color(0.30f, 0.30f, 0.30f, 0.65f);
 
@@ -165,6 +164,7 @@ public class CardMergeBoard : MonoBehaviour
     private IBoxFactory _boxFactory;
     private IFarmBoxMergeFeedbackService _feedback;
     private IFarmBoxMergeAdsService _ads;
+    private IFarmBoxMergeLocalizationService _localization;
     private MergeItemSpawner _itemSpawner;
     private Material _slotPreviewMaterial;
     private FarmBoxMergeLevelDefinition _activeSlotPlanLevel;
@@ -177,12 +177,14 @@ public class CardMergeBoard : MonoBehaviour
         IBoxFactory boxFactory,
         IFarmBoxMergeFeedbackService feedback,
         MergeItemSpawner itemSpawner,
-        IFarmBoxMergeAdsService ads)
+        IFarmBoxMergeAdsService ads,
+        IFarmBoxMergeLocalizationService localization)
     {
         _boxFactory = boxFactory;
         _feedback = feedback;
         _itemSpawner = itemSpawner;
         _ads = ads;
+        _localization = localization;
     }
 
     private void Reset()
@@ -199,6 +201,7 @@ public class CardMergeBoard : MonoBehaviour
         }
 
         _initialized = true;
+        _localization.Changed += RefreshTrashState;
         ResolveReferences();
         EnsureDefaultPalette();
         EnsureDragLayer();
@@ -233,6 +236,7 @@ public class CardMergeBoard : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_localization != null) _localization.Changed -= RefreshTrashState;
         if (actionBudget != null)
         {
             actionBudget.Changed -= RefreshTrashState;
@@ -384,7 +388,7 @@ public class CardMergeBoard : MonoBehaviour
         EnsureDragLayer();
         EnsureSpawnDropLayer();
         card.PrepareForDrag(dragLayer != null ? dragLayer : CardContainer, eventData);
-        ShowInteractionHint($"DRAG {card.CounterValue} TO A MATCHING {card.CounterValue}-BOX SHAPE");
+        ShowInteractionHint(_localization.Format("hint_drag", card.CounterValue));
         RefreshSlotPreviews(card.CounterValue, true);
         UpdateDrag(card, eventData);
     }
@@ -460,12 +464,12 @@ public class CardMergeBoard : MonoBehaviour
 
         if (!targetCard.CanMergeWith(draggedCard))
         {
-            ShowInteractionHint("MATCH BOTH COLOR AND NUMBER");
+            ShowInteractionHint(_localization.Get("hint_match"));
             return false;
         }
 
         draggedCard.MergeInto(targetCard);
-        ShowInteractionHint($"MATCH! TWO {targetCard.CounterValue} CARDS MAKE {targetCard.CounterValue + 1}");
+        ShowInteractionHint(_localization.Format("hint_merged", targetCard.CounterValue, targetCard.CounterValue + 1));
         return true;
     }
 
@@ -691,7 +695,7 @@ public class CardMergeBoard : MonoBehaviour
 
         BoxGroupPlaced?.Invoke(card, slotView);
         card.ConsumeForWorldSpawn();
-        ShowInteractionHint("NICE! CHECK ITEMS LEFT FOR YOUR NEXT BOX");
+        ShowInteractionHint(_localization.Get("hint_next"));
         return true;
     }
 
@@ -1068,7 +1072,8 @@ public class CardMergeBoard : MonoBehaviour
         TextMeshProUGUI label = FarmBoxMergeRewardedAdBadge.FindPrimaryLabel(trashDropLayer);
         if (label != null)
         {
-            label.text = remainingUses > 0 ? $"{trashLabel} ({remainingUses})" : trashLabel;
+            string title = _localization.Get("trash");
+            label.text = remainingUses > 0 ? $"{title} ({remainingUses})" : title;
         }
 
         FarmBoxMergeRewardedAdBadge.SetVisible(trashDropLayer, remainingUses <= 0);
@@ -1104,8 +1109,8 @@ public class CardMergeBoard : MonoBehaviour
         if (availableSpawnPoint == null && nearestSlot != null)
         {
             ShowInteractionHint(nearestSlot.IsOccupied
-                ? "THAT SPACE IS BUSY — TRY AN EMPTY SHAPE"
-                : $"THIS SHAPE NEEDS A {nearestSlot.AcceptedCardValue} CARD");
+                ? _localization.Get("hint_busy")
+                : _localization.Format("hint_shape", nearestSlot.AcceptedCardValue));
         }
         return availableSpawnPoint != null;
     }

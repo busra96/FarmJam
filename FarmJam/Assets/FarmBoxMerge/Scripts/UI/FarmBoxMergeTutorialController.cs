@@ -42,13 +42,12 @@ public sealed class FarmBoxMergeTutorialController : MonoBehaviour,
     [Header("Guide")]
     [SerializeField, Min(0.5f)] private float gestureDuration = 1.5f;
     [SerializeField, Min(0.1f)] private float gesturePause = 0.65f;
-    [SerializeField] private string mergeText = "1 / 2   MERGE MATCHING CARDS\n<size=72%>Drag one card onto the other: 1 + 1 = 2</size>";
-    [SerializeField] private string placementText = "2 / 2   MAKE YOUR FIRST BOX\n<size=72%>Drag the 2 card onto a 2-box shape</size>";
 
     private CardMergeBoard _board;
     private FarmBoxMergeGameController _game;
     private FarmBoxMergeLevelRuntime _levels;
     private IFarmBoxMergeTutorialProgress _progress;
+    private IFarmBoxMergeLocalizationService _localization;
     private Camera _worldCamera;
     private Card _firstCard;
     private Card _secondCard;
@@ -66,18 +65,21 @@ public sealed class FarmBoxMergeTutorialController : MonoBehaviour,
 
     [Inject]
     public void Construct(CardMergeBoard board, FarmBoxMergeGameController game,
-        FarmBoxMergeLevelRuntime levels, IFarmBoxMergeTutorialProgress progress)
+        FarmBoxMergeLevelRuntime levels, IFarmBoxMergeTutorialProgress progress,
+        IFarmBoxMergeLocalizationService localization)
     {
         _board = board;
         _game = game;
         _levels = levels;
         _progress = progress;
+        _localization = localization;
     }
 
     public void Initialize()
     {
         if (_initialized) return;
         _initialized = true;
+        _localization.Changed += RefreshInstruction;
         HideView();
         _game.AttemptResetStarted += StopTutorial;
         _game.AttemptReady += BeginAttempt;
@@ -134,7 +136,7 @@ public sealed class FarmBoxMergeTutorialController : MonoBehaviour,
         Step = TutorialStep.Merge;
         _board.SetInteractionGate(this);
         _game.SetTutorialActive(true);
-        instruction.text = mergeText;
+        RefreshInstruction();
         hand.sprite = tutorialHand;
         hand.rectTransform.pivot = fingerPivot;
         overlay.gameObject.SetActive(true);
@@ -146,7 +148,7 @@ public sealed class FarmBoxMergeTutorialController : MonoBehaviour,
         if (Step != TutorialStep.Merge || !CanMerge(source, target) || target.CounterValue != 2) return;
         _mergedCard = target;
         Step = TutorialStep.Place;
-        instruction.text = placementText;
+        RefreshInstruction();
         RestartGesture();
     }
 
@@ -247,6 +249,7 @@ public sealed class FarmBoxMergeTutorialController : MonoBehaviour,
     {
         StopTutorial();
         if (!_initialized) return;
+        if (_localization != null) _localization.Changed -= RefreshInstruction;
         if (_game != null)
         {
             _game.AttemptResetStarted -= StopTutorial;
@@ -257,5 +260,11 @@ public sealed class FarmBoxMergeTutorialController : MonoBehaviour,
             _board.CardMergeCompleted -= OnMergeCompleted;
             _board.BoxGroupPlaced -= OnBoxPlaced;
         }
+    }
+
+    private void RefreshInstruction()
+    {
+        if (IsActive && instruction != null)
+            instruction.text = _localization.Get(Step == TutorialStep.Merge ? "tutorial_merge" : "tutorial_place");
     }
 }
