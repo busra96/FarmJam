@@ -23,6 +23,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
     [SerializeField] private CardMergeBoard cardMergeBoard;
     [SerializeField] private MergeItemSpawner itemSpawner;
     [SerializeField] private FarmBoxMergeActionBudget actionBudget;
+    [SerializeField] private CardSpawner cardSpawner;
 
     [Header("Panels")]
     [SerializeField] private GameObject winPanel;
@@ -42,6 +43,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
     private Coroutine _enableMonitoringRoutine;
     private IFarmBoxMergeFeedbackService _feedback;
     private bool _initialized;
+    private bool _applicationSuspended;
 
     [Inject]
     public void Construct(
@@ -75,7 +77,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
 
     public void Tick()
     {
-        if (!_monitoring || _outcomeShown || gameController == null
+        if (!_monitoring || _outcomeShown || _applicationSuspended || gameController == null
             || gameController.IsResetting || gameController.IsAdInProgress)
         {
             return;
@@ -107,7 +109,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
         bool cardBoardIsFull = cardMergeBoard != null && !cardMergeBoard.HasCardCapacity;
         bool nextItemCannotJump = itemSpawner != null && itemSpawner.IsNextQueuedItemBlocked;
         bool impossibleBoxDemand = cardMergeBoard != null && cardMergeBoard.HasImpossibleBoxDemand(itemSpawner);
-        bool noStandardCardMove = cardBoardIsFull
+        bool noStandardCardMove = (cardBoardIsFull || cardSpawner == null || !cardSpawner.HasPendingLevelCards)
             && nextItemCannotJump
             && cardMergeBoard != null
             && !cardMergeBoard.HasAnyStandardCardMove();
@@ -134,6 +136,12 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
         {
             retryLevelButton.onClick.RemoveListener(HandleRetryClicked);
         }
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        _applicationSuspended = paused;
+        _evaluationElapsed = 0f;
     }
 
     private void ConfigureButtons()
@@ -326,6 +334,7 @@ public class FarmBoxMergeOutcomeController : MonoBehaviour, IFarmBoxMergeOutcome
         cardMergeBoard ??= FarmBoxMergeObjectUtility.FindSceneComponent<CardMergeBoard>();
         itemSpawner ??= FarmBoxMergeObjectUtility.FindSceneComponent<MergeItemSpawner>();
         actionBudget ??= FarmBoxMergeObjectUtility.FindSceneComponent<FarmBoxMergeActionBudget>();
+        cardSpawner ??= FarmBoxMergeObjectUtility.FindSceneComponent<CardSpawner>();
 
         Canvas canvas = GetComponentInParent<Canvas>();
         if (canvas == null)

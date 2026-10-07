@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public static class FarmBoxMergeFeedbackInstaller
 {
-    private const string ScenePath = "Assets/FarmBoxMerge/FarmBoxMerge.unity";
+    private const string ScenePath = "Assets/FarmBoxMerge/Scenes/FarmBoxMerge.unity";
     private const string FeedbackObjectName = "FarmBoxMergeGameFeel";
     private const string AudioCatalogPath = "Assets/FarmBoxMerge/Config/FarmBoxMergeAudioCatalog.asset";
 

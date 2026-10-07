@@ -25,8 +25,8 @@ public class FarmBoxMergeActionBudget : MonoBehaviour
 
     public void ResetForAttempt()
     {
-        _remainingAddCardUses = Mathf.Max(0, _settings != null ? _settings.AddCardUses : 3);
-        _remainingTrashUses = Mathf.Max(0, _settings != null ? _settings.TrashUses : 3);
+        _remainingAddCardUses = Mathf.Max(0, _settings != null ? _settings.AddCardUses : 1);
+        _remainingTrashUses = Mathf.Max(0, _settings != null ? _settings.TrashUses : 1);
         Changed?.Invoke();
     }
 

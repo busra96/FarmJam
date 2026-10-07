@@ -45,6 +45,8 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     private bool _hasRuntimeData;
     private bool _isDragging;
     private bool _mergeCompleted;
+    private Card _incomingMerge;
+    private Card _mergeTarget;
 
     private Transform _originalParent;
     private int _originalSiblingIndex;
@@ -76,6 +78,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
     public bool HasRuntimeData => _hasRuntimeData;
     public bool IsDragging => _isDragging;
     public bool MergeCompleted => _mergeCompleted;
+    public bool IsBusy => _mergeCompleted || _incomingMerge != null;
     public RectTransform RectTransform => _rectTransform != null ? _rectTransform : _rectTransform = (RectTransform)transform;
 
     private CanvasGroup CanvasGroup
@@ -157,6 +160,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     private void OnDestroy()
     {
+        ReleaseMergeTarget();
         _board?.UnregisterCard(this);
         StopScaleEffectRoutine();
         DestroyPlaceholder();
@@ -242,7 +246,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     public bool CanMergeWith(Card otherCard)
     {
-        if (otherCard == null || otherCard == this)
+        if (otherCard == null || otherCard == this || IsBusy || otherCard.IsBusy || _isDragging)
         {
             return false;
         }
@@ -316,12 +320,14 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     public void MergeInto(Card targetCard)
     {
-        if (targetCard == null)
+        if (targetCard == null || !targetCard.CanMergeWith(this))
         {
             ReturnToOriginalSlot();
             return;
         }
 
+        _mergeTarget = targetCard;
+        targetCard._incomingMerge = this;
         _mergeCompleted = true;
         _isDragging = false;
         _targetScaleMultiplier = 1f;
@@ -382,13 +388,13 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (_mergeCompleted)
+        if (IsBusy)
         {
             return;
         }
 
         EnsureReadyForInteraction();
-        if (_board != null && !_board.CanAcceptGameplayInput)
+        if (_board != null && !_board.CanDragCard(this))
         {
             return;
         }
@@ -408,8 +414,9 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (IsBusy) return;
         EnsureReadyForInteraction();
-        if (_board != null && !_board.CanAcceptGameplayInput)
+        if (_board != null && !_board.CanDragCard(this))
         {
             return;
         }
@@ -658,6 +665,8 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
         if (dragParent == null || targetCard == null)
         {
+            ReleaseMergeTarget();
+            _mergeCompleted = false;
             RestoreToOriginalSlotImmediate();
             yield break;
         }
@@ -677,13 +686,17 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
 
         if (targetCard == null)
         {
+            ReleaseMergeTarget();
+            _mergeCompleted = false;
             RestoreToOriginalSlotImmediate();
             yield break;
         }
 
+        ReleaseMergeTarget();
         targetCard.SetCounter(targetCard.CounterValue + 1);
         targetCard.PlayMergePop();
         _feedback?.PlayCardMerge(targetCard.RectTransform, targetCard.ResolveVisualColor());
+        _board?.NotifyCardMergeCompleted(this, targetCard);
         DestroyPlaceholder();
 
         if (_originalParent is RectTransform parentRect)
@@ -692,6 +705,15 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         }
 
         Destroy(gameObject);
+    }
+
+    private void ReleaseMergeTarget()
+    {
+        if (_mergeTarget != null && _mergeTarget._incomingMerge == this)
+        {
+            _mergeTarget._incomingMerge = null;
+        }
+        _mergeTarget = null;
     }
 
     private IEnumerator AnimateDiscard(RectTransform trashTarget)

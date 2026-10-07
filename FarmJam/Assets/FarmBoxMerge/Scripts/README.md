@@ -40,6 +40,8 @@ With a level catalog assigned, `RefreshGame` and `RetryLevel` both reload the cu
 
 Card counters are limited to `1-4`. A level-four card cannot merge again. Three-box groups use a compact L triomino, while authored four-box groups use their saved square/L/T/Z variant whose width never exceeds two boxes.
 
+World drops target the nearest visible slot under the pointer instead of silently choosing the first compatible slot. An occupied or mismatched target rejects the drop and restores the card. Incoming merge targets are reserved until their animation completes, preventing concurrent drags from merging into the same card. The existing card-panel heading displays brief placement/merge guidance without adding another Canvas.
+
 The three reusable world slots show transparent white box silhouettes of size `1`, `2`, `3` or `4`. A silhouette restricts only the card value; the player chooses its color and remains responsible for following a solvable distribution. The first three authored entries fill the initial slots from left to right. Each later entry is consumed only by the slot whose completed box leaves; the other visible silhouettes never change. Retry and Refresh reset the cursor, so the same actions always reveal the same saved silhouettes and four-box variants. The intended color stored in the level is editor-only solution metadata and never colors or restricts the white silhouette. After the authored flow ends it loops deterministically only to preserve the always-visible slot presentation until the outcome state locks gameplay input. Levels without an authored flow retain the old live-calculated behavior as a compatibility fallback.
 
 The card board holds at most 12 cards. `ADD CARD` always creates a level-one card and chooses its color by comparing queued item demand with the capacity already available in cards and world boxes. Queue order breaks ties; when demand is already covered, it prefers a color that can immediately merge with another level-one card.
@@ -48,7 +50,19 @@ The card board holds at most 12 cards. `ADD CARD` always creates a level-one car
 
 `FarmBoxMergeOutcomeController` confirms a win for three seconds and a fail for five seconds before showing UI; both delays are independently configurable. A win requires both every queued, pending or assigned item to be gone and every active box group to have cleared. The fail countdown also starts whenever a color's empty-box demand is greater than that color's remaining unplaced item count, covering partially filled groups that can no longer be completed. The existing full-board/blocked-queue checks remain active. Card, item and action-budget activity cancels and reevaluates the pending fail timer. `NextLevelButton` advances through the catalog order; `RetryLevelButton` reloads the current catalog entry.
 
+An exhausted deck with no remaining legal merge or placement also starts the fail timer, even if the card panel is not full. Application suspension pauses outcome evaluation. Settings lock gameplay input while open and close automatically on either outcome; their input lock does not override the win/fail lock. The settings button respects top and side safe-area insets.
+
 `FarmBoxMergeRemainingItemsView` shows the remaining unplaced collectables in `Canvas/RemainingItemsPanel`. It only enables colors authored in the current level, keeps those colors visible after their count reaches zero and uses a horizontal layout/content-size fitter so the panel width follows the active color count. Counts include both visible and pending level items and decrease when an item lands in a matching box. Reapply this HUD after hierarchy changes with `Tools > FarmBoxMerge > Apply Remaining Items HUD`.
+
+## First-time tutorial
+
+Both steps share the single `Tutorial Hand` sprite and `Finger Pivot` on the Canvas component. Preview can be opened from Edit Mode or while already playing (including the main menu); it focuses Game View when ready. Unsaved Edit Mode scenes show Unity's Save/Don't Save/Cancel prompt rather than silently refusing to start. Clicking Preview again restarts an already running preview without modifying real player preferences.
+
+`FarmBoxMergeTutorialController` is an optional VContainer feature on the authored gameplay Canvas. On level 1 only, an incomplete tutorial loops `hand1` between the two matching cards, then uses the same `hand1` sprite to demonstrate dragging the merged card to a compatible white box shape. Either merge direction and any compatible size-two slot are accepted. Tutorial graphics never intercept pointer events; a removable board interaction gate blocks early placement/trash, while the game controller temporarily disables add/refresh/retry actions. Settings pause the guide, and attempt resets restart an unfinished tutorial.
+
+Completion is saved immediately after a successful real box placement under `<settings PlayerPrefsPrefix>.TutorialCompleted`. Once saved, the guide does not return on retry, scene reload or app restart. Existing players already beyond level 1 are not forced back. Removing the Canvas tutorial component disables the optional feature without changing core gameplay or creating a new Canvas.
+
+Use `Tools > FarmBoxMerge > Tutorial > Preview First-Time Tutorial` for a playable level-one preview with isolated tutorial preferences and disabled progression writes. Stop Play Mode to exit; the original scene and saved player data are preserved. `Run Tutorial Checks` exercises actual merge/drop, both merge directions, rejected trash, input locks, settings pause, interrupted retry and completion persistence. Its report/screenshots are in `Temp/FarmBoxMergeTests/tutorial*`. `Reset Completion Flag` clears only the tutorial flag; to view it in ordinary Play Mode, the current level must also be level 1. Tutorial wording, timings and hand references can be edited on the Canvas component. `Install Canvas Guide` installs the authored overlay after intentional scene reconstruction.
 
 ## Visual setup
 
@@ -63,3 +77,11 @@ Queued collectables use the serialized `queueItemEulerAngles` presentation rotat
 - `FarmBoxMergeFeedbackController` owns SFX/music levels, pooled world/UI particles, mobile haptics, panel entrances and restrained camera punches.
 - `FarmBoxMergeButtonFeedback` is added to scene buttons at runtime for consistent press/release animation and click sound.
 - Gameplay scripts only announce meaningful moments (card merge/discard, box creation, item landing, box clear, win/fail), keeping feedback reusable for future levels.
+
+## Regression checks
+
+Save the scene and leave Play Mode, then run `Tools > FarmBoxMerge > Run Gameplay Regression` (F8). The Editor-only runner validates all authored plans and an independent 12-card deck simulation, then plays the catalog through real card merge/drag/drop and item/box lifecycle APIs. It also exercises settings persistence using isolated temporary preference keys, rewarded completion/cancellation callback ordering, attempt budgets, retry determinism, separate outcome delays, modal/input locks, six Game View resolutions and synthetic safe-area insets.
+
+Reports and screenshots are written to `Temp/FarmBoxMergeTests`. The original scene and Game View size are restored. Saved player progression is not advanced, and temporary Game View sizes and isolated test preferences are removed. Run this check in a quiet editor session without editing scripts or stopping Play Mode; the level sweep accelerates gameplay animations for testing only. Real ad-network behavior, Android rendering, touch latency, thermal performance and hardware haptics still require physical-device testing.
+
+`Repeat Presentation Checks` reruns the screen/safe-area and authored main-menu Play transition checks after a completed level sweep, retaining its previously passed runtime results explicitly in the report. Use the full regression again after changing level or gameplay rules.

@@ -141,6 +141,26 @@ public class CardMergeBoard : MonoBehaviour
     }
 
     public event Action CardCountChanged;
+    public event Action<string> InteractionHintChanged;
+    public event Action<Card, Card> CardMergeCompleted;
+    public event Action<Card, FarmBoxMergeBoxSlotView> BoxGroupPlaced;
+    private IFarmBoxMergeCardInteractionGate _interactionGate;
+
+    public bool CanDragCard(Card card) => CanAcceptGameplayInput && (_interactionGate == null || _interactionGate.CanDrag(card));
+    public void SetInteractionGate(IFarmBoxMergeCardInteractionGate gate) => _interactionGate = gate;
+    public void ClearInteractionGate(IFarmBoxMergeCardInteractionGate gate)
+    {
+        if (_interactionGate == gate) _interactionGate = null;
+    }
+    public void NotifyCardMergeCompleted(Card source, Card target) => CardMergeCompleted?.Invoke(source, target);
+    public FarmBoxMergeBoxSlotView FindAvailableBoxSlot(int cardValue)
+    {
+        foreach (FarmBoxMergeBoxSlotView slot in _slotViews)
+            if (slot != null && slot.CanAccept(cardValue)) return slot;
+        return null;
+    }
+
+    public void ShowInteractionHint(string message) => InteractionHintChanged?.Invoke(message);
 
     private IBoxFactory _boxFactory;
     private IFarmBoxMergeFeedbackService _feedback;
@@ -355,7 +375,7 @@ public class CardMergeBoard : MonoBehaviour
 
     public void BeginDrag(Card card, PointerEventData eventData)
     {
-        if (card == null || !CanAcceptGameplayInput)
+        if (card == null || card.IsBusy || !CanDragCard(card))
         {
             return;
         }
@@ -364,6 +384,7 @@ public class CardMergeBoard : MonoBehaviour
         EnsureDragLayer();
         EnsureSpawnDropLayer();
         card.PrepareForDrag(dragLayer != null ? dragLayer : CardContainer, eventData);
+        ShowInteractionHint($"DRAG {card.CounterValue} TO A MATCHING {card.CounterValue}-BOX SHAPE");
         RefreshSlotPreviews(card.CounterValue, true);
         UpdateDrag(card, eventData);
     }
@@ -398,7 +419,7 @@ public class CardMergeBoard : MonoBehaviour
             return;
         }
 
-        if (card.MergeCompleted)
+        if (card.IsBusy)
         {
             RefreshSlotPreviews();
             return;
@@ -432,15 +453,19 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
+        if (_interactionGate != null && !_interactionGate.CanMerge(draggedCard, targetCard)) return false;
+
         RegisterCard(draggedCard);
         RegisterCard(targetCard);
 
         if (!targetCard.CanMergeWith(draggedCard))
         {
+            ShowInteractionHint("MATCH BOTH COLOR AND NUMBER");
             return false;
         }
 
         draggedCard.MergeInto(targetCard);
+        ShowInteractionHint($"MATCH! TWO {targetCard.CounterValue} CARDS MAKE {targetCard.CounterValue + 1}");
         return true;
     }
 
@@ -562,7 +587,7 @@ public class CardMergeBoard : MonoBehaviour
             for (int slotIndex = 0; slotIndex < _slotViews.Count; slotIndex++)
             {
                 FarmBoxMergeBoxSlotView slotView = _slotViews[slotIndex];
-                if (slotView != null && slotView.CanAccept(card.CounterValue))
+                if (!card.IsBusy && slotView != null && slotView.CanAccept(card.CounterValue))
                 {
                     return true;
                 }
@@ -647,12 +672,13 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
-        if (!TryGetAvailableSpawnPoint(card.CounterValue, out Transform availableSpawnPoint))
+        if (!TryGetAvailableSpawnPoint(card.CounterValue, eventData.position, dropCamera, out Transform availableSpawnPoint))
         {
             return false;
         }
 
         FarmBoxMergeBoxSlotView slotView = availableSpawnPoint.GetComponent<FarmBoxMergeBoxSlotView>();
+        if (_interactionGate != null && !_interactionGate.CanPlace(card, slotView)) return false;
         MergeBoxParent spawnedGroup = SpawnBoxGroup(
             card.CounterValue,
             card.CardColorType,
@@ -663,12 +689,15 @@ public class CardMergeBoard : MonoBehaviour
             return false;
         }
 
+        BoxGroupPlaced?.Invoke(card, slotView);
         card.ConsumeForWorldSpawn();
+        ShowInteractionHint("NICE! CHECK ITEMS LEFT FOR YOUR NEXT BOX");
         return true;
     }
 
     private bool TryDiscardCard(Card card, PointerEventData eventData)
     {
+        if (_interactionGate != null && !_interactionGate.CanDiscard) return false;
         if (card == null || trashDropLayer == null || !IsPointerInsideUiLayer(trashDropLayer, eventData.position))
         {
             return false;
@@ -1047,24 +1076,38 @@ public class CardMergeBoard : MonoBehaviour
 
     private bool TryGetAvailableSpawnPoint(
         int cardValue,
+        Vector2 screenPosition,
+        Camera dropCamera,
         out Transform availableSpawnPoint)
     {
         EnsureSlotViews();
-
+        FarmBoxMergeBoxSlotView nearestSlot = null;
+        float nearestDistance = float.MaxValue;
         for (int i = 0; i < _slotViews.Count; i++)
         {
             FarmBoxMergeBoxSlotView slotView = _slotViews[i];
-            if (slotView == null || !slotView.CanAccept(cardValue))
+            if (slotView == null)
             {
                 continue;
             }
-
-            availableSpawnPoint = slotView.transform;
-            return true;
+            Vector3 slotPosition = dropCamera.WorldToScreenPoint(slotView.transform.position);
+            if (slotPosition.z <= 0f) continue;
+            float distance = ((Vector2)slotPosition - screenPosition).sqrMagnitude;
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestSlot = slotView;
+            }
         }
-
-        availableSpawnPoint = null;
-        return false;
+        availableSpawnPoint = nearestSlot != null && nearestSlot.CanAccept(cardValue)
+            ? nearestSlot.transform : null;
+        if (availableSpawnPoint == null && nearestSlot != null)
+        {
+            ShowInteractionHint(nearestSlot.IsOccupied
+                ? "THAT SPACE IS BUSY — TRY AN EMPTY SHAPE"
+                : $"THIS SHAPE NEEDS A {nearestSlot.AcceptedCardValue} CARD");
+        }
+        return availableSpawnPoint != null;
     }
 
     private void EnsureSlotViews()
@@ -1601,9 +1644,7 @@ public class CardMergeBoard : MonoBehaviour
             foreach (Card secondCard in _registeredCards)
             {
                 if (secondCard != null
-                    && !ReferenceEquals(firstCard, secondCard)
-                    && firstCard.CardColorType == secondCard.CardColorType
-                    && firstCard.CounterValue == secondCard.CounterValue)
+                    && firstCard.CanMergeWith(secondCard))
                 {
                     return true;
                 }

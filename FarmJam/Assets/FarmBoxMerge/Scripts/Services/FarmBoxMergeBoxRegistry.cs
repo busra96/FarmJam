@@ -10,11 +10,11 @@ public interface IFarmBoxMergeBoxRegistry
 
 public sealed class FarmBoxMergeBoxRegistry : IFarmBoxMergeBoxRegistry
 {
-    private readonly HashSet<Box> _activeBoxes = new HashSet<Box>();
+    private readonly List<Box> _activeBoxes = new List<Box>(12);
 
     public void Register(Box box)
     {
-        if (box != null) _activeBoxes.Add(box);
+        if (box != null && !_activeBoxes.Contains(box)) _activeBoxes.Add(box);
     }
 
     public void Unregister(Box box)
@@ -52,6 +52,6 @@ public sealed class FarmBoxMergeBoxRegistry : IFarmBoxMergeBoxRegistry
 
     private void Cleanup()
     {
-        _activeBoxes.RemoveWhere(box => box == null);
+        _activeBoxes.RemoveAll(box => box == null);
     }
 }

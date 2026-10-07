@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public static class FarmBoxMergeVisualPolishInstaller
 {
-    private const string ScenePath = "Assets/FarmBoxMerge/FarmBoxMerge.unity";
+    private const string ScenePath = "Assets/FarmBoxMerge/Scenes/FarmBoxMerge.unity";
     private const string CardPrefabPath = "Assets/FarmBoxMerge/Prefabs/Card.prefab";
     private const string BackdropPath = "Assets/FarmBoxMerge/Visuals/Backgrounds/FarmBackdrop.png";
     private const string CrateIconPath = "Assets/FarmBoxMerge/Visuals/UI/FarmCrateIcon.png";
@@ -24,6 +24,43 @@ public static class FarmBoxMergeVisualPolishInstaller
     private static readonly Color Blue = Hex("4F9FCA");
     private static readonly Color Orange = Hex("E99B48");
     private static readonly Color Red = Hex("D85B54");
+
+    [MenuItem("Tools/FarmBoxMerge/Apply Interaction Polish")]
+    public static void ApplyInteractionPolish()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode || SceneManager.GetActiveScene().isDirty)
+        {
+            Debug.LogWarning("Stop Play Mode and save your scene before applying interaction polish.");
+            return;
+        }
+        Scene scene = SceneManager.GetActiveScene();
+        string previousScene = scene.path;
+        if (scene.path != ScenePath) scene = EditorSceneManager.OpenScene(ScenePath);
+        CardMergeBoard board = Object.FindFirstObjectByType<CardMergeBoard>();
+        Transform title = board != null ? board.transform.parent.Find("CardsTitle") : null;
+        if (title != null && title.TryGetComponent(out TextMeshProUGUI label))
+        {
+            Undo.RecordObject(label, "Polish merge guidance");
+            Undo.RecordObject(label.rectTransform, "Polish merge guidance layout");
+            label.text = "MERGE CARDS\n<size=58%>1 + 1 = 2   •   2 + 2 = 3   •   3 + 3 = 4</size>";
+            label.fontSize = 32;
+            label.richText = true;
+            label.enableAutoSizing = false;
+            label.rectTransform.sizeDelta = new Vector2(900, 60);
+            label.rectTransform.anchoredPosition = new Vector2(0, -16);
+            var view = title.GetComponent<FarmBoxMergeInteractionView>();
+            if (view == null) view = Undo.AddComponent<FarmBoxMergeInteractionView>(title.gameObject);
+            var serialized = new SerializedObject(view);
+            serialized.FindProperty("board").objectReferenceValue = board;
+            serialized.ApplyModifiedProperties();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("FarmBoxMerge interaction guidance installed on the existing CardsTitle.");
+        }
+        else Debug.LogError("CardsTitle could not be found. No scene changes were saved.");
+        if (!string.IsNullOrEmpty(previousScene) && previousScene != ScenePath)
+            EditorSceneManager.OpenScene(previousScene);
+    }
 
     [MenuItem("Tools/FarmBoxMerge/Apply Mobile Visual Polish")]
     public static void ApplyPolish()

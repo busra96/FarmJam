@@ -13,15 +13,18 @@ public sealed class FarmBoxMergeSettingsPanelController : MonoBehaviour, IFarmBo
 
     private IFarmBoxMergeSettingsService _settings;
     private IFarmBoxMergeOutcomeMonitor _outcomeMonitor;
+    private FarmBoxMergeGameController _gameController;
     private bool _initialized;
 
     [Inject]
     public void Construct(
         IFarmBoxMergeSettingsService settings,
-        IFarmBoxMergeOutcomeMonitor outcomeMonitor)
+        IFarmBoxMergeOutcomeMonitor outcomeMonitor,
+        FarmBoxMergeGameController gameController)
     {
         _settings = settings;
         _outcomeMonitor = outcomeMonitor;
+        _gameController = gameController;
     }
 
     public void Initialize()
@@ -72,11 +75,18 @@ public sealed class FarmBoxMergeSettingsPanelController : MonoBehaviour, IFarmBo
     {
         SyncToggleState();
         settingsPanel?.SetActive(true);
+        _gameController?.SetSettingsOpen(true);
     }
 
     public void Close()
     {
         settingsPanel?.SetActive(false);
+        _gameController?.SetSettingsOpen(false);
+    }
+
+    private void OnDisable()
+    {
+        _gameController?.SetSettingsOpen(false);
     }
 
     private void OnDestroy()

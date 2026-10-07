@@ -29,11 +29,13 @@ public class FarmBoxMergeGameController : MonoBehaviour
     private Coroutine _resetRoutine;
     private IFarmBoxMergeAdsService _ads;
     private bool _gameplayInputEnabled = true;
+    private bool _settingsOpen;
+    private bool _tutorialActive;
     private bool _levelTransitionPending;
     private bool _initialized;
 
     public bool IsResetting => _resetRoutine != null;
-    public bool GameplayInputEnabled => _gameplayInputEnabled && !IsResetting && !IsAdInProgress;
+    public bool GameplayInputEnabled => _gameplayInputEnabled && !_settingsOpen && !IsResetting && !IsAdInProgress;
     public bool IsAdInProgress => _ads != null && _ads.IsShowingAd;
     public event Action AttemptResetStarted;
     public event Action AttemptReady;
@@ -156,7 +158,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     public void AddRecommendedCard()
     {
-        if (!Application.isPlaying || !GameplayInputEnabled)
+        if (!Application.isPlaying || !GameplayInputEnabled || _tutorialActive)
         {
             return;
         }
@@ -174,12 +176,13 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
         _ads?.ShowRewarded(
             _ads.AddCardPlacement,
-            () => ExecuteAddRecommendedCard(consumeFreeUse: false));
+            () => ExecuteAddRecommendedCard(consumeFreeUse: false),
+            () => cardMergeBoard?.ShowInteractionHint("AD UNAVAILABLE OR NOT COMPLETED — NO USE SPENT"));
     }
 
     private void ExecuteAddRecommendedCard(bool consumeFreeUse)
     {
-        if (!Application.isPlaying || !GameplayInputEnabled || actionBudget == null
+        if (!Application.isPlaying || !GameplayInputEnabled || _tutorialActive || actionBudget == null
             || cardSpawner == null || !cardSpawner.CanSpawnCard())
         {
             return;
@@ -216,6 +219,20 @@ public class FarmBoxMergeGameController : MonoBehaviour
         }
     }
 
+    public void SetSettingsOpen(bool open)
+    {
+        if (_settingsOpen == open) return;
+        _settingsOpen = open;
+        SetButtonsInteractable(GameplayInputEnabled);
+        GameplayInputChanged?.Invoke(GameplayInputEnabled);
+    }
+
+    public void SetTutorialActive(bool active)
+    {
+        _tutorialActive = active;
+        SetButtonsInteractable(GameplayInputEnabled);
+    }
+
     private void StartReset(bool replaySameLevel)
     {
         if (!Application.isPlaying || _resetRoutine != null)
@@ -233,7 +250,8 @@ public class FarmBoxMergeGameController : MonoBehaviour
     {
         if (CanRequestGameplayReward())
         {
-            _ads.ShowRewarded(_ads.RefreshPlacement, RefreshGame);
+            _ads.ShowRewarded(_ads.RefreshPlacement, RefreshGame,
+                () => cardMergeBoard?.ShowInteractionHint("AD UNAVAILABLE OR NOT COMPLETED — TRY AGAIN"));
         }
     }
 
@@ -241,13 +259,14 @@ public class FarmBoxMergeGameController : MonoBehaviour
     {
         if (CanRequestGameplayReward())
         {
-            _ads.ShowRewarded(_ads.RetryPlacement, RetryLevel);
+            _ads.ShowRewarded(_ads.RetryPlacement, RetryLevel,
+                () => cardMergeBoard?.ShowInteractionHint("AD UNAVAILABLE OR NOT COMPLETED — TRY AGAIN"));
         }
     }
 
     private bool CanRequestGameplayReward()
     {
-        return Application.isPlaying && GameplayInputEnabled && _ads != null;
+        return Application.isPlaying && GameplayInputEnabled && !_tutorialActive && _ads != null;
     }
 
     private void CompleteLevelTransition()
@@ -362,6 +381,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
 
     private void SetButtonsInteractable(bool interactable)
     {
+        interactable &= !_tutorialActive;
         bool rewardedReady = _ads != null && _ads.IsRewardedReady;
         if (refreshButton != null)
         {
@@ -388,7 +408,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
     {
         if (addCardButton != null)
         {
-            addCardButton.interactable = GameplayInputEnabled
+            addCardButton.interactable = GameplayInputEnabled && !_tutorialActive
                 && actionBudget != null
                 && cardSpawner != null
                 && cardSpawner.CanSpawnCard();

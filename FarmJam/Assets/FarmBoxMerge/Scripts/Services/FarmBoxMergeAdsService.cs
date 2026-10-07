@@ -31,6 +31,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
     private Action _pendingRewardedFailure;
     private Action _pendingInterstitialClosed;
     private bool _initialized;
+    private bool _disposed;
     private bool _sdkReady;
     private bool _rewardEarned;
     private bool _rewardCloseQueued;
@@ -44,8 +45,8 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
     public event Action StateChanged;
 
     public bool IsShowingAd { get; private set; }
-    public bool IsRewardedReady => !IsShowingAd && _rewardedAd != null && _rewardedAd.IsAdReady();
-    public bool IsInterstitialReady => !IsShowingAd && _interstitialAd != null && _interstitialAd.IsAdReady();
+    public bool IsRewardedReady => !_disposed && !IsShowingAd && _rewardedAd != null && _rewardedAd.IsAdReady();
+    public bool IsInterstitialReady => !_disposed && !IsShowingAd && _interstitialAd != null && _interstitialAd.IsAdReady();
     public string AddCardPlacement => _settings != null ? _settings.AddCardPlacement : "add_card";
     public string TrashPlacement => _settings != null ? _settings.TrashPlacement : "trash_card";
     public string RefreshPlacement => _settings != null ? _settings.RefreshPlacement : "refresh_level";
@@ -53,7 +54,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     public void Initialize()
     {
-        if (_initialized)
+        if (_disposed || _initialized)
         {
             return;
         }
@@ -142,6 +143,8 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
         LevelPlay.OnInitSuccess -= HandleInitializationSucceeded;
         LevelPlay.OnInitFailed -= HandleInitializationFailed;
 
@@ -156,6 +159,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     private void HandleInitializationSucceeded(LevelPlayConfiguration configuration)
     {
+        if (_disposed) return;
         _sdkReady = true;
         CreateRewardedAd();
         CreateInterstitialAd();
@@ -242,12 +246,13 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     private void HandleRewardedEarned(LevelPlayAdInfo adInfo, LevelPlayReward reward)
     {
+        if (_disposed || !IsShowingAd) return;
         _rewardEarned = DidRewardedAdComplete();
     }
 
     private void HandleRewardedClosed(LevelPlayAdInfo adInfo)
     {
-        if (_rewardCloseQueued)
+        if (_disposed || !IsShowingAd || _rewardCloseQueued)
         {
             return;
         }
@@ -289,6 +294,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     private void CompleteRewarded(bool success)
     {
+        if (_disposed || (_pendingRewardedSuccess == null && _pendingRewardedFailure == null)) return;
         Action completion = success ? _pendingRewardedSuccess : _pendingRewardedFailure;
         _pendingRewardedSuccess = null;
         _pendingRewardedFailure = null;
@@ -302,6 +308,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     private void CompleteInterstitial()
     {
+        if (_disposed || _pendingInterstitialClosed == null) return;
         Action completion = _pendingInterstitialClosed;
         _pendingInterstitialClosed = null;
         SetAdShowing(false);
@@ -311,7 +318,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     private void TryLoadRewarded()
     {
-        if (_sdkReady && _rewardedAd != null && !_rewardedAd.IsAdReady())
+        if (!_disposed && !IsShowingAd && _sdkReady && _rewardedAd != null && !_rewardedAd.IsAdReady())
         {
             _rewardedAd.LoadAd();
         }
@@ -319,7 +326,7 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
 
     private void TryLoadInterstitial()
     {
-        if (_sdkReady && _interstitialAd != null && !_interstitialAd.IsAdReady())
+        if (!_disposed && !IsShowingAd && _sdkReady && _interstitialAd != null && !_interstitialAd.IsAdReady())
         {
             _interstitialAd.LoadAd();
         }

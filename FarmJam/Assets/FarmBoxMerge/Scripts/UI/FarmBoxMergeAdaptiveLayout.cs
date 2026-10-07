@@ -21,9 +21,11 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour, IFarmBoxMergeLay
     [SerializeField] private RectTransform[] topSafeAreaElements;
     [SerializeField] private RectTransform[] bottomSafeAreaElements;
     [SerializeField] private RectTransform[] horizontalSafeAreaElements;
+    [SerializeField] private RectTransform[] rightSafeAreaElements;
 
     private Vector2[] _topBasePositions;
     private Vector2[] _bottomBasePositions;
+    private Vector2[] _rightBasePositions;
     private Vector2[] _horizontalBaseOffsetMins;
     private Vector2[] _horizontalBaseOffsetMaxs;
     private Vector3 _backdropBaseScale;
@@ -115,6 +117,7 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour, IFarmBoxMergeLay
 
         _topBasePositions = CacheAnchoredPositions(topSafeAreaElements);
         _bottomBasePositions = CacheAnchoredPositions(bottomSafeAreaElements);
+        _rightBasePositions = CacheAnchoredPositions(rightSafeAreaElements);
         CacheHorizontalOffsets();
 
         if (cameraBackdrop != null)
@@ -246,6 +249,15 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour, IFarmBoxMergeLay
         ApplyVerticalInset(topSafeAreaElements, _topBasePositions, -topInset);
         ApplyVerticalInset(bottomSafeAreaElements, _bottomBasePositions, bottomInset);
         ApplyHorizontalInsets(leftInset, rightInset);
+        if (rightSafeAreaElements != null && _rightBasePositions != null)
+        {
+            for (int i = 0; i < Mathf.Min(rightSafeAreaElements.Length, _rightBasePositions.Length); i++)
+            {
+                RectTransform element = rightSafeAreaElements[i];
+                if (element != null)
+                    element.anchoredPosition = new Vector2(_rightBasePositions[i].x - rightInset, element.anchoredPosition.y);
+            }
+        }
     }
 
     private static Vector2[] CacheAnchoredPositions(RectTransform[] elements)
@@ -340,6 +352,8 @@ public sealed class FarmBoxMergeAdaptiveLayout : MonoBehaviour, IFarmBoxMergeLay
 
             Vector2 offsetMin = _horizontalBaseOffsetMins[index];
             Vector2 offsetMax = _horizontalBaseOffsetMaxs[index];
+            offsetMin.y = element.offsetMin.y;
+            offsetMax.y = element.offsetMax.y;
             offsetMin.x += leftInset;
             offsetMax.x -= rightInset;
             element.offsetMin = offsetMin;

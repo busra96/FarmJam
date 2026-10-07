@@ -20,6 +20,7 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
     private readonly FarmBoxMergeAnalyticsSettings _settings;
     private readonly Queue<Action> _pendingEvents = new Queue<Action>();
     private bool _initializationStarted;
+    private bool _serviceInitializationStarted;
     private bool _servicesReady;
     private bool _consentGranted;
     private bool _disposed;
@@ -29,12 +30,12 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
         _settings = settings;
     }
 
-    public bool IsCollectionEnabled => IsEnabled && _servicesReady && _consentGranted;
+    public bool IsCollectionEnabled => !_disposed && IsEnabled && _servicesReady && _consentGranted;
     private bool IsEnabled => _settings != null && _settings.AnalyticsEnabled;
 
-    public async void Initialize()
+    public void Initialize()
     {
-        if (_initializationStarted || !IsEnabled)
+        if (_disposed || _initializationStarted || !IsEnabled)
         {
             return;
         }
@@ -42,6 +43,13 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
         _initializationStarted = true;
         EndUserConsent.consentStateChanged += HandleConsentChanged;
         _consentGranted = EndUserConsent.GetConsentState().AnalyticsIntent == ConsentStatus.Granted;
+        if (_consentGranted) InitializeServices();
+    }
+
+    private async void InitializeServices()
+    {
+        if (_disposed || _serviceInitializationStarted) return;
+        _serviceInitializationStarted = true;
 
         try
         {
@@ -50,11 +58,13 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
                 await UnityServices.InitializeAsync();
             }
 
+            if (_disposed) return;
             _servicesReady = UnityServices.State == ServicesInitializationState.Initialized;
             DrainPendingEvents();
         }
         catch (Exception exception)
         {
+            if (_disposed) return;
             _servicesReady = false;
             _pendingEvents.Clear();
             Debug.LogWarning($"FarmBoxMerge Analytics initialization failed: {exception.Message}");
@@ -90,7 +100,6 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
             return;
         }
 
-        _disposed = true;
         if (_initializationStarted)
         {
             EndUserConsent.consentStateChanged -= HandleConsentChanged;
@@ -100,7 +109,7 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
         {
             AnalyticsService.Instance.Flush();
         }
-
+        _disposed = true;
         _pendingEvents.Clear();
     }
 
@@ -122,6 +131,7 @@ public sealed class FarmBoxMergeAnalyticsService : IFarmBoxMergeAnalyticsService
             return;
         }
 
+        InitializeServices();
         DrainPendingEvents();
     }
 

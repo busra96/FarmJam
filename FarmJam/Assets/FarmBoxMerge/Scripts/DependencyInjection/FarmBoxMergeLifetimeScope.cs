@@ -25,6 +25,8 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
         builder.RegisterInstance(settings);
         builder.RegisterInstance(adsSettings);
         builder.RegisterInstance(analyticsSettings);
+        builder.Register<FarmBoxMergeTutorialProgress>(Lifetime.Singleton)
+            .As<IFarmBoxMergeTutorialProgress>();
 
         builder.Register<FarmBoxMergeSettingsService>(Lifetime.Singleton)
             .As<IFarmBoxMergeSettingsService>();
@@ -56,6 +58,13 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
 
     private void RegisterOptionalFeatures(IContainerBuilder builder)
     {
+        FarmBoxMergeTutorialController tutorial =
+            Object.FindFirstObjectByType<FarmBoxMergeTutorialController>(FindObjectsInactive.Include);
+        if (tutorial != null)
+            builder.RegisterComponent(tutorial).AsSelf().As<IFarmBoxMergeTutorialFeature>();
+        else
+            builder.Register<FarmBoxMergeNullTutorialFeature>(Lifetime.Singleton).As<IFarmBoxMergeTutorialFeature>();
+
         FarmBoxMergeFeedbackController feedbackController =
             Object.FindFirstObjectByType<FarmBoxMergeFeedbackController>(FindObjectsInactive.Include);
         if (feedbackController != null && audioCatalog != null)
