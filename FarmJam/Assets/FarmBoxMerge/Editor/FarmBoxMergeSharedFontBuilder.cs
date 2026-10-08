@@ -11,10 +11,29 @@ using UnityEngine.TextCore.LowLevel;
 public static class FarmBoxMergeSharedFontBuilder
 {
     public const string FontPath = "Assets/FarmBoxMerge/Art/Fonts/Multilingual/FarmBoxMerge Multilingual SDF.asset";
+    public const string RoundedFontPath = "Assets/FarmBoxMerge/Art/Fonts/Rounded/FarmBoxMerge Rounded Bold SDF.asset";
     private const string SourcePath = "Assets/FarmBoxMerge/Art/Fonts/Multilingual/Editor/LXGWWenKai-Medium.ttf";
+    private const string RoundedSourcePath = "Assets/FarmBoxMerge/Art/Fonts/Rounded/Editor/NowarRounded-Bold.ttf";
 
     [MenuItem("Tools/FarmBoxMerge/Localization/Rebuild and Assign Shared Font")]
     public static void Build()
+    {
+        BuildFont(SourcePath, FontPath, "FarmBoxMerge Multilingual SDF", "LXGW WenKai Medium", "shared-font", true);
+    }
+
+    [MenuItem("Tools/FarmBoxMerge/Localization/Rebuild Rounded Alternative Font")]
+    public static void BuildRounded()
+    {
+        BuildFont(RoundedSourcePath, RoundedFontPath, "FarmBoxMerge Rounded Bold SDF", "Nowar Rounded Bold", "rounded-font", false);
+    }
+
+    [MenuItem("Tools/FarmBoxMerge/Localization/Use Rounded Bold for All Languages")]
+    public static void UseRounded()
+    {
+        BuildFont(RoundedSourcePath, RoundedFontPath, "FarmBoxMerge Rounded Bold SDF", "Nowar Rounded Bold", "rounded-font", true);
+    }
+
+    private static void BuildFont(string sourcePath, string fontPath, string assetName, string sourceName, string reportName, bool assign)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode)
         {
@@ -22,16 +41,16 @@ public static class FarmBoxMergeSharedFontBuilder
             return;
         }
         var catalog = AssetDatabase.LoadAssetAtPath<FarmBoxMergeLocalizationCatalog>(FarmBoxMergeLocalizationInstaller.CatalogPath);
-        var source = AssetDatabase.LoadAssetAtPath<Font>(SourcePath);
-        if (catalog == null || source == null) throw new InvalidOperationException("Localization catalog or LXGW WenKai Medium source font is missing.");
+        var source = AssetDatabase.LoadAssetAtPath<Font>(sourcePath);
+        if (catalog == null || source == null) throw new InvalidOperationException($"Localization catalog or {sourceName} source font is missing.");
         string characters = RequiredCharacters(catalog);
-        var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath);
+        var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(fontPath);
         bool created = font == null;
         if (created)
         {
             font = TMP_FontAsset.CreateFontAsset(source, 90, 8, GlyphRenderMode.SDFAA, 2048, 2048, AtlasPopulationMode.Dynamic, true);
-            if (font == null) throw new InvalidOperationException("Unable to load the LXGW WenKai font face.");
-            font.name = "FarmBoxMerge Multilingual SDF";
+            if (font == null) throw new InvalidOperationException($"Unable to load the {sourceName} font face.");
+            font.name = assetName;
             font.material.name = font.name + " Material";
         }
         else Undo.RecordObject(font, "Extend shared localization font");
@@ -63,7 +82,7 @@ public static class FarmBoxMergeSharedFontBuilder
         serialized.ApplyModifiedPropertiesWithoutUndo();
         if (created)
         {
-            AssetDatabase.CreateAsset(font, FontPath);
+            AssetDatabase.CreateAsset(font, fontPath);
             AssetDatabase.AddObjectToAsset(font.material, font);
         }
         foreach (Texture2D texture in font.atlasTextures)
@@ -81,14 +100,18 @@ public static class FarmBoxMergeSharedFontBuilder
         if (!font.HasCharacters(characters, out missingCodepoints, false, false))
             throw new InvalidOperationException("Saved shared font validation failed: " + string.Join(",", missingCodepoints));
 
-        Undo.RecordObject(catalog, "Assign shared font to four languages");
-        catalog.fonts = Enum.GetValues(typeof(FarmBoxMergeLanguage)).Cast<FarmBoxMergeLanguage>()
-            .Select(language => new FarmBoxMergeLocalizationCatalog.LanguageFont(language) { font = font }).ToArray();
-        EditorUtility.SetDirty(catalog);
-        AssetDatabase.SaveAssetIfDirty(catalog);
-        string report = $"PASS LXGW WenKai Medium shared by all four languages. {characters.Length} unique glyphs verified without fallback; {font.atlasTextures.Length} baked 2048x2048 atlas(es). Source font kept in Editor folder for rebuilds; runtime population is Static.";
+        if (assign)
+        {
+            Undo.RecordObject(catalog, "Assign shared font to four languages");
+            catalog.fonts = Enum.GetValues(typeof(FarmBoxMergeLanguage)).Cast<FarmBoxMergeLanguage>()
+                .Select(language => new FarmBoxMergeLocalizationCatalog.LanguageFont(language) { font = font }).ToArray();
+            EditorUtility.SetDirty(catalog);
+            AssetDatabase.SaveAssetIfDirty(catalog);
+        }
+        string report = $"PASS {sourceName} supports all four languages. {characters.Length} unique glyphs verified without fallback; {font.atlasTextures.Length} baked 2048x2048 atlas(es). Source font kept in Editor folder for rebuilds; runtime population is Static. " +
+            (assign ? "Assigned to all languages." : "Added as an alternative; existing language font assignments preserved.");
         Directory.CreateDirectory("Logs/FarmBoxMergeTests");
-        File.WriteAllText("Logs/FarmBoxMergeTests/shared-font.txt", report);
+        File.WriteAllText($"Logs/FarmBoxMergeTests/{reportName}.txt", report);
         Debug.Log("[FarmBoxMerge Localization] " + report);
     }
 
