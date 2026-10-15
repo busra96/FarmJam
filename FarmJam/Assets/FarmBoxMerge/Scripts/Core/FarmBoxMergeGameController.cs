@@ -176,6 +176,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
             return;
         }
 
+        if (!FarmBoxMergePlatformPolicy.UsesRewardedAds) return;
         _ads?.ShowRewarded(
             _ads.AddCardPlacement,
             () => ExecuteAddRecommendedCard(consumeFreeUse: false),
@@ -400,7 +401,8 @@ public class FarmBoxMergeGameController : MonoBehaviour
             addCardButton.interactable = interactable
                 && actionBudget != null
                 && cardSpawner != null
-                && cardSpawner.CanSpawnCard();
+                && cardSpawner.CanSpawnCard()
+                && (actionBudget.CanAddCard || FarmBoxMergePlatformPolicy.UsesRewardedAds);
         }
 
         RefreshAddCardButtonLabel();
@@ -413,7 +415,8 @@ public class FarmBoxMergeGameController : MonoBehaviour
             addCardButton.interactable = GameplayInputEnabled && !_tutorialActive
                 && actionBudget != null
                 && cardSpawner != null
-                && cardSpawner.CanSpawnCard();
+                && cardSpawner.CanSpawnCard()
+                && (actionBudget.CanAddCard || FarmBoxMergePlatformPolicy.UsesRewardedAds);
         }
 
         RefreshAddCardButtonLabel();
@@ -437,7 +440,7 @@ public class FarmBoxMergeGameController : MonoBehaviour
         if (label != null)
         {
             string title = _localization.Get("add_card");
-            label.text = remainingUses > 0 ? $"{title} ({remainingUses})" : title;
+            label.text = remainingUses > 0 || !FarmBoxMergePlatformPolicy.UsesRewardedAds ? $"{title} ({remainingUses})" : title;
         }
 
         FarmBoxMergeRewardedAdBadge.SetVisible(addCardButton.transform, remainingUses <= 0);

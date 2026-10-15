@@ -33,10 +33,17 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
 
         builder.Register<FarmBoxMergeSettingsService>(Lifetime.Singleton)
             .As<IFarmBoxMergeSettingsService>();
+#if UNITY_WEBGL || FARMBOXMERGE_ITCHIO
+        builder.Register<FarmBoxMergeOfflineAdsService>(Lifetime.Singleton)
+            .As<IFarmBoxMergeAdsService>();
+        builder.Register<FarmBoxMergeOfflineAnalyticsService>(Lifetime.Singleton)
+            .As<IFarmBoxMergeAnalyticsService>();
+#else
         builder.Register<FarmBoxMergeLevelPlayAdsService>(Lifetime.Singleton)
             .As<IFarmBoxMergeAdsService>();
         builder.Register<FarmBoxMergeAnalyticsService>(Lifetime.Singleton)
             .As<IFarmBoxMergeAnalyticsService>();
+#endif
         builder.Register<FarmBoxMergeAnalyticsTracker>(Lifetime.Singleton);
         builder.Register<FarmBoxMergeBoxRegistry>(Lifetime.Singleton)
             .As<IFarmBoxMergeBoxRegistry>();

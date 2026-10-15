@@ -17,6 +17,12 @@ public static class FarmBoxMergeRewardedAdBadge
             return;
         }
 
+        if (!FarmBoxMergePlatformPolicy.UsesRewardedAds)
+        {
+            SetVisible(target, false);
+            return;
+        }
+
         TextMeshProUGUI sourceLabel = FindSourceLabel(target);
         RectTransform badgeRect = FindOrCreateRect(target, BadgeObjectName);
         ConfigureBadgeRect(badgeRect);
@@ -71,6 +77,7 @@ public static class FarmBoxMergeRewardedAdBadge
 
     public static void SetVisible(Transform target, bool visible)
     {
+        visible &= FarmBoxMergePlatformPolicy.UsesRewardedAds;
         if (target == null)
         {
             return;

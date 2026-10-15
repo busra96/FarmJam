@@ -145,6 +145,8 @@ public sealed class FarmBoxMergeSettingsPanelController : MonoBehaviour, IFarmBo
         }
 
         soundToggle?.Initialize(_settings.SoundEnabled && _settings.MusicEnabled);
-        hapticToggle?.Initialize(_settings.HapticsEnabled);
+        hapticToggle?.Initialize(_settings.HapticsEnabled && !FarmBoxMergePlatformPolicy.IsItchEdition);
+        if (hapticToggle != null && FarmBoxMergePlatformPolicy.IsItchEdition)
+            hapticToggle.GetComponent<Button>().interactable = false;
     }
 }

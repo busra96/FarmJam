@@ -724,7 +724,7 @@ public class CardMergeBoard : MonoBehaviour
         }
 
         card.ReturnToOriginalSlot();
-        if (_ads == null)
+        if (_ads == null || !FarmBoxMergePlatformPolicy.UsesRewardedAds)
         {
             return true;
         }
@@ -849,6 +849,7 @@ public class CardMergeBoard : MonoBehaviour
 
     private void HandleGameplayInputChanged(bool inputEnabled)
     {
+        if (!isActiveAndEnabled || !gameObject.scene.isLoaded) return;
         RefreshTrashState();
 
         if (inputEnabled)
@@ -1061,7 +1062,7 @@ public class CardMergeBoard : MonoBehaviour
 
         bool canUseTrash = CanAcceptGameplayInput
             && actionBudget != null
-            && (actionBudget.CanUseTrash || _ads != null);
+            && (actionBudget.CanUseTrash || (FarmBoxMergePlatformPolicy.UsesRewardedAds && _ads != null));
         if (trashDropLayer.TryGetComponent(out Image image))
         {
             image.color = canUseTrash ? trashAvailableColor : trashUnavailableColor;
@@ -1073,7 +1074,7 @@ public class CardMergeBoard : MonoBehaviour
         if (label != null)
         {
             string title = _localization.Get("trash");
-            label.text = remainingUses > 0 ? $"{title} ({remainingUses})" : title;
+            label.text = remainingUses > 0 || !FarmBoxMergePlatformPolicy.UsesRewardedAds ? $"{title} ({remainingUses})" : title;
         }
 
         FarmBoxMergeRewardedAdBadge.SetVisible(trashDropLayer, remainingUses <= 0);

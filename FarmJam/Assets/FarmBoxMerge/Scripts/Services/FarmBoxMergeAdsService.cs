@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Unity.Services.LevelPlay;
+#endif
 using UnityEngine;
 
 public interface IFarmBoxMergeAdsService
@@ -20,6 +22,7 @@ public interface IFarmBoxMergeAdsService
     bool ShowInterstitialAfterLevel(int completedLevelNumber, Action onClosed);
 }
 
+#if !UNITY_WEBGL || UNITY_EDITOR
 public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, IDisposable
 {
     private readonly FarmBoxMergeAdsSettings _settings;
@@ -363,3 +366,4 @@ public sealed class FarmBoxMergeLevelPlayAdsService : IFarmBoxMergeAdsService, I
         return true;
     }
 }
+#endif

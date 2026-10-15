@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Farm Jam — Merge &amp; Harvest</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#233b25;color:#fff7db;font-family:system-ui,sans-serif}
+    body{display:flex;align-items:center;justify-content:center}#game{position:relative;height:100%;width:min(100%,56.25vh);background:#426a36}
+    canvas{width:100%;height:100%;display:block;touch-action:none;outline:none}#loading{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:28px;background:#426a36}
+    h1{margin:0 0 8px;font-size:36px;letter-spacing:1px}p{line-height:1.5}progress{width:100%;height:16px;accent-color:#ffc44c}
+    #fullscreen{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));border:1px solid #ffffff50;border-radius:12px;background:#233b25e6;color:#fff7db;padding:10px 14px;cursor:pointer}
+    #error{display:none;position:fixed;inset:15%;padding:24px;background:#fff7db;color:#472f24;border-radius:16px;overflow:auto;z-index:5}
+    @media(max-aspect-ratio:9/16){#game{width:100%;height:177.7778vw}}@media(max-width:600px){#fullscreen{font-size:11px;padding:6px 8px;opacity:.7}}
+  </style>
+</head>
+<body>
+  <main id="game">
+    <canvas id="unity-canvas" width="540" height="960" tabindex="0" aria-label="Farm Jam puzzle game. Drag matching cards to merge, then place them onto matching box shapes."></canvas>
+    <div id="loading"><h1>FARM JAM</h1><p>Merge. Pack. Harvest.</p><progress id="progress" max="1" value="0"></progress><p id="status" role="status">Preparing the farm…</p></div>
+  </main>
+  <button id="fullscreen" type="button" aria-label="Enter or exit fullscreen">⛶ Fullscreen</button>
+  <div id="error" role="alert"></div>
+  <script>
+    const canvas=document.getElementById('unity-canvas');
+    const showError=message=>{const e=document.getElementById('error');e.textContent=message;e.style.display='block';};
+    const buildUrl='Build';
+    const config={dataUrl:buildUrl+'/{{{ DATA_FILENAME }}}',frameworkUrl:buildUrl+'/{{{ FRAMEWORK_FILENAME }}}',codeUrl:buildUrl+'/{{{ CODE_FILENAME }}}',streamingAssetsUrl:'StreamingAssets',companyName:{{{ JSON.stringify(COMPANY_NAME) }}},productName:{{{ JSON.stringify(PRODUCT_NAME) }}},productVersion:{{{ JSON.stringify(PRODUCT_VERSION) }}},devicePixelRatio:Math.min(window.devicePixelRatio||1,1.5),showBanner:(message,type)=>{if(type==='error')showError(message);else console.warn(message);}};
+    const script=document.createElement('script');script.src=buildUrl+'/{{{ LOADER_FILENAME }}}';
+    script.onload=()=>createUnityInstance(canvas,config,progress=>{document.getElementById('progress').value=progress;document.getElementById('status').textContent='Loading the harvest… '+Math.round(progress*100)+'%';}).then(instance=>{window.farmJamInstance=instance;document.getElementById('loading').style.display='none';canvas.focus();}).catch(showError);
+    script.onerror=()=>showError('The game could not download. Check your connection and reload.');document.body.appendChild(script);
+    document.getElementById('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{window.farmJamInstance?.SetFullscreen(1);}};
+    canvas.addEventListener('pointerdown',event=>{canvas.focus();canvas.setPointerCapture?.(event.pointerId);});
+    window.addEventListener('error',event=>console.error('Farm Jam browser error:',event.message));
+  </script>
+</body>
+</html>

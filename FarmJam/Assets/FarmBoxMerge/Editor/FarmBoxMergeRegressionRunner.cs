@@ -38,7 +38,15 @@ public static class FarmBoxMergeRegressionRunner
     private static string _retrySignature;
     private static FarmBoxMergeScreenChecks _screenChecks;
     private static bool _screensOnly;
-    public static string Status { get; private set; } = "Not run";
+    private static Card _pendingDropCard;
+    private static FarmBoxMergeBoxSlotView _pendingDropSlot;
+    private static PointerEventData _pendingDropPointer;
+    private static int _pendingDropTarget;
+    public static string Status
+    {
+        get => SessionState.GetString(SessionKey + ".Status", "Not run");
+        private set => SessionState.SetString(SessionKey + ".Status", value);
+    }
 
     static FarmBoxMergeRegressionRunner()
     {
@@ -264,10 +272,14 @@ public static class FarmBoxMergeRegressionRunner
             EditorApplication.QueuePlayerLoopUpdate();
             if (now > _deadline) throw new Exception("Timeout: " + Status + " " + DescribeState());
             if (now < _nextAction) return;
+            if (_pendingDropCard != null)
+            {
+                CompletePendingDrop(now);
+                return;
+            }
             if (_stage == 0)
             {
                 _game = Object.FindFirstObjectByType<FarmBoxMergeGameController>();
-                Object.FindFirstObjectByType<FarmBoxMergeTutorialController>()?.SetSuppressedForSession(true);
                 _levels = Object.FindFirstObjectByType<FarmBoxMergeLevelRuntime>();
                 _board = Object.FindFirstObjectByType<CardMergeBoard>();
                 _items = Object.FindFirstObjectByType<MergeItemSpawner>();
@@ -275,6 +287,7 @@ public static class FarmBoxMergeRegressionRunner
                 if (_game == null || _levels == null || _outcome == null || _board == null
                     || !Get<bool>(_game, "_initialized") || !Get<bool>(_board, "_initialized")
                     || !Get<bool>(_outcome, "_initialized")) return;
+                Object.FindFirstObjectByType<FarmBoxMergeTutorialController>()?.SetSuppressedForSession(true);
                 _originalTimeScale = Time.timeScale;
                 _originalRunInBackground = Application.runInBackground;
                 Application.runInBackground = true;
@@ -362,23 +375,11 @@ public static class FarmBoxMergeRegressionRunner
                 {
                     var pointer = new PointerEventData(EventSystem.current) { position = Camera.main.WorldToScreenPoint(slot.transform.position) };
                     ready.OnBeginDrag(pointer);
-                    ready.OnEndDrag(pointer);
-                    if (!slot.IsOccupied)
-                    {
-                        if (Targets[slot] != targetIndex && ready.MergeCompleted)
-                        {
-                            _nextAction = now + 0.18;
-                            return;
-                        }
-                        throw new Exception("Targeted UI drop rejected at " + slot.name + " pos=" + pointer.position
-                            + " expected=" + target.boxSize + " actual=" + slot.AcceptedCardValue
-                            + " card=" + ready.CounterValue + " busy=" + ready.IsBusy
-                            + " input=" + _game.GameplayInputEnabled + " " + DescribeState());
-                    }
-                    var group = slot.GetComponentInChildren<MergeBoxParent>();
-                    if (group.ColorType != target.intendedColor || group.CounterValue != target.boxSize) throw new Exception("Wrong slot placement");
-                    Occupied.Add(slot);
-                    _nextAction = now + 0.18;
+                    _pendingDropCard = ready;
+                    _pendingDropSlot = slot;
+                    _pendingDropPointer = pointer;
+                    _pendingDropTarget = targetIndex;
+                    _nextAction = now + 0.12;
                     return;
                 }
                 for (int value = target.boxSize - 1; value >= 1; value--)
@@ -398,6 +399,31 @@ public static class FarmBoxMergeRegressionRunner
     }
 
     private static Card[] Cards() => Object.FindObjectsByType<Card>(FindObjectsSortMode.None);
+
+    private static void CompletePendingDrop(double now)
+    {
+        Card card = _pendingDropCard;
+        var slot = _pendingDropSlot;
+        _pendingDropCard = null;
+        Canvas.ForceUpdateCanvases();
+        card.OnEndDrag(_pendingDropPointer);
+        var target = _levels.CurrentLevel.BoxSlotPlan[_pendingDropTarget];
+        if (!slot.IsOccupied)
+        {
+            if (Targets[slot] != _pendingDropTarget && card.MergeCompleted) return;
+            throw new Exception("Targeted UI drop rejected at " + slot.name + " pos=" + _pendingDropPointer.position
+                + " expected=" + target.boxSize + " actual=" + slot.AcceptedCardValue
+                + " card=" + card.CounterValue + " busy=" + card.IsBusy
+                + " dropArea=" + typeof(CardMergeBoard).GetMethod("IsPointerInsideSpawnDropLayer", PrivateInstance)
+                    .Invoke(_board, new object[] { _pendingDropPointer.position })
+                + " input=" + _game.GameplayInputEnabled + " " + DescribeState());
+        }
+        var group = slot.GetComponentInChildren<MergeBoxParent>();
+        if (group.ColorType != target.intendedColor || group.CounterValue != target.boxSize)
+            throw new Exception("Wrong slot placement");
+        Occupied.Add(slot);
+        _nextAction = now + 0.18;
+    }
 
     private static void TestEdgeCases(double now)
     {
@@ -473,7 +499,7 @@ public static class FarmBoxMergeRegressionRunner
             if (_game.GameplayInputEnabled) throw new Exception("Settings did not lock gameplay");
             var settings = Get<IFarmBoxMergeSettingsService>(panel, "_settings");
             if (Get<FarmBoxMergeToggleView>(panel, "soundToggle").IsOn != (settings.SoundEnabled && settings.MusicEnabled)
-                || Get<FarmBoxMergeToggleView>(panel, "hapticToggle").IsOn != settings.HapticsEnabled) throw new Exception("Saved toggle state mismatch");
+                || Get<FarmBoxMergeToggleView>(panel, "hapticToggle").IsOn != (settings.HapticsEnabled && !FarmBoxMergePlatformPolicy.IsItchEdition)) throw new Exception("Saved toggle state mismatch");
             panel.Close();
             if (!_game.GameplayInputEnabled) throw new Exception("Settings close did not restore input");
             int count = _board.CardCount;
