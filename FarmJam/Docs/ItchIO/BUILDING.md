@@ -13,7 +13,7 @@ Select the Web platform before running these Editor menus:
 
 For automated runtime verification, start this project in a separate Editor process with `-buildTarget WebGL -executeMethod FarmBoxMergeItchIORuntimeChecks.Run`. This entry point exits the Editor after completion and restores the saved level, language and tutorial preferences. Do not invoke it in an Editor with unsaved work. It exports screenshots and a runtime report to the release folder.
 
-All exports go to the OS-resolved Desktop under `FARMJAMBUILD/ItchIO-2026-10-15`. The build refuses to overwrite an existing WebGL directory or ZIP. Archive the previous candidate outside the Unity project before rebuilding. Keep builds, symbols, logs and QA images out of Git.
+All exports go to the OS-resolved Desktop under `FARMJAMBUILD/ItchIO-YYYY-MM-DD`, using the local build date. The build refuses to overwrite an existing WebGL directory or ZIP. Archive the previous candidate outside the Unity project before rebuilding. Keep builds, symbols, logs and QA images out of Git.
 
 ## Local preview and host verification
 

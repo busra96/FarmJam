@@ -21,6 +21,6 @@ public static class FarmBoxMergeObjectUtility
 
     public static T FindSceneComponent<T>() where T : Object
     {
-        return Object.FindFirstObjectByType<T>();
+        return Object.FindFirstObjectByType<T>(FindObjectsInactive.Include);
     }
 }

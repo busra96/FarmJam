@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using Object = UnityEngine.Object;
 
 [DefaultExecutionOrder(-10000)]
 [DisallowMultipleComponent]
@@ -15,10 +18,11 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        if (prefabCatalog == null || settings == null || settings.Localization == null || adsSettings == null || analyticsSettings == null)
+        List<string> missingConfiguration = GetMissingConfiguration();
+        if (missingConfiguration.Count > 0)
         {
-            Debug.LogError("FarmBoxMerge prefab, game, localization, ads, or analytics settings asset is missing.", this);
-            return;
+            throw new InvalidOperationException(
+                "FarmBoxMerge configuration is incomplete: " + string.Join(", ", missingConfiguration));
         }
 
         builder.RegisterInstance(prefabCatalog);
@@ -64,6 +68,17 @@ public sealed class FarmBoxMergeLifetimeScope : LifetimeScope
 
         builder.RegisterEntryPoint<FarmBoxMergeBootstrapper>();
         builder.RegisterEntryPoint<FarmBoxMergeRuntimeTicker>();
+    }
+
+    private List<string> GetMissingConfiguration()
+    {
+        var missing = new List<string>();
+        if (prefabCatalog == null) missing.Add(nameof(prefabCatalog));
+        if (settings == null) missing.Add(nameof(settings));
+        else if (settings.Localization == null) missing.Add(nameof(settings) + ".Localization");
+        if (adsSettings == null) missing.Add(nameof(adsSettings));
+        if (analyticsSettings == null) missing.Add(nameof(analyticsSettings));
+        return missing;
     }
 
     private void RegisterOptionalFeatures(IContainerBuilder builder)

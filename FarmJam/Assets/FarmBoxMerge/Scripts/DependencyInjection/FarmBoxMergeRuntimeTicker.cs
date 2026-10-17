@@ -53,18 +53,22 @@ public sealed class FarmBoxMergeRuntimeTicker : ITickable
 {
     private readonly IFarmBoxMergeOutcomeMonitor _outcomeMonitor;
     private readonly IFarmBoxMergeLayoutController _layoutController;
+    private readonly CardMergeBoard _cardMergeBoard;
 
     public FarmBoxMergeRuntimeTicker(
         IFarmBoxMergeOutcomeMonitor outcomeMonitor,
-        IFarmBoxMergeLayoutController layoutController)
+        IFarmBoxMergeLayoutController layoutController,
+        CardMergeBoard cardMergeBoard)
     {
         _outcomeMonitor = outcomeMonitor;
         _layoutController = layoutController;
+        _cardMergeBoard = cardMergeBoard;
     }
 
     public void Tick()
     {
         _outcomeMonitor.Tick();
         _layoutController.Tick();
+        _cardMergeBoard.TickCardVisuals();
     }
 }

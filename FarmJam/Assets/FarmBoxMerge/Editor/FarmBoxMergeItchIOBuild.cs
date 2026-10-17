@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Globalization;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
@@ -9,6 +10,8 @@ using UnityEngine;
 
 public static class FarmBoxMergeItchIOBuild
 {
+    private static readonly string ReleaseDate = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
     public static string ReleaseRoot
     {
         get
@@ -16,7 +19,7 @@ public static class FarmBoxMergeItchIOBuild
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             if (string.IsNullOrWhiteSpace(desktop) || !Path.IsPathRooted(desktop))
                 throw new InvalidOperationException("The operating system Desktop directory is unavailable.");
-            return Path.Combine(desktop, "FARMJAMBUILD", "ItchIO-2026-10-15");
+            return Path.Combine(desktop, "FARMJAMBUILD", "ItchIO-" + ReleaseDate);
         }
     }
 

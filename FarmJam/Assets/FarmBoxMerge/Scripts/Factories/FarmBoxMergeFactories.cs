@@ -17,53 +17,49 @@ public interface IMergeItemFactory
     MergeItem Create(Transform parent);
 }
 
-public sealed class FarmBoxMergeCardFactory : ICardFactory
+public abstract class FarmBoxMergePrefabFactory<T> where T : Component
 {
     private readonly IObjectResolver _resolver;
-    private readonly FarmBoxMergePrefabCatalog _catalog;
+    private readonly T _prefab;
 
+    protected FarmBoxMergePrefabFactory(IObjectResolver resolver, T prefab)
+    {
+        _resolver = resolver;
+        _prefab = prefab;
+    }
+
+    protected T CreateInstance(Transform parent)
+    {
+        return _prefab != null ? _resolver.Instantiate(_prefab, parent, false) : null;
+    }
+}
+
+public sealed class FarmBoxMergeCardFactory : FarmBoxMergePrefabFactory<Card>, ICardFactory
+{
     public FarmBoxMergeCardFactory(IObjectResolver resolver, FarmBoxMergePrefabCatalog catalog)
+        : base(resolver, catalog.Card)
     {
-        _resolver = resolver;
-        _catalog = catalog;
     }
 
-    public Card Create(Transform parent)
-    {
-        return _catalog.Card != null ? _resolver.Instantiate(_catalog.Card, parent, false) : null;
-    }
+    public Card Create(Transform parent) => CreateInstance(parent);
 }
 
-public sealed class FarmBoxMergeBoxFactory : IBoxFactory
+public sealed class FarmBoxMergeBoxFactory : FarmBoxMergePrefabFactory<Box>, IBoxFactory
 {
-    private readonly IObjectResolver _resolver;
-    private readonly FarmBoxMergePrefabCatalog _catalog;
-
     public FarmBoxMergeBoxFactory(IObjectResolver resolver, FarmBoxMergePrefabCatalog catalog)
+        : base(resolver, catalog.Box)
     {
-        _resolver = resolver;
-        _catalog = catalog;
     }
 
-    public Box Create(Transform parent)
-    {
-        return _catalog.Box != null ? _resolver.Instantiate(_catalog.Box, parent, false) : null;
-    }
+    public Box Create(Transform parent) => CreateInstance(parent);
 }
 
-public sealed class FarmBoxMergeItemFactory : IMergeItemFactory
+public sealed class FarmBoxMergeItemFactory : FarmBoxMergePrefabFactory<MergeItem>, IMergeItemFactory
 {
-    private readonly IObjectResolver _resolver;
-    private readonly FarmBoxMergePrefabCatalog _catalog;
-
     public FarmBoxMergeItemFactory(IObjectResolver resolver, FarmBoxMergePrefabCatalog catalog)
+        : base(resolver, catalog.MergeItem)
     {
-        _resolver = resolver;
-        _catalog = catalog;
     }
 
-    public MergeItem Create(Transform parent)
-    {
-        return _catalog.MergeItem != null ? _resolver.Instantiate(_catalog.MergeItem, parent, false) : null;
-    }
+    public MergeItem Create(Transform parent) => CreateInstance(parent);
 }

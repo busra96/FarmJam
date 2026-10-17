@@ -132,7 +132,7 @@ public class Card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBegi
         }
     }
 
-    private void Update()
+    internal void TickVisuals()
     {
         if (_isDragging)
         {

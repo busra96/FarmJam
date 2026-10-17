@@ -498,6 +498,15 @@ public class CardMergeBoard : MonoBehaviour
         }
     }
 
+    public void TickCardVisuals()
+    {
+        _registeredCards.RemoveWhere(card => card == null);
+        foreach (Card card in _registeredCards)
+        {
+            card.TickVisuals();
+        }
+    }
+
     public int GetCardCapacity(ColorType colorType)
     {
         int capacity = 0;
