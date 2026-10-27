@@ -13,26 +13,32 @@ MonoBehaviour:
   m_Name: Level_022
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000016
-  levelName: 22 - Dolu Tezgah
-  designerNotes: Orta zor. On kart ve bes renk ile kart tahtasini dikkatli yonet.
+  levelName: 22 - Tek Tek
+  designerNotes: Tekli kutu yagmuru - dogru rengi dogru siluete hizla koy.
   itemSequence:
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 4
     count: 1
   - colorType: 3
     count: 1
-  - colorType: 1
-    count: 1
   - colorType: 4
     count: 1
   - colorType: 3
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
+  - colorType: 4
     count: 1
   - colorType: 1
     count: 1
@@ -40,62 +46,56 @@ MonoBehaviour:
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 4
-    count: 1
   - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
     count: 1
   - colorType: 2
     count: 1
   cardSpawnPlan:
-  - colorType: 0
-    count: 4
-  - colorType: 1
-    count: 4
-  - colorType: 2
-    count: 4
-  - colorType: 3
-    count: 4
   - colorType: 4
     count: 4
+  - colorType: 0
+    count: 4
+  - colorType: 3
+    count: 3
+  - colorType: 1
+    count: 3
+  - colorType: 2
+    count: 3
   boxSlotPlan:
+  - intendedColor: 4
+    boxSize: 1
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 1
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 1
+    fourBoxPatternVariant: 0
   - intendedColor: 1
     boxSize: 2
     fourBoxPatternVariant: 0
-  - intendedColor: 3
-    boxSize: 2
+  - intendedColor: 2
+    boxSize: 1
     fourBoxPatternVariant: 0
   - intendedColor: 4
     boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 0
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 1
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 4
-    boxSize: 2
+    boxSize: 1
     fourBoxPatternVariant: 0
   - intendedColor: 3
     boxSize: 2
     fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 1
+    fourBoxPatternVariant: 0
   - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 1
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
     boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000001
   levelName: 01 - Ilk Hasat
-  designerNotes: Egitim. Ayni renkte iki seviye bir kartla temel merge ve kutu olusturma.
+  designerNotes: Egitim. Iki yesil 1 karti birlestir, 2lik kutuya birak.
   itemSequence:
   - colorType: 0
     count: 2

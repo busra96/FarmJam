@@ -13,67 +13,80 @@ MonoBehaviour:
   m_Name: Level_023
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000017
-  levelName: 23 - Uclu Maraton
-  designerNotes: Zor. Uc rengin altisar itemini bloklar arasinda gecis yaparak tamamla.
+  levelName: 23 - Dortlu Labirent
+  designerNotes: Uc farkli 4lu sekil ve araya giren kucuk kutular.
   itemSequence:
-  - colorType: 0
+  - colorType: 3
     count: 1
   - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 2
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
+  - colorType: 3
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
+  - colorType: 3
     count: 1
   - colorType: 2
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
+  - colorType: 3
     count: 1
   - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 2
+    count: 4
   cardSpawnPlan:
+  - colorType: 3
+    count: 12
   - colorType: 0
-    count: 8
+    count: 12
   - colorType: 1
     count: 8
+  - colorType: 4
+    count: 2
   - colorType: 2
-    count: 8
+    count: 4
   boxSlotPlan:
-  - intendedColor: 1
-    boxSize: 3
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 3
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
-    boxSize: 3
-    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 4
+    fourBoxPatternVariant: 3
   - intendedColor: 0
     boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 1
-    boxSize: 3
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 4
+    boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 2
     boxSize: 3
     fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 2
   cardPlanVersion: 1

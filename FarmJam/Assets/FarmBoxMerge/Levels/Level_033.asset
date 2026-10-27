@@ -13,14 +13,12 @@ MonoBehaviour:
   m_Name: Level_033
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000021
-  levelName: 33 - Besli Denge
-  designerNotes: Cok zor. Bes renk esit kapasitede ancak akis surekli yon degistirir.
+  levelName: 33 - Ters Kuyruk
+  designerNotes: Dort 4lu kasa arasinda kuyruk surekli doner; ileriyi planla.
   itemSequence:
-  - colorType: 4
+  - colorType: 1
     count: 1
   - colorType: 0
-    count: 1
-  - colorType: 4
     count: 1
   - colorType: 1
     count: 1
@@ -28,39 +26,19 @@ MonoBehaviour:
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 4
-    count: 1
   - colorType: 0
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 3
+  - colorType: 0
+    count: 1
+  - colorType: 1
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
   - colorType: 3
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
+  - colorType: 4
     count: 1
   - colorType: 3
     count: 1
@@ -68,50 +46,78 @@ MonoBehaviour:
     count: 1
   - colorType: 1
     count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 2
     count: 1
   - colorType: 1
-    count: 3
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
   cardSpawnPlan:
-  - colorType: 0
-    count: 10
   - colorType: 1
-    count: 10
-  - colorType: 2
-    count: 10
+    count: 12
+  - colorType: 0
+    count: 6
+  - colorType: 4
+    count: 12
   - colorType: 3
     count: 10
-  - colorType: 4
+  - colorType: 2
     count: 10
   boxSlotPlan:
   - intendedColor: 1
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 4
-    boxSize: 4
-    fourBoxPatternVariant: 2
-  - intendedColor: 0
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 4
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 3
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
     boxSize: 4
     fourBoxPatternVariant: 3
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 3
+    fourBoxPatternVariant: 0
   - intendedColor: 3
     boxSize: 4
     fourBoxPatternVariant: 0
   - intendedColor: 2
-    boxSize: 4
-    fourBoxPatternVariant: 1
-  - intendedColor: 1
-    boxSize: 4
-    fourBoxPatternVariant: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

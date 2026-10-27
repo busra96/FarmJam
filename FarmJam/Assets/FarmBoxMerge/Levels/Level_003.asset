@@ -14,15 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000003
   levelName: 03 - Uclu Sandik
-  designerNotes: Egitim. Dort seviye bir karttan uclu Tetris kutusu olusturmayi kesfet.
+  designerNotes: 3lu L kutu ve tek kart yerlestirme tanitimi.
   itemSequence:
-  - colorType: 0
+  - colorType: 1
     count: 3
-  cardSpawnPlan:
   - colorType: 0
+    count: 1
+  cardSpawnPlan:
+  - colorType: 1
     count: 4
+  - colorType: 0
+    count: 1
   boxSlotPlan:
-  - intendedColor: 0
+  - intendedColor: 1
     boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 1
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

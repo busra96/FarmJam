@@ -391,6 +391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4425291096783918156}
   - component: {fileID: 7977972393316634556}
+  - component: {fileID: 3364555894881390651}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -448,3 +449,22 @@ MonoBehaviour:
   dragTiltByMovement: 0.12
   mergePopScale: 1.16
   mergePopDuration: 0.18
+--- !u!114 &3364555894881390651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7024641228150106492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f3aa5fff0800fc449d98fb1a313aea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeCardDecor
+  glossSprite: {fileID: 21300000, guid: c9dba72d4ed1e164ca9d4ce772e745ef, type: 3}
+  pipSprite: {fileID: 21300000, guid: 6c7ed148f76cd124a9252d08ea5e2c26, type: 3}
+  glowSprite: {fileID: 21300000, guid: 42cdcbacd383ef746ba1fe9a671f68b3, type: 3}
+  maxGlowColor: {r: 1, g: 0.86, b: 0.32, a: 0.9}
+  glossAlpha: 0.32
+  emptyPipAlpha: 0.28
+  pipSize: 17

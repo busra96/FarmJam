@@ -14,36 +14,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000008
   levelName: 08 - Sira Takibi
-  designerNotes: Kolay. Ayni renk kuyrukta yeniden geldiginde ikinci kutuyu zamaninda
-    ac.
+  designerNotes: Kuyruk karisik akar; uc kutuyu da erken hazirla.
   itemSequence:
   - colorType: 1
     count: 1
-  - colorType: 0
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
     count: 1
   - colorType: 1
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
+  - colorType: 3
     count: 1
   - colorType: 0
-    count: 1
-  - colorType: 1
     count: 1
   cardSpawnPlan:
-  - colorType: 0
-    count: 4
   - colorType: 1
+    count: 5
+  - colorType: 2
     count: 4
+  - colorType: 0
+    count: 2
+  - colorType: 3
+    count: 2
   boxSlotPlan:
   - intendedColor: 1
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
     boxSize: 3
     fourBoxPatternVariant: 0
-  - intendedColor: 1
+  - intendedColor: 2
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
     boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 1
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

@@ -13,47 +13,44 @@ MonoBehaviour:
   m_Name: Level_009
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000009
-  levelName: 09 - Ilk Plan
-  designerNotes: Kolay orta. Gorunen kuyruga bakarak uc rengi dogru slotlara yerlestir.
+  levelName: 09 - Kocaman Dortluler
+  designerNotes: Iki farkli 4lu sekil - L ve T. Uzun birlesme zincirleri.
   itemSequence:
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
   - colorType: 0
     count: 1
   - colorType: 2
     count: 1
   - colorType: 1
     count: 1
+  - colorType: 2
+    count: 1
   - colorType: 0
     count: 1
-  - colorType: 2
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
     count: 1
   - colorType: 1
     count: 1
   cardSpawnPlan:
   - colorType: 0
-    count: 3
-  - colorType: 1
-    count: 4
+    count: 8
   - colorType: 2
+    count: 2
+  - colorType: 1
     count: 8
   boxSlotPlan:
-  - intendedColor: 2
+  - intendedColor: 0
     boxSize: 4
     fourBoxPatternVariant: 1
-  - intendedColor: 1
-    boxSize: 3
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
+  - intendedColor: 2
     boxSize: 2
     fourBoxPatternVariant: 0
-  - intendedColor: 0
-    boxSize: 1
-    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 4
+    fourBoxPatternVariant: 2
   cardPlanVersion: 1

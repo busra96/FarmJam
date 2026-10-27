@@ -13,9 +13,25 @@ MonoBehaviour:
   m_Name: Level_024
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000018
-  levelName: 24 - Dortlu Maraton
-  designerNotes: Zor. Dort rengin beser itemi icin ikili ve uclu kutulari planla.
+  levelName: 24 - Renk Firtinasi
+  designerNotes: Bes renk surekli doner; 2 ve 3 siluetleri karismasin.
   itemSequence:
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
   - colorType: 1
     count: 1
   - colorType: 0
@@ -24,51 +40,51 @@ MonoBehaviour:
     count: 1
   - colorType: 3
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
   - colorType: 2
     count: 1
   - colorType: 3
     count: 1
   - colorType: 2
     count: 1
-  - colorType: 0
+  - colorType: 4
     count: 1
-  - colorType: 2
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 3
     count: 1
   - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 2
+    count: 3
   cardSpawnPlan:
-  - colorType: 0
+  - colorType: 2
+    count: 6
+  - colorType: 4
     count: 6
   - colorType: 1
     count: 6
-  - colorType: 2
+  - colorType: 0
     count: 6
   - colorType: 3
     count: 6
   boxSlotPlan:
-  - intendedColor: 0
+  - intendedColor: 2
     boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 1
     boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 3
     boxSize: 3
@@ -76,13 +92,13 @@ MonoBehaviour:
   - intendedColor: 2
     boxSize: 2
     fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 3
+    fourBoxPatternVariant: 0
   - intendedColor: 1
     boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 0
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
     boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 3

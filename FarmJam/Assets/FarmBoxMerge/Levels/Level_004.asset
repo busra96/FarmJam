@@ -13,29 +13,23 @@ MonoBehaviour:
   m_Name: Level_004
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000004
-  levelName: 04 - Renk Degisimi
-  designerNotes: Kolay. Ikili merge ile hazir uclu karti dogru item sirasinda kullan.
+  levelName: 04 - Dev Kasa
+  designerNotes: Ilk 4lu kare kasa - sekiz karti zincirle birlestir.
   itemSequence:
-  - colorType: 1
-    count: 1
   - colorType: 0
-    count: 1
+    count: 4
   - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
+    count: 2
   cardSpawnPlan:
   - colorType: 0
-    count: 2
+    count: 8
   - colorType: 1
-    count: 4
+    count: 2
   boxSlotPlan:
   - intendedColor: 0
-    boxSize: 2
+    boxSize: 4
     fourBoxPatternVariant: 0
   - intendedColor: 1
-    boxSize: 3
+    boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

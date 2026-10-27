@@ -13,79 +13,44 @@ MonoBehaviour:
   m_Name: Level_031
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001f
-  levelName: 31 - Usta Uclu
-  designerNotes: Cok zor. Uc rengin sekizer itemini parcali dortlu kutularla yonet.
+  levelName: 31 - Ikinci Bahar
+  designerNotes: Nefes/vitrin - bes dev kasa arka arkaya.
   itemSequence:
-  - colorType: 1
-    count: 1
   - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
+    count: 4
   - colorType: 1
-    count: 1
+    count: 4
   - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 2
+    count: 4
+  - colorType: 3
+    count: 4
+  - colorType: 4
+    count: 4
   cardSpawnPlan:
   - colorType: 0
-    count: 16
+    count: 8
   - colorType: 1
-    count: 16
+    count: 8
   - colorType: 2
-    count: 16
+    count: 8
+  - colorType: 3
+    count: 8
+  - colorType: 4
+    count: 8
   boxSlotPlan:
   - intendedColor: 0
     boxSize: 4
-    fourBoxPatternVariant: 3
-  - intendedColor: 1
-    boxSize: 4
     fourBoxPatternVariant: 0
-  - intendedColor: 2
+  - intendedColor: 1
     boxSize: 4
     fourBoxPatternVariant: 1
-  - intendedColor: 1
-    boxSize: 4
-    fourBoxPatternVariant: 2
   - intendedColor: 2
     boxSize: 4
+    fourBoxPatternVariant: 2
+  - intendedColor: 3
+    boxSize: 4
     fourBoxPatternVariant: 3
-  - intendedColor: 0
+  - intendedColor: 4
     boxSize: 4
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

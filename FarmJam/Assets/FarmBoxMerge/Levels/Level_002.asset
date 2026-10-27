@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Level_002
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000002
-  levelName: 02 - Iki Renk
-  designerNotes: Egitim. Yesil ve turuncu kartlari ayirarak iki temel merge yap.
+  levelName: 02 - Iki Sepet
+  designerNotes: Ikinci renk. Iki ayri 2lik kutu, siralar karisik gelir.
   itemSequence:
   - colorType: 0
     count: 1

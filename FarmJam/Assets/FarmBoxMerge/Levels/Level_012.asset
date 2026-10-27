@@ -13,24 +13,10 @@ MonoBehaviour:
   m_Name: Level_012
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000c
-  levelName: 12 - Hizli Degisim
-  designerNotes: Orta. Dort renk surekli degisir; ilk uc kutu secimi onemlidir.
+  levelName: 12 - Cifte Ucler
+  designerNotes: Ayni boyutlu uc siluet - hangi rengin nereye gidecegini kuyruktan oku.
   itemSequence:
-  - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
   - colorType: 3
-    count: 1
-  - colorType: 1
     count: 1
   - colorType: 2
     count: 1
@@ -40,26 +26,52 @@ MonoBehaviour:
     count: 1
   - colorType: 3
     count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 3
+    count: 2
   cardSpawnPlan:
+  - colorType: 2
+    count: 6
+  - colorType: 3
+    count: 6
   - colorType: 0
     count: 4
   - colorType: 1
-    count: 4
-  - colorType: 2
-    count: 4
-  - colorType: 3
     count: 4
   boxSlotPlan:
-  - intendedColor: 1
+  - intendedColor: 2
     boxSize: 3
     fourBoxPatternVariant: 0
-  - intendedColor: 2
+  - intendedColor: 3
     boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 0
     boxSize: 3
     fourBoxPatternVariant: 0
-  - intendedColor: 3
+  - intendedColor: 1
     boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

@@ -13,50 +13,42 @@ MonoBehaviour:
   m_Name: Level_010
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000a
-  levelName: 10 - Renk Senligi
-  designerNotes: Kolay orta. Bes rengin ilk tanitimi ve kart tahtasi yonetimi.
+  levelName: 10 - Gokkusagi
+  designerNotes: Vitrin bolumu - bes renk birden, sari tanitimi.
   itemSequence:
   - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
+    count: 2
   - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
+    count: 3
   - colorType: 1
-    count: 1
+    count: 2
+  - colorType: 2
+    count: 3
   - colorType: 0
     count: 2
   cardSpawnPlan:
-  - colorType: 0
-    count: 2
-  - colorType: 1
-    count: 2
-  - colorType: 2
-    count: 2
   - colorType: 3
     count: 2
   - colorType: 4
+    count: 4
+  - colorType: 1
+    count: 2
+  - colorType: 2
+    count: 4
+  - colorType: 0
     count: 2
   boxSlotPlan:
   - intendedColor: 3
     boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 4
-    boxSize: 2
+    boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 1
     boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 2
-    boxSize: 2
+    boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 0
     boxSize: 2

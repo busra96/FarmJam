@@ -13,95 +13,88 @@ MonoBehaviour:
   m_Name: Level_025
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000019
-  levelName: 25 - Buyuk Pazar
-  designerNotes: Zor. Bes renk, yirmi bes item ve on kartlik dengeli pazar sinavi.
+  levelName: 25 - Hasat Bayrami
+  designerNotes: Vitrin - bes dev kasa ve final iki kucuk kutu.
   itemSequence:
+  - colorType: 4
+    count: 1
   - colorType: 0
     count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
   - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
     count: 1
   - colorType: 0
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 4
     count: 1
   - colorType: 2
     count: 1
   - colorType: 0
-    count: 3
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 2
+    count: 1
   cardSpawnPlan:
-  - colorType: 0
-    count: 9
-  - colorType: 1
-    count: 9
-  - colorType: 2
-    count: 9
-  - colorType: 3
-    count: 9
   - colorType: 4
-    count: 9
+    count: 10
+  - colorType: 0
+    count: 10
+  - colorType: 1
+    count: 8
+  - colorType: 3
+    count: 8
+  - colorType: 2
+    count: 8
   boxSlotPlan:
-  - intendedColor: 0
-    boxSize: 1
-    fourBoxPatternVariant: 0
-  - intendedColor: 3
-    boxSize: 1
-    fourBoxPatternVariant: 0
-  - intendedColor: 1
-    boxSize: 1
-    fourBoxPatternVariant: 0
   - intendedColor: 4
     boxSize: 4
     fourBoxPatternVariant: 0
-  - intendedColor: 3
-    boxSize: 4
-    fourBoxPatternVariant: 1
-  - intendedColor: 2
-    boxSize: 1
-    fourBoxPatternVariant: 0
-  - intendedColor: 1
-    boxSize: 4
-    fourBoxPatternVariant: 3
-  - intendedColor: 4
-    boxSize: 1
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 4
-    fourBoxPatternVariant: 1
   - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 1
     boxSize: 4
     fourBoxPatternVariant: 2
+  - intendedColor: 3
+    boxSize: 4
+    fourBoxPatternVariant: 3
+  - intendedColor: 2
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

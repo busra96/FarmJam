@@ -13,104 +13,64 @@ MonoBehaviour:
   m_Name: Level_029
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001d
-  levelName: 29 - Sik Renk Degisimi
-  designerNotes: Cok zor. Yedi yesil ve diger renklerde beser item ile hizli slot
-    rotasyonu.
+  levelName: 29 - Sabir Testi
+  designerNotes: Buyuk kasalar tek tek dolar; tahtayi tikama, siradakini onceden hazirla.
   itemSequence:
-  - colorType: 3
-    count: 1
   - colorType: 2
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 2
-    count: 1
+    count: 4
+  - colorType: 1
+    count: 3
   - colorType: 0
-    count: 1
+    count: 4
   - colorType: 3
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
+    count: 3
   - colorType: 4
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 1
+    count: 4
   - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
+    count: 2
   - colorType: 1
-    count: 1
+    count: 2
+  - colorType: 0
+    count: 3
   - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 2
-    count: 1
+    count: 2
   cardSpawnPlan:
+  - colorType: 2
+    count: 10
+  - colorType: 1
+    count: 6
   - colorType: 0
     count: 12
-  - colorType: 1
-    count: 6
-  - colorType: 2
-    count: 6
   - colorType: 3
     count: 6
   - colorType: 4
-    count: 6
+    count: 8
   boxSlotPlan:
   - intendedColor: 2
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 4
-    boxSize: 3
-    fourBoxPatternVariant: 0
-  - intendedColor: 3
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
-    boxSize: 3
-    fourBoxPatternVariant: 0
+    boxSize: 4
+    fourBoxPatternVariant: 1
   - intendedColor: 1
     boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 0
     boxSize: 4
     fourBoxPatternVariant: 2
-  - intendedColor: 4
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 3
-    fourBoxPatternVariant: 0
   - intendedColor: 3
     boxSize: 3
     fourBoxPatternVariant: 0
+  - intendedColor: 4
+    boxSize: 4
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
   - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
     boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

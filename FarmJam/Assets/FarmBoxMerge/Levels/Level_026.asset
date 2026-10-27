@@ -13,28 +13,24 @@ MonoBehaviour:
   m_Name: Level_026
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000001a
-  levelName: 26 - Yesil Dalga
-  designerNotes: Zor. Sekiz yesil item arasinda diger dort rengi bloke etmeden ilerle.
+  levelName: 26 - Sakin Tarla
+  designerNotes: Nefes bolumu. Uc renk, duzenli akis.
   itemSequence:
-  - colorType: 3
+  - colorType: 1
     count: 1
   - colorType: 0
     count: 1
   - colorType: 1
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 3
     count: 1
   - colorType: 0
     count: 1
   - colorType: 2
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 2
+    count: 1
+  - colorType: 0
     count: 1
   - colorType: 1
     count: 1
@@ -48,48 +44,37 @@ MonoBehaviour:
     count: 1
   - colorType: 0
     count: 1
+  - colorType: 1
+    count: 1
   - colorType: 2
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 4
-    count: 2
   cardSpawnPlan:
-  - colorType: 0
-    count: 16
   - colorType: 1
-    count: 8
+    count: 7
+  - colorType: 0
+    count: 6
   - colorType: 2
-    count: 8
-  - colorType: 3
-    count: 8
-  - colorType: 4
-    count: 8
+    count: 6
   boxSlotPlan:
-  - intendedColor: 3
-    boxSize: 4
-    fourBoxPatternVariant: 2
   - intendedColor: 1
-    boxSize: 4
-    fourBoxPatternVariant: 3
+    boxSize: 3
+    fourBoxPatternVariant: 0
   - intendedColor: 0
-    boxSize: 4
+    boxSize: 3
     fourBoxPatternVariant: 0
   - intendedColor: 2
-    boxSize: 4
-    fourBoxPatternVariant: 1
-  - intendedColor: 4
-    boxSize: 4
-    fourBoxPatternVariant: 2
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 2
+    fourBoxPatternVariant: 0
   - intendedColor: 0
-    boxSize: 4
-    fourBoxPatternVariant: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 2
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 1
+    boxSize: 1
+    fourBoxPatternVariant: 0
   cardPlanVersion: 1

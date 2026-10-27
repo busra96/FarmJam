@@ -13,20 +13,12 @@ MonoBehaviour:
   m_Name: Level_016
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000010
-  levelName: 16 - Tam Tur
-  designerNotes: Orta. Bes rengin uc tam dongusunde slotlari kuyruga gore yenile.
+  levelName: 16 - Pazar Sabahi
+  designerNotes: Nefes bolumu. Kisa ve akici.
   itemSequence:
   - colorType: 3
     count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 3
-    count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
+  - colorType: 2
     count: 1
   - colorType: 3
     count: 1
@@ -36,41 +28,34 @@ MonoBehaviour:
     count: 1
   - colorType: 4
     count: 1
-  - colorType: 1
-    count: 1
-  - colorType: 2
+  - colorType: 0
     count: 1
   - colorType: 4
     count: 1
   - colorType: 2
     count: 1
   - colorType: 4
-    count: 1
+    count: 2
   cardSpawnPlan:
-  - colorType: 0
-    count: 4
-  - colorType: 1
-    count: 4
+  - colorType: 4
+    count: 8
   - colorType: 2
     count: 4
   - colorType: 3
-    count: 4
-  - colorType: 4
-    count: 4
+    count: 2
+  - colorType: 0
+    count: 2
   boxSlotPlan:
-  - intendedColor: 3
-    boxSize: 3
-    fourBoxPatternVariant: 0
-  - intendedColor: 1
-    boxSize: 3
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
-    boxSize: 3
-    fourBoxPatternVariant: 0
   - intendedColor: 4
-    boxSize: 3
+    boxSize: 4
     fourBoxPatternVariant: 0
   - intendedColor: 2
     boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 3
+    boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

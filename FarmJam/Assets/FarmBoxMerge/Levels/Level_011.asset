@@ -13,57 +13,56 @@ MonoBehaviour:
   m_Name: Level_011
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 0000000000000000000000000000000b
-  levelName: 11 - Uclu Dongu
-  designerNotes: Orta. Uc renk ikinci kez donmeden once bos slot yarat.
+  levelName: 11 - Limon Bahcesi
+  designerNotes: Nefes bolumu. 3luk kutularla duzenli hasat.
   itemSequence:
-  - colorType: 0
-    count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
+  - colorType: 4
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 2
+  - colorType: 4
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 1
+  - colorType: 4
     count: 1
   - colorType: 0
     count: 1
   - colorType: 1
     count: 1
-  - colorType: 2
+  - colorType: 4
     count: 1
   - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 0
     count: 1
   cardSpawnPlan:
+  - colorType: 4
+    count: 6
   - colorType: 0
-    count: 4
+    count: 6
   - colorType: 1
     count: 4
-  - colorType: 2
-    count: 4
   boxSlotPlan:
+  - intendedColor: 4
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 3
+    fourBoxPatternVariant: 0
   - intendedColor: 1
+    boxSize: 3
+    fourBoxPatternVariant: 0
+  - intendedColor: 4
     boxSize: 2
     fourBoxPatternVariant: 0
   - intendedColor: 0
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 2
-    boxSize: 2
-    fourBoxPatternVariant: 0
-  - intendedColor: 1
     boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1

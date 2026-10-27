@@ -13,57 +13,65 @@ MonoBehaviour:
   m_Name: Level_017
   m_EditorClassIdentifier: Assembly-CSharp::FarmBoxMergeLevelDefinition
   levelId: 00000000000000000000000000000011
-  levelName: 17 - Cifte Sandik
-  designerNotes: Orta. Yesil icin iki ayri ikili kutu gerekir; diger renkleri erken
-    kilitleme.
+  levelName: 17 - Karisik Tezgah
+  designerNotes: Tum boyutlar ayni bolumde.
   itemSequence:
   - colorType: 3
     count: 1
-  - colorType: 2
-    count: 1
-  - colorType: 3
-    count: 1
   - colorType: 0
     count: 1
   - colorType: 3
     count: 1
+  - colorType: 1
+    count: 1
   - colorType: 0
+    count: 1
+  - colorType: 3
+    count: 1
+  - colorType: 1
+    count: 1
+  - colorType: 4
+    count: 1
+  - colorType: 0
+    count: 1
+  - colorType: 3
     count: 1
   - colorType: 2
     count: 1
   - colorType: 0
     count: 1
-  - colorType: 1
+  - colorType: 3
     count: 1
   - colorType: 2
-    count: 1
-  - colorType: 0
-    count: 1
-  - colorType: 1
-    count: 3
+    count: 2
   cardSpawnPlan:
-  - colorType: 0
-    count: 4
-  - colorType: 1
-    count: 8
-  - colorType: 2
-    count: 4
   - colorType: 3
+    count: 6
+  - colorType: 1
+    count: 2
+  - colorType: 0
+    count: 8
+  - colorType: 4
+    count: 1
+  - colorType: 2
     count: 4
   boxSlotPlan:
   - intendedColor: 3
     boxSize: 3
     fourBoxPatternVariant: 0
-  - intendedColor: 0
+  - intendedColor: 1
     boxSize: 2
+    fourBoxPatternVariant: 0
+  - intendedColor: 0
+    boxSize: 4
+    fourBoxPatternVariant: 1
+  - intendedColor: 4
+    boxSize: 1
     fourBoxPatternVariant: 0
   - intendedColor: 2
     boxSize: 3
     fourBoxPatternVariant: 0
-  - intendedColor: 1
-    boxSize: 4
-    fourBoxPatternVariant: 0
-  - intendedColor: 0
+  - intendedColor: 3
     boxSize: 2
     fourBoxPatternVariant: 0
   cardPlanVersion: 1
